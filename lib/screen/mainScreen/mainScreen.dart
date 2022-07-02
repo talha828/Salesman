@@ -1,3 +1,6 @@
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +8,17 @@ import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:location/location.dart' as loc;
+import 'package:http/http.dart'as http;
+import 'package:salesmen_app_new/screen/AddCustomer/add_customer_screen.dart';
+import 'package:salesmen_app_new/screen/BankAccountScreen/bank_account_screen.dart';
+import 'package:salesmen_app_new/screen/History_Screen/history_screen.dart';
+import 'package:salesmen_app_new/screen/agingReport/aging_card.dart';
+
+import 'package:salesmen_app_new/screen/assignShopScreen/AssignShopScreen.dart';
+import 'package:salesmen_app_new/screen/customer_screen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
+import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class MainScreen extends StatefulWidget {
 
   @override
@@ -14,23 +28,41 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   bool _serviceEnabled = false;
   var actualAddress = "Searching....";
-  late Coordinates userLatLng;
-  void onStart()async{
-    loc.Location location = new loc.Location();
-    var _location = await location.getLocation();
-      _serviceEnabled = true;
-      actualAddress = "Searching....";
-    userLatLng =Coordinates(_location.latitude, _location.longitude);
-    print("userLatLng: " + userLatLng.toString());
-    var addresses = await Geocoder.local.findAddressesFromCoordinates(userLatLng);
-    actualAddress = addresses.first.subLocality.toString();
-    print(actualAddress);
-    setState(() {});
+   Coordinates userLatLng;
+  getAddressFromLatLng(context, double lat, double lng) async {
+    String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+    String _host = 'https://maps.google.com/maps/api/geocode/json';
+    final url = '$_host?key=$mapApiKey&language=en&latlng=$lat,$lng';
+    if(lat != null && lng != null){
+      var response = await http.get(Uri.parse(url));
+      if(response.statusCode == 200) {
+        Map data = jsonDecode(response.body);
+        String _formattedAddress = data["results"][0]["formatted_address"];
+        print("response ==== $_formattedAddress");
+        return _formattedAddress;
+      } else return null;
+    } else return null;
   }
+  // void onStart()async{
+  //
+  //
+  //
+  //   loc.Location location = new loc.Location();
+  //   var _location = await location.getLocation();
+  //     _serviceEnabled = true;
+  //     actualAddress = "Searching....";
+  //   userLatLng =Coordinates(_location.latitude, _location.longitude);
+  //   print("userLatLng: " + userLatLng.toString());
+  //   var addresses = await Geocoder.local.findAddressesFromCoordinates(userLatLng);
+  //   actualAddress = addresses.first.subLocality.toString();
+  //   print(actualAddress);
+  //   setState(() {});
+  // }
+
   
   @override
   void initState() {
-    onStart();
+    //onStart();
     super.initState();
   }
   
@@ -41,23 +73,25 @@ class _MainScreenState extends State<MainScreen> {
     double height = media.height;
     double width = media.width;
     return DefaultTabController(
-      length: 4,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
+          elevation: 0.0,
           title: Center(child: Text("DashBoard",style: TextStyle(color: Colors.white),)),
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-              child: Center(
-                child: VariableText(
-                  text: actualAddress,
-                  fontsize: 15,
-                  fontcolor: Colors.white,
-                  fontFamily: fontRegular,
-                  weight: FontWeight.w300,
-                ),
-              ),
-            ),
+            SizedBox(width: 15,),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 15),
+            //   child: Center(
+            //     child: VariableText(
+            //       text: actualAddress,
+            //       fontsize: 15,
+            //       fontcolor: Colors.white,
+            //       fontFamily: fontRegular,
+            //       weight: FontWeight.w300,
+            //     ),
+            //   ),
+            // ),
           ],
           bottom: TabBar(
             indicatorColor: Colors.white,
@@ -67,6 +101,8 @@ class _MainScreenState extends State<MainScreen> {
                 child: Row(
                   children: [
                     Image.asset("assets/tabviewicon/all.png",color: Colors.white,width: 24,height: 24,),
+                    SizedBox(width: 10,),
+                    Text("All Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
                   ],
                 ),
               ),
@@ -75,25 +111,27 @@ class _MainScreenState extends State<MainScreen> {
                 child: Row(
                   children: [
                     Image.asset("assets/tabviewicon/user.png",color: Colors.white,width: 24,height: 24,),
+                    SizedBox(width: 10,),
+                    Text("Assign Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Image.asset("assets/icons/delivery.png",color: Colors.white,width: 24,height: 24,),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Image.asset("assets/icons/alliedmcb.png",color: Colors.white,width: 24,height: 24,),
-                  ],
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Row(
+              //     children: [
+              //       Image.asset("assets/icons/delivery.png",color: Colors.white,width: 24,height: 24,),
+              //     ],
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Row(
+              //     children: [
+              //       Image.asset("assets/icons/alliedmcb.png",color: Colors.white,width: 24,height: 24,),
+              //     ],
+              //   ),
+              // ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: Image.asset("assets/tabviewicon/dues.png"),
@@ -127,7 +165,7 @@ class _MainScreenState extends State<MainScreen> {
                             height: height * 0.01,
                           ),
                           VariableText(
-                            text: userData.firstName+ userData.lastName,
+                            text: "talha ",
                             fontsize: 16,
                             fontcolor: textcolorblack,
                             fontFamily: fontMedium,
@@ -137,7 +175,7 @@ class _MainScreenState extends State<MainScreen> {
                             height: height * 0.0055,
                           ),
                           VariableText(
-                            text:userData.email,
+                            text: "talhaiqbal246@gmail.com",
                             fontsize: 12,
                             fontcolor: textcolorgrey,
                             fontFamily: fontRegular,
@@ -148,8 +186,8 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                           VariableText(
                             text: "Limit: " +
-                                "20,000" +
-                                ' / ' +"40,000",
+                                "1000" + ' / ' +
+                                "2000",
                             fontsize: 12,
                             fontcolor: textcolorgrey,
                             fontFamily: fontRegular,
@@ -164,6 +202,82 @@ class _MainScreenState extends State<MainScreen> {
                   selected: true,
                   onTap: () {
                     Navigator.of(context).pop();
+                  },
+                ),
+                DrawerList(
+                  text: 'Add Customer',
+                  imageSource: "assets/icons/addcustomer.png",
+                  selected: false,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,MaterialPageRoute(builder: (context)=>AddCustomerScreen()));
+                  },
+                ),
+                DrawerList(
+                  text: 'Reports',
+                  imageSource: "assets/icons/ledger.png",
+                  selected: false,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,MaterialPageRoute(builder: (context)=>LedgerScreen()));
+                  },
+                ),
+                DrawerList(
+                    text: 'Customer Ordes',
+                    imageSource: "assets/icons/totalitem.png",
+                    selected: false,
+                    onTap: () {
+                      // Navigator.of(context).pop();
+                      // Navigator.push(context,
+                      //     NoAnimationRoute(widget: ShowDeliveryScreen()));
+                    }),
+                DrawerList(
+                    text: 'AGING',
+                    imageSource: "assets/icons/aging.png",
+                    selected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>AgingScreen()));
+                    }),
+                DrawerList(
+                    text: 'Bank Account',
+                    imageSource: "assets/icons/bankaccount.png",
+                    selected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>BankAccountScreen(
+
+                      )));
+                    }),
+                DrawerList(
+                  text: 'History',
+                  imageSource: "assets/icons/history.png",
+                  selected: false,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,MaterialPageRoute(builder: (context)=>HistoryScreen(
+
+                    )));
+                  },
+                ),
+                DrawerList(
+                  text: 'Logout',
+                  imageSource: "assets/icons/logout.png",
+                  selected: false,
+                  onTap: () async {
+                    SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                    prefs.remove('phoneno');
+                    prefs.remove('password');
+                    Navigator.push(
+                        context,MaterialPageRoute(builder: (context)=>VerifyPhoneNoScreen(
+
+                    )));
                   },
                 ),
                 Spacer(),
@@ -186,11 +300,8 @@ class _MainScreenState extends State<MainScreen> {
         ),
         body: TabBarView(
           children: [
-            One(text: "one"),
-            One(text:"Two"),
-            One(text: "Three"),
-            One(text: "Four"),
-
+            CustomerScreen(),
+            AssignShopScreen(),
           ],
         ),
       ),
@@ -199,11 +310,11 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class One extends StatelessWidget {
-  One({required this.text});
+  One({ this.text});
   String text;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text(text),),);
+    return Scaffold(body:Placeholder());
   }
 }
 

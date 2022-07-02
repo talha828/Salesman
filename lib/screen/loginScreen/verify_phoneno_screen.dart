@@ -39,7 +39,7 @@ class _VerifyPhoneNoScreenState extends State<VerifyPhoneNoScreen> {
 
   TextEditingController _numController=new TextEditingController();
   List<String> phoneCodes = ['+1', '+92'];
-  late String selectedCode;
+   String selectedCode;
 
   @override
   void initState() {

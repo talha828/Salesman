@@ -11,8 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app_new/api/Auth/auth.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/screen/ForgetPasswordScreen/verify_phone_no_screen.dart';
-import 'package:salesmen_app_new/screen/login_screen/verificationcodescreen.dart';
+import 'package:salesmen_app_new/screen/loginScreen/verificationcodescreen.dart';
 
 import '../../others/common.dart';
 import '../../others/style.dart';
@@ -58,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   getLogin(context)async{
     setLoading(true);
-    var response=await Auth.getLogin(phoneNo:"921234567890", password:_passController.text,onSuccess: (response)async{
+    var response=await Auth.getLogin(phoneNo:"+921234567890", password:_passController.text,onSuccess: (response)async{
       print("status ${response.statusCode}");
       if(response.statusCode==200){
         var data=jsonDecode(response.toString());
@@ -348,11 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 backgroundColor: themeColor1,
                 onPressed: () =>getLogin(context),
-                )),isLoading ? Container(
-            width: width,
-            height: height,
-            color: Colors.white.withOpacity(0.5),
-            child: LoadingAnimationWidget.threeArchedCircle(color: themeColor1, size: 70)) : Container(),
+                )),isLoading ? LoadingIndicator(width: width, height: height) : Container(),
       ],
     );
   }
@@ -366,3 +363,4 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 }
+

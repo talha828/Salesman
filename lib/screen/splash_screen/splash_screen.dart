@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:salesmen_app_new/screen/loginScreen/login_screen.dart';
+import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -6,7 +10,13 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
+  @override
+  void initState() {
+    Timer(Duration(seconds: 5),(){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>VerifyPhoneNoScreen()));
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

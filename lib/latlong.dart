@@ -1,6 +1,6 @@
 
 class LatLong{
-  late double? latitude;
-  late double? longitude;
+   double latitude;
+   double longitude;
   LatLong( this.latitude, this.longitude);
 }

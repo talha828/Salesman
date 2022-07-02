@@ -25,7 +25,7 @@ class _ForgetPasswordVerificationCodeScreenState extends State<ForgetPasswordVer
 
   bool hasError = false;
   String currentText = "";
-  late String otpCode;
+   String otpCode;
   bool isLoading=false;
 
   @override
@@ -134,7 +134,7 @@ class _ForgetPasswordVerificationCodeScreenState extends State<ForgetPasswordVer
     try{
       AuthCredential credential=PhoneAuthProvider.credential(verificationId: widget.verificationCode.toString(), smsCode: otpCode);
       UserCredential result=await _auth.signInWithCredential(credential);
-      User? user=result.user;  
+      User user=result.user;
       if(user!=null){
        setLoading(false);
         SharedPreferences prefs = await SharedPreferences.getInstance();

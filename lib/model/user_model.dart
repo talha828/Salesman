@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 
 class UserModel extends ChangeNotifier{
-   late String success;
-   late String message;
-   late String id;
-   late String firstName;
-   late String lastName;
-   late String email;
-   late String phone;
-   late String image;
-   late String isActive;
-   late String dateOfBirth;
-   late String createdAt;
-   late String updateAt;
-   late String token;
+    String success;
+    String message;
+    String id;
+    String firstName;
+    String lastName;
+    String email;
+    String phone;
+    String image;
+    String isActive;
+    String dateOfBirth;
+    String createdAt;
+    String updateAt;
+    String token;
 
    fetchData(Map<String, dynamic> json){
     success=json['success'].toString();

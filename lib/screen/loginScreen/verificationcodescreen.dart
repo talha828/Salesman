@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
-import 'package:salesmen_app_new/screen/login_screen/sucessfully_verified_screen.dart';
+import 'package:salesmen_app_new/screen/loginScreen/sucessfully_verified_screen.dart';
 import '../../others/common.dart';
 import '../../others/style.dart';
 
@@ -25,7 +25,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
   TextEditingController textEditingController1 = new TextEditingController();
   bool hasError = false;
   String currentText = "";
-  late String otpCode;
+   String otpCode;
   bool isLoading=false;
   @override
   void initState() {

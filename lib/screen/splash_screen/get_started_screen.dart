@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:salesmen_app_new/others/style.dart';
-import 'package:salesmen_app_new/screen/login_screen/verify_phoneno_screen.dart';
+import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
+
 
 class GetStartedScreen extends StatefulWidget {
 
