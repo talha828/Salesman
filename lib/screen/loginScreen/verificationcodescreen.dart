@@ -2,10 +2,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/screen/loginScreen/sucessfully_verified_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../others/common.dart';
 import '../../others/style.dart';
 
@@ -107,11 +110,10 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                     setState(() {
                       otpCode = value;
                     });
-                    // var _credential = PhoneAuthProvider.credential(verificationId: widget.verificationCode, smsCode: otpCode.toString());
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SucessFullyVerifiedScreen()));
+                     //var _credential = PhoneAuthProvider.credential(verificationId: widget.verificationCode, smsCode: otpCode.toString());
                     print("Completed");
 
-                    // verifyOtp();
+                     verifyOtp();
                   },
                   onChanged: (value) {
                     setState(() {
@@ -167,7 +169,9 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                 }
                   )*/
         ),
-        isLoading ? Positioned.fill(child: CircularProgressIndicator()) : Container(),
+        isLoading ? Container(
+            alignment: Alignment.center,
+            child: Positioned.fill(child: CircularProgressIndicator())) : Container(),
       ],
     );
   }
@@ -176,54 +180,54 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       isLoading = loading;
     });
   }
-  // void verifyOtp() async{
-  //   setLoading(true);
-  //   FirebaseAuth _auth=FirebaseAuth.instance;
-  //   try{
-  //     AuthCredential credential=PhoneAuthProvider.credential(verificationId: widget.verificationCode.toString(), smsCode: otpCode);
-  //     UserCredential result=await _auth.signInWithCredential(credential);
-  //     User? user=result.user;
-  //     if(user!=null){
-  //       setLoading(false);
-  //       SharedPreferences prefs = await SharedPreferences.getInstance();
-  //       prefs.setString('phoneno', widget.phoneNo.toString());
-  //       prefs.setString('password',widget.password.toString());
-  //       phoneNumber = prefs.getString('phoneno')!;
-  //       password = prefs.getString('password')!;
-  //       Fluttertoast.showToast(
-  //           msg: "Successfully Logged in",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //       Navigator.push(
-  //           context, MaterialPageRoute(builder: (context)=>SucessFullyVerifiedScreen()));
-  //     }
-  //     else{
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "Invalid OTP , Try again later",
-  //           toastLength: Toast.LENGTH_LONG,
-  //           gravity:  ToastGravity.BOTTOM,
-  //           timeInSecForIosWeb: 3,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //
-  //     }
-  //
-  //   }
-  //   catch(e){
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //         msg: "Invalid OTP , Try again later",
-  //         toastLength: Toast.LENGTH_LONG,
-  //         gravity: ToastGravity.BOTTOM,
-  //         timeInSecForIosWeb: 3,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //     print("exceptxc;ion is"+e.toString());
-  //   }
-  // }
+  void verifyOtp() async{
+    setLoading(true);
+    FirebaseAuth _auth=FirebaseAuth.instance;
+    try{
+      AuthCredential credential=PhoneAuthProvider.credential(verificationId: widget.verificationCode.toString(), smsCode: otpCode);
+      UserCredential result=await _auth.signInWithCredential(credential);
+      User user=result.user;
+      if(user!=null){
+        setLoading(false);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('phoneno', widget.phoneNo.toString());
+        prefs.setString('password',widget.password.toString());
+        phoneNumber = prefs.getString('phoneno');
+        password = prefs.getString('password');
+        Fluttertoast.showToast(
+            msg: "Successfully Logged in",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context)=>SucessFullyVerifiedScreen()));
+      }
+      else{
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "Invalid OTP , Try again later",
+            toastLength: Toast.LENGTH_LONG,
+            gravity:  ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+      }
+
+    }
+    catch(e){
+      setLoading(false);
+      Fluttertoast.showToast(
+          msg: "Invalid OTP , Try again later",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      print("exceptxc;ion is"+e.toString());
+    }
+  }
 }

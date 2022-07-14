@@ -1,17 +1,28 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/model.dart';
 import 'package:http/http.dart'as http;
+import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
-import 'package:salesmen_app_new/model/customer_model.dart';
+import 'package:salesmen_app_new/model/addressModel.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/screen/customer_screen/customer_screen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'dart:math' show cos, sqrt, asin;
+
+import 'package:shimmer/shimmer.dart';
 class AssignShopScreen extends StatefulWidget {
+  List<CustomerModel> customer;
+  AssignShopScreen({this.customer});
+
 
   @override
   State<AssignShopScreen> createState() => _AssignShopScreenState();
@@ -20,6 +31,7 @@ class AssignShopScreen extends StatefulWidget {
 class _AssignShopScreenState extends State<AssignShopScreen> {
    Coordinates userLatLng;
   List<CustomerModel> customer=[];
+  List<CustomerModel> customers=[];
   bool isLoading=false;
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
   double calculateDistance(lat1, lon1, lat2, lon2){
@@ -30,26 +42,101 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
             (1 - c((lon2 - lon1) * p))/2;
     return 12742 * asin(sqrt(a));
   }
-  void getCustomerInfo()async{
-    setLoading(true);
-    loc.Location location = new loc.Location();
-    var _location = await location.getLocation();
-    userLatLng =Coordinates(_location.latitude, _location.longitude);
-    http.Response response=await OnlineDatabase().getCustomer();
-    if(response.statusCode==200){
-      var list=jsonDecode(response.body);
-      int i=0;
-      print(list["data"]);
-      for (var person in list['data']){
-        double dist=calculateDistance(userLatLng.latitude,userLatLng.longitude,double.parse(person['lat'].toString()=="null"?1.toString():person['lat'].toString()), double.parse(person['long'].toString()=="null"?1.toString():person['long'].toString()));
-        customer.add(CustomerModel.fromJson(person,dist));
-        print(customer[i].userData.firstName);
-        print(customer[i].custCode);
-        i++;
-      }
+   loc.Location location = new loc.Location();
+   String actualAddress="Searching....";
+   Future<void> getAllCustomerData() async {
+     try {
+       Provider.of<CustomerList>(context,listen: false).clearList();
+       var data =await location.getLocation();
+       List<AddressModel>addressList=[];
+       userLatLng=Coordinates(data.latitude,data.longitude);
+       String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+       String _host = 'https://maps.google.com/maps/api/geocode/json';
+       final url = '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
+       print(url);
+       if(userLatLng.latitude != null && userLatLng.longitude != null){
+         var response1 = await http.get(Uri.parse(url));
+         if(response1.statusCode == 200) {
+           Map data = jsonDecode(response1.body);
+           String _formattedAddress = data["results"][0]["formatted_address"];
+           var address = data["results"][0]["address_components"];
+           for(var i in address){
+             addressList.add(AddressModel.fromJson(i));
+           }
+           actualAddress=addressList[3].shortName;
+           Provider.of<CustomerList>(context,listen: false).updateAddress(actualAddress);
+           print("response ==== $_formattedAddress");
+           _formattedAddress;
+         }
+         var response = await OnlineDatabase.getAllCustomer();
+         print("Response code is " + response.statusCode.toString());
+         if (response.statusCode == 200) {
+           var data = jsonDecode(utf8.decode(response.bodyBytes));
+           //print("Response is" + data.toString());
+           int i=0;
+           for (var item in data["results"]) {
+             double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+             customer.add(CustomerModel.fromModel(item,distance: dist));
+             print(i);
+             i++;
+           }
+           customer.sort((a,b)=>a.distance.compareTo(b.distance));
+           Provider.of<CustomerList>(context,listen: false).add(customer);
+           Provider.of<CustomerList>(context,listen: false).getDues(customer);
+           Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
+           print("done");
+           setState(() {
+
+           });
+           //print("length is"+limitedcustomer.length.toString());
+         } else if (response.statusCode == 400) {
+           var data = jsonDecode(utf8.decode(response.bodyBytes));
+           Fluttertoast.showToast(
+               msg: "${data['results'].toString()}",
+               toastLength: Toast.LENGTH_SHORT,
+               backgroundColor: Colors.black87,
+               textColor: Colors.white,
+               fontSize: 16.0);
+         }}
+     } catch (e, stack) {
+       print('exception is' + e.toString());
+       Fluttertoast.showToast(
+           msg: "Error: " + e.toString(),
+           toastLength: Toast.LENGTH_SHORT,
+           backgroundColor: Colors.black87,
+           textColor: Colors.white,
+           fontSize: 16.0);
+     }
+   }
+  // void getCustomerInfo()async{
+  //   setLoading(true);
+  //   loc.Location location = new loc.Location();
+  //   var _location = await location.getLocation();
+  //   userLatLng =Coordinates(_location.latitude, _location.longitude);
+  //   http.Response response=await OnlineDatabase().getCustomer();
+  //   if(response.statusCode==200){
+  //     var list=jsonDecode(response.body);
+  //     int i=0;
+  //     print(list["data"]);
+  //     for (var person in list['data']){
+  //       double dist=calculateDistance(userLatLng.latitude,userLatLng.longitude,double.parse(person['lat'].toString()=="null"?1.toString():person['lat'].toString()), double.parse(person['long'].toString()=="null"?1.toString():person['long'].toString()));
+  //       customer.add(NewCustomerModel.fromJson(person,dist));
+  //       print(customer[i].userData.firstName);
+  //       print(customer[i].custCode);
+  //       i++;
+  //     }
+  //   }
+  //   setLoading(false);
+  // }
+  changeList(List<CustomerModel> value,String buttonText){
+    if(buttonText=="dues"){
+      setState(() {
+        customers.clear();
+        customers.addAll(value);
+      });
     }
-    setLoading(false);
   }
+  var dues;
   void setLoading(bool value){
     setState(() {
       isLoading=value;
@@ -58,11 +145,12 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
   int index = 0;
   @override
   void initState() {
-    getCustomerInfo();
+    //initData();
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
+    var dd=Provider.of<CustomerList>(context);
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
     return Scaffold(
@@ -71,7 +159,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
           children: [
             SingleChildScrollView(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
                 child: Column(
                   children: [
                     Padding(
@@ -137,7 +225,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          width: width *0.8,
+                          width: width *0.78,
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(5)
@@ -151,53 +239,123 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                               hintText: "Search by shop name",
                             ),
                           ),),
-                        IconButton(onPressed: (){}, icon: Icon(Icons.refresh,color: themeColor1,size: 30,))
+                        IconButton(
+                            padding: EdgeInsets.all(0),
+                            onPressed: (){
+                              setLoading(true);
+                              getAllCustomerData().then((value) => setLoading(false)).catchError((e)=>setLoading(false));
+                            }, icon: Icon(Icons.refresh,color: themeColor1,size: 30,))
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Near by you (${customer.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
+                          Text("Near by you (${customers.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
                           Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
                         ],),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 0),
-                      child: isLoading?LoadingIndicator(width: width, height: height):ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
+                    isLoading?Container(
+                      height: 480,
+                      child: Shimmer.fromColors(
+                        period: Duration(seconds: 1),
+                        baseColor: Colors.grey.withOpacity(0.4),
+                        highlightColor: Colors.grey.shade100,
+                        enabled: true,
+                        child: ListView.builder(
+                          scrollDirection: Axis.vertical,
                           shrinkWrap: true,
-                          itemCount: customer.length,
-                          itemBuilder: (context,index){
-                            return CustomerCard(
-                              height: height,
-                              width: width,
-                              f: f,
-                              menuButton: menuButton,
-                              code: customer[index].custCode.toString().toUpperCase()=="NULL"?"NULL":customer[index].custCode.toString(),
-                              category: customer[index].custcatId.toString().toUpperCase()=="NULL"?"NULL":customer[index].custcatId.toString(),
-                              shopName: customer[index].custPrimName.toString().toUpperCase()=="NULL"?"NULL":customer[index].custPrimName.toString(),
-                              address: customer[index].areaId.toString().toUpperCase()=="NULL"?"NULL":customer[index].areaId.toString(),
-                              name: customer[index].custName.toString().toUpperCase()=="NULL"?"NULL":customer[index].custName.toString(),
-                              phoneNo: customer[index].phone2.toString().toUpperCase()=="NULL"?"NULL":customer[index].phone2.toString(),
-                              lastVisit: customer[index].cityId.toString().toUpperCase()=="NULL"?"NULL": customer[index].cityId.toString(),
-                              dues: customer[index].custMaxCredit.toString().toUpperCase()=="NULL"?"NULL": customer[index].custMaxCredit.toString(),
-                              lastTrans: customer[index].custMaxCredit.toString().toUpperCase()=="NULL"?"NULL":customer[index].custMaxCredit.toString(),
-                              outstanding: customer[index].custMaxCredit.toString().toUpperCase()=="NULL"?"NULL":customer[index].custMaxCredit.toString(),
-                              shopAssigned: customer[index].custPrimPass.toString().toUpperCase()=="NULL"?"NULL":customer[index].custPrimPass.toString(),
-                              lat: customer[index].lat.toString().toUpperCase()=="NULL"?"NULL":customer[index].lat.toString(),
-                              long: customer[index].long.toString().toUpperCase()=="NULL"?"NULL":customer[index].long.toString(),
-                              customerData: customer[index],
-                              image:
-                              "https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages.indianexpress.com%2F2021%2F12%2Fdoctor-strange-2-1200.jpg&imgrefurl=https%3A%2F%2Findianexpress.com%2Farticle%2Fentertainment%2Fhollywood%2Fdoctor-strange-2-suggest-benedict-cumberbatch-sorcerer-supreme-might-lead-avengers-7698058%2F&tbnid=GxuE_SM1fXrAqM&vet=12ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ..i&docid=6gb_YRZyTk5MWM&w=1200&h=667&q=dr%20strange&ved=2ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ",
-                              showLoading: (value) {
-                                setState(() {
-                                  isLoading = value;
-                                });
-                              },
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: 4,
+                          itemBuilder:
+                              (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                CustomShopContainerLoading(
+                                  height: height,
+                                  width: width,
+                                ),
+                                SizedBox(
+                                  height: height * 0.025,
+                                ),
+                              ],
                             );
-                          }),
+                          },
+                        ),
+                      ),
+                    ):Consumer<CustomerList>(
+                      builder: (key,customerList,child){
+                        return  Container(
+                            child: index==0?SingleChildScrollView(
+                              child: Container(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: dd.dues.length>10?10:dd.dues.length,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        CustomShopContainer(
+                                          customerList: dd.dues,
+                                          height: height,
+                                          width: width,
+                                          customerData:dd.dues[index],
+                                          //isLoading2: isLoading2,
+                                          //enableLocation: _serviceEnabled,
+                                          lat: 1.0,
+                                          long:1.0,
+                                          showLoading: (value) {
+                                            setState(() {
+                                              isLoading = value;
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.025,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ):SingleChildScrollView(
+                              child: Container(
+                                child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: dd.assign.length>10?10:dd.assign.length,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        CustomShopContainer(
+                                          customerList: dd.assign,
+                                          height: height,
+                                          width: width,
+                                          customerData:dd.assign[index],
+                                          //isLoading2: isLoading2,
+                                          //enableLocation: _serviceEnabled,
+                                          lat: 1.0,
+                                          long:1.0,
+                                          showLoading: (value) {
+                                            setState(() {
+                                              isLoading = value;
+                                            });
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height: height * 0.025,
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                        );
+                      },
                     ),
                   ],
                 ),

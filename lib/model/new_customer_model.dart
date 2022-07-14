@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class CustomerModel extends ChangeNotifier{
+class NewCustomerModel extends ChangeNotifier{
   int id;
   String custRegDate;
   int custStatus;
@@ -46,7 +46,7 @@ class CustomerModel extends ChangeNotifier{
   UserData userData;
   double distances;
 
-  CustomerModel(
+  NewCustomerModel(
       {this.id,
         this.custRegDate,
         this.custStatus,
@@ -93,7 +93,7 @@ class CustomerModel extends ChangeNotifier{
        this.distances
       });
 
-  CustomerModel.fromJson(Map<String, dynamic> json,double dist) {
+  NewCustomerModel.fromJson(Map<String, dynamic> json,double dist) {
     id = json['id'];
     custRegDate = json['cust_reg_date'];
     custStatus = json['cust_status'];

@@ -2,13 +2,19 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/addressModel.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:location/location.dart' as loc;
 import 'package:http/http.dart'as http;
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:salesmen_app_new/screen/AddCustomer/add_customer_screen.dart';
 import 'package:salesmen_app_new/screen/BankAccountScreen/bank_account_screen.dart';
 import 'package:salesmen_app_new/screen/History_Screen/history_screen.dart';
@@ -27,22 +33,108 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   bool _serviceEnabled = false;
-  var actualAddress = "Searching....";
-   Coordinates userLatLng;
-  getAddressFromLatLng(context, double lat, double lng) async {
+  loc.Location location = new loc.Location();
+  calculateDistance(double lat1,double long1,double lat2,double long2) {
+    var distance = geo.Geolocator.distanceBetween(lat2,
+        long2, lat1, long1);
+    return distance / 1000;
+  }
+  void getAllCustomerData() async {
+    try {
+      var data =await location.getLocation();
+      List<AddressModel>addressList=[];
+      userLatLng=Coordinates(data.latitude,data.longitude);
+      String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+      String _host = 'https://maps.google.com/maps/api/geocode/json';
+      final url = '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
+      print(url);
+      if(userLatLng.latitude != null && userLatLng.longitude != null){
+        var response1 = await http.get(Uri.parse(url));
+        if(response1.statusCode == 200) {
+          Map data = jsonDecode(response1.body);
+          String _formattedAddress = data["results"][0]["formatted_address"];
+          var address = data["results"][0]["address_components"];
+          for(var i in address){
+            addressList.add(AddressModel.fromJson(i));
+          }
+          actualAddress=addressList[3].shortName;
+          Provider.of<CustomerList>(context,listen: false).updateAddress(actualAddress);
+          print("response ==== $_formattedAddress");
+           _formattedAddress;
+        }
+      var response = await OnlineDatabase.getAllCustomer();
+      print("Response code is " + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        //print("Response is" + data.toString());
+        int i=0;
+        for (var item in data["results"]) {
+          double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+          customer.add(CustomerModel.fromModel(item,distance: dist));
+          print(i);
+          i++;
+        }
+        customer.sort((a,b)=>a.distance.compareTo(b.distance));
+        Provider.of<CustomerList>(context,listen: false).add(customer);
+        Provider.of<CustomerList>(context,listen: false).getDues(customer);
+        Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
+        print("done");
+        setState(() {
+
+        });
+        //print("length is"+limitedcustomer.length.toString());
+      } else if (response.statusCode == 400) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        Fluttertoast.showToast(
+            msg: "${data['results'].toString()}",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }}
+    } catch (e, stack) {
+      print('exception is' + e.toString());
+      Fluttertoast.showToast(
+          msg: "Error: " + e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+  Coordinates userLatLng;
+  getAddressFromLatLng() async {
+    var data =await location.getLocation();
+    userLatLng=Coordinates(data.latitude,data.longitude);
+    var lat=data.latitude;
+    var lng=data.longitude;
+    //userLatLng=Coordinates(lat, lng);setState(() {});
+    List<AddressModel>addressList=[];
     String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
     String _host = 'https://maps.google.com/maps/api/geocode/json';
     final url = '$_host?key=$mapApiKey&language=en&latlng=$lat,$lng';
+    print(url);
     if(lat != null && lng != null){
       var response = await http.get(Uri.parse(url));
       if(response.statusCode == 200) {
         Map data = jsonDecode(response.body);
         String _formattedAddress = data["results"][0]["formatted_address"];
+        var address = data["results"][0]["address_components"];
+        for(var i in address){
+          addressList.add(AddressModel.fromJson(i));
+        }
+        actualAddress=addressList[3].shortName;
+        Provider.of<CustomerList>(context).updateAddress(actualAddress);
         print("response ==== $_formattedAddress");
         return _formattedAddress;
       } else return null;
     } else return null;
   }
+  var actualAddress = "Searching....";
+
+   List<CustomerModel> customer=[];
+
+
   // void onStart()async{
   //
   //
@@ -62,7 +154,8 @@ class _MainScreenState extends State<MainScreen> {
   
   @override
   void initState() {
-    //onStart();
+    //getAddressFromLatLng();
+    getAllCustomerData();
     super.initState();
   }
   
@@ -300,7 +393,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         body: TabBarView(
           children: [
-            CustomerScreen(),
+            CustomerScreen( temp: customer,address: actualAddress,),
             AssignShopScreen(),
           ],
         ),
@@ -309,12 +402,4 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class One extends StatelessWidget {
-  One({ this.text});
-  String text;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body:Placeholder());
-  }
-}
 

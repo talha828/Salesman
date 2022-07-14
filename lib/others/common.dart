@@ -1,8 +1,10 @@
 import 'dart:math'as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
@@ -437,7 +439,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                     Spacer(),
                                     VariableText(
                                       //text: 'Muhammad Ali',
-                                      text: widget.customerData.lastVisitDay
+                                      text: widget.customerData.lastVisitDay.toString()=="null"?"- -":widget.customerData.lastVisitDay.toString()
                                           .toString(),
                                       // text: shopdetails[index].ownerName,
                                       fontsize: 11,
@@ -468,7 +470,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                     Spacer(),
                                     VariableText(
                                       //text: 'Muhammad Ali',
-                                      text: widget.customerData.lastTransDay
+                                      text: widget.customerData.lastTransDay.toString()=="null"?"- -":widget.customerData.lastTransDay.toString()
                                           .toString(),
                                       // text: shopdetails[index].ownerName,
                                       fontsize: 11,
@@ -506,7 +508,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                     Spacer(),
                                     VariableText(
                                       //text: 'Muhammad Ali',
-                                      text: f.format(double.parse(widget.customerData.dues.toString())),
+                                      text: widget.customerData.dues.toString()=="null"?"- -":f.format(double.parse(widget.customerData.dues.toString())),
                                       // text: shopdetails[index].ownerName,
                                       fontsize: 11,
                                       fontcolor: textcolorgrey,
@@ -536,7 +538,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                     Spacer(),
                                     VariableText(
                                       //text: 'Muhammad Ali',
-                                      text: f.format(double.parse(widget.customerData.outStanding.toString())),
+                                      text: widget.customerData.outStanding.toString()=="null"?"- -":f.format(double.parse(widget.customerData.outStanding.toString())),
                                       // text: shopdetails[index].ownerName,
                                       fontsize: 11,
                                       fontcolor: textcolorgrey,
@@ -571,79 +573,80 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                           children: List.generate(menuButton.length, (index) {
                             return InkWell(
                                 onTap: () async {
-                                  // _onSelected(index);
-                                  // if (index == 1) {
-                                  //   if (templat == null) {
-                                  //     Fluttertoast.showToast(
-                                  //         msg: 'Please Enable Your Location',
-                                  //         toastLength: Toast.LENGTH_SHORT,
-                                  //         backgroundColor: Colors.black87,
-                                  //         textColor: Colors.white,
-                                  //         fontSize: 16.0);
-                                  //     //checkAndGetLocation();
-                                  //   } else {
-                                  //     if(widget.customerData.shopAssigned == 'Yes'){
-                                  //       if (double.parse(userData.usercashReceive) >=
-                                  //           double.parse(userData.usercashLimit)
-                                  //       // || double.parse(userData.usercashReceive) < 0
-                                  //       ) {
-                                  //         limitReachedPopup(
-                                  //             context: context,
-                                  //             height: widget.height,
-                                  //             width: widget.width);
-                                  //
-                                  //         ///for testing
-                                  //         /*widget.showLoading(true);
-                                  //   await PostEmployeeVisit(
-                                  //       customerCode:
-                                  //           widget.customerData.customerCode,
-                                  //       purpose: 'Check In',
-                                  //       lat: templat.toString(),
-                                  //       long: templong.toString(),
-                                  //       customerData: widget.customerData);
-                                  //   widget.showLoading(false);*/
-                                  //       } else {
-                                  //         widget.showLoading(true);
-                                  //         await PostEmployeeVisit(
-                                  //             customerCode:
-                                  //             widget.customerData.customerCode,
-                                  //             purpose: 'Check In',
-                                  //             lat: templat.toString(),
-                                  //             long: templong.toString(),
-                                  //             customerData: widget.customerData);
-                                  //         widget.showLoading(false);
-                                  //       }
-                                  //     }
-                                  //   }
-                                  // } else if (index == 0) {
-                                  //   ///Launch Map
-                                  //   if (widget.customerData.customerLatitude ==
-                                  //       null) {
-                                  //     Fluttertoast.showToast(
-                                  //         msg: "Shop location not found",
-                                  //         toastLength: Toast.LENGTH_SHORT,
-                                  //         gravity: ToastGravity.BOTTOM,
-                                  //         timeInSecForIosWeb: 3,
-                                  //         backgroundColor: Colors.black87,
-                                  //         textColor: Colors.white,
-                                  //         fontSize: 16.0);
-                                  //   } else {
-                                  //     if (await MapLauncher.isMapAvailable(
-                                  //         MapType.google)) {
-                                  //       await MapLauncher.showMarker(
-                                  //         mapType: MapType.google,
-                                  //         coords: Coords(
-                                  //             widget.customerData.customerLatitude,
-                                  //             widget
-                                  //                 .customerData.customerLongitude),
-                                  //         title:
-                                  //         widget.customerData.customerShopName,
-                                  //         description:
-                                  //         widget.customerData.customerAddress,
-                                  //       );
-                                  //     }
-                                  //   }
-                                  // }
+                                  _onSelected(index);
+                                  if (index == 1) {
+                                    if (templat == null) {
+                                      Fluttertoast.showToast(
+                                          msg: 'Please Enable Your Location',
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          backgroundColor: Colors.black87,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0);
+                                      //checkAndGetLocation();
+                                    } else {
+                                    //   if(widget.customerData.shopAssigned == 'Yes'){
+                                    //     if (double.parse(userData.usercashReceive) >=
+                                    //         double.parse(userData.usercashLimit)
+                                    //     // || double.parse(userData.usercashReceive) < 0
+                                    //     ) {
+                                    //       limitReachedPopup(
+                                    //           context: context,
+                                    //           height: widget.height,
+                                    //           width: widget.width);
+                                    //
+                                    //       ///for testing
+                                    //       /*widget.showLoading(true);
+                                    // await PostEmployeeVisit(
+                                    //     customerCode:
+                                    //         widget.customerData.customerCode,
+                                    //     purpose: 'Check In',
+                                    //     lat: templat.toString(),
+                                    //     long: templong.toString(),
+                                    //     customerData: widget.customerData);
+                                    // widget.showLoading(false);*/
+                                    //     } else {
+                                    //       //TODO:// set check-in api
+                                    //       // widget.showLoading(true);
+                                    //       // await PostEmployeeVisit(
+                                    //       //     customerCode:
+                                    //       //     widget.customerData.customerCode,
+                                    //       //     purpose: 'Check In',
+                                    //       //     lat: templat.toString(),
+                                    //       //     long: templong.toString(),
+                                    //       //     customerData: widget.customerData);
+                                    //       // widget.showLoading(false);
+                                    //     }
+                                    //   }
+                                    }
+                                  } else if (index == 0) {
+                                    ///Launch Map
+                                    if (widget.customerData.customerLatitude ==
+                                        null) {
+                                      Fluttertoast.showToast(
+                                          msg: "Shop location not found",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 3,
+                                          backgroundColor: Colors.black87,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0);
+                                    } else {
+                                      if (await MapLauncher.isMapAvailable(
+                                          MapType.google)) {
+                                        await MapLauncher.showMarker(
+                                          mapType: MapType.google,
+                                          coords: Coords(
+                                              widget.customerData.customerLatitude,
+                                              widget
+                                                  .customerData.customerLongitude),
+                                          title:
+                                          widget.customerData.customerShopName,
+                                          description:
+                                          widget.customerData.customerAddress,
+                                        );
+                                      }
+                                    }
+                                  }
                                 },
                                 child: Row(
                                   children: [
@@ -659,17 +662,17 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                               : themeColor2,
                                           borderRadius: BorderRadius.circular(5),
                                           border: Border.all(
-                                              // color: index == 0 ?
-                                              // themeColor1
-                                              //     : widget.customerData.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400]
+                                              color: index == 0 ?
+                                              themeColor1
+                                                  : widget.customerData.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400]
                                           )),
                                       child: Center(
                                         child: VariableText(
                                           text: menuButton[index],
                                           fontsize: 11,
-                                          // fontcolor: index == 0
-                                          //     ? themeColor2
-                                          //     : widget.customerData.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400],
+                                          fontcolor: index == 0
+                                              ? themeColor2
+                                              : widget.customerData.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400],
                                           weight: FontWeight.w700,
                                           fontFamily: fontRegular,
                                         ),

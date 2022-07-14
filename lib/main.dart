@@ -2,7 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
-import 'package:salesmen_app_new/model/customer_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
@@ -24,11 +25,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<UserModel>(
           create: (_) => UserModel(),
         ),
-        ChangeNotifierProvider<CustomerModel>(
-          create: (_) => CustomerModel(),
+        ChangeNotifierProvider<NewCustomerModel>(
+          create: (_) => NewCustomerModel(),
         ),
         ChangeNotifierProvider<CartModel>(
           create: (_) => CartModel(),
+        ),
+        ChangeNotifierProvider<CustomerList>(
+          create: (_) => CustomerList(),
         ),
       ],
       child: MaterialApp(

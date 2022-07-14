@@ -59,13 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   getLogin(context)async{
     setLoading(true);
-    var response=await Auth.getLogin(phoneNo:"+921234567890", password:_passController.text,onSuccess: (response)async{
-      print("status ${response.statusCode}");
+    var response=await Auth.getLogin(phoneNo:widget.phoneNumber, password:_passController.text,onSuccess: (response)async{
+      //print("status ${response.statusCode}");
       if(response.statusCode==200){
         var data=jsonDecode(response.toString());
           print(data['success']);
          await  Provider.of<UserModel>(context,listen: false).fetchData(data);
-        FirebaseAuth _auth= await FirebaseAuth.instance;
+        FirebaseAuth _auth=  FirebaseAuth.instance;
         _auth.verifyPhoneNumber(
             phoneNumber: widget.phoneNumber,
             timeout: Duration(seconds: 120),
@@ -159,8 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Alert(
         context: context,
         type: AlertType.error,
-        title: "Api`s not Responses",
-        desc: "please try again after few Mints",
+        title: "Something want wrong",
+        desc: "Error:"+ e.toString(),
         buttons: [
           DialogButton(
             color:themeColor1 ,

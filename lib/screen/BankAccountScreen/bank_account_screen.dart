@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:salesmen_app_new/model/bank_account_model.dart';
-import 'package:salesmen_app_new/model/customer_model.dart';
+import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 
 class BankAccountScreen extends StatefulWidget {
   var lat,long;
-  List<CustomerModel> shopDetails;
+  List<NewCustomerModel> shopDetails;
   BankAccountScreen({this.shopDetails,this.lat,this.long});
 
 

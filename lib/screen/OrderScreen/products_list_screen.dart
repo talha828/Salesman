@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
-import 'package:salesmen_app_new/model/customer_model.dart';
+import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -18,10 +18,10 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductListScreen extends StatefulWidget {
   String productmaintypeId, productsubtypeId;
-  CustomerModel shopDetails;
+  NewCustomerModel shopDetails;
   double lat, long;
   var locationdata;
-  List<CustomerModel> customerList;
+  List<NewCustomerModel> customerList;
   ProductListScreen(
       {this.shopDetails,
         this.customerList,
