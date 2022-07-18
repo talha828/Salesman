@@ -52,6 +52,7 @@ dependencies:
   shimmer: ^2.0.0
   flutter_datetime_picker: ^1.5.1
   geolocator: 7.0.0
+  draggable_scrollbar: ^0.1.0
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
@@ -478,6 +479,7 @@ class _CustomerCardState extends State<CustomerCard> {
                             //       } else
                             if (index == 1) {
                               widget.showLoading(true);
+                              Provider.of<CustomerList>(context,listen: false).myCustomer(widget.customerData);
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckInScreen()));
 
                               // await PostEmployeeVisit(

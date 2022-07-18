@@ -7,6 +7,7 @@ class ProductModel extends ChangeNotifier {
    String model;
    String productDescription;
    String outOfStock;
+   String brandId;
    String productCode;
    String productMainType;
    String productSubType;
@@ -23,6 +24,7 @@ class ProductModel extends ChangeNotifier {
        this.productDescription,
        this.productCode,
        this.productPrice,
+        this.brandId,
        this.imageUrl,
          this.outOfStock,
          this.brand,  this.model
@@ -42,6 +44,7 @@ class ProductModel extends ChangeNotifier {
       productMainType = json['MAINTYPE'];
       productSubType = json['SUBTYPE'];
       brand = json['BRAND'];
+      brandId = json['BRAND_ID'];
       model = json['MODEL'];
       imageUrl =json['IMAGE_URL'] == "no image" ? null : json['IMAGE_URL'];
           /* "https://suqexpress.com/assets/images/product/1644320668_5659_download.jpg";*/  //== "no image" ? null : json['IMAGE_URL'];

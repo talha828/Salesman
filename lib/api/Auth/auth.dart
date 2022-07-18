@@ -7,6 +7,7 @@ class Auth{
     FormData formData = new FormData.fromMap({
       'phone': phoneNo,
       'password': password,
+      'user_type':1,
     });
     var response = await dio.post(url, data: formData,
       options: Options(

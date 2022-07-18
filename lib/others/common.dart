@@ -1,15 +1,22 @@
+import 'dart:convert';
 import 'dart:math'as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:location/location.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 import 'package:shimmer/shimmer.dart';
 var f = NumberFormat("###,###.0#", "en_US");
 class VariableText extends StatelessWidget {
@@ -114,11 +121,11 @@ class LoginButton extends StatelessWidget {
 }
 class CustomShopContainer extends StatefulWidget {
   double height, width, lat, long;
-  final customerData;
+  CustomerModel customerData;
   //bool isLoading2;
   //LocationData locationData;
   Function showLoading;
-  final customerList;
+  List<CustomerModel> customerList;
   CustomShopContainer(
       { this.height,
          this.width,
@@ -138,8 +145,61 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
   /*Location location = new Location();
   bool _serviceEnabled = false;
   LocationData _locationData;*/
-   double templat, templong;
 
+   double templat, templong;
+   void PostEmployeeVisit(
+       {String customerCode,
+         String employeeCode,
+         String purpose,
+         String lat,
+         String long,
+         CustomerModel customerData}) async {
+     try {
+       /*   setState(() {
+      widget.isLoading2=true;
+    });*/
+       var response = await OnlineDatabase.postEmployee(emp_id: employeeCode, customerCode: customerCode, purpose: purpose, long: long, lat: lat);
+       print("Response is" + response.statusCode.toString());
+       if (response.statusCode == 200) {
+        // print("data is" + response.data["message"].toString());
+         //Provider.of<CartModel>(context, listen: false).createCart();
+         // Location location = new Location();
+         // var _location = await location.getLocation();
+         Fluttertoast.showToast(
+             msg: 'Check In Successfully',
+             toastLength: Toast.LENGTH_SHORT,
+             backgroundColor: Colors.black87,
+             textColor: Colors.white,
+             fontSize: 16.0);
+         Provider.of<CustomerList>(context,listen: false).myCustomer(widget.customerData);
+         Navigator.push(
+             context,
+             MaterialPageRoute(
+                 builder: (_) => CheckInScreen(
+                     customerList: widget.customerList,
+                     //locationdata: _locationData,
+                     shopDetails: customerData,)));
+       } else {
+         print("data is" + response.statusCode.toString());
+
+         Fluttertoast.showToast(
+             msg: 'Some thing went wrong',
+             toastLength: Toast.LENGTH_SHORT,
+             backgroundColor: Colors.black87,
+             textColor: Colors.white,
+             fontSize: 16.0);
+       }
+     } catch (e, stack) {
+       print('exception is' + e.toString());
+
+       Fluttertoast.showToast(
+           msg: "Error: " + e.toString(),
+           toastLength: Toast.LENGTH_SHORT,
+           backgroundColor: Colors.black87,
+           textColor: Colors.white,
+           fontSize: 16.0);
+     }
+   }
   /*void checkAndGetLocation() async {
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
@@ -573,6 +633,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                           children: List.generate(menuButton.length, (index) {
                             return InkWell(
                                 onTap: () async {
+                                  widget.showLoading(true);
                                   _onSelected(index);
                                   if (index == 1) {
                                     if (templat == null) {
@@ -582,41 +643,56 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                           backgroundColor: Colors.black87,
                                           textColor: Colors.white,
                                           fontSize: 16.0);
+                                      widget.showLoading(false);
                                       //checkAndGetLocation();
                                     } else {
-                                    //   if(widget.customerData.shopAssigned == 'Yes'){
-                                    //     if (double.parse(userData.usercashReceive) >=
-                                    //         double.parse(userData.usercashLimit)
-                                    //     // || double.parse(userData.usercashReceive) < 0
-                                    //     ) {
-                                    //       limitReachedPopup(
-                                    //           context: context,
-                                    //           height: widget.height,
-                                    //           width: widget.width);
-                                    //
-                                    //       ///for testing
-                                    //       /*widget.showLoading(true);
-                                    // await PostEmployeeVisit(
-                                    //     customerCode:
-                                    //         widget.customerData.customerCode,
-                                    //     purpose: 'Check In',
-                                    //     lat: templat.toString(),
-                                    //     long: templong.toString(),
-                                    //     customerData: widget.customerData);
-                                    // widget.showLoading(false);*/
-                                    //     } else {
-                                    //       //TODO:// set check-in api
-                                    //       // widget.showLoading(true);
-                                    //       // await PostEmployeeVisit(
-                                    //       //     customerCode:
-                                    //       //     widget.customerData.customerCode,
-                                    //       //     purpose: 'Check In',
-                                    //       //     lat: templat.toString(),
-                                    //       //     long: templong.toString(),
-                                    //       //     customerData: widget.customerData);
-                                    //       // widget.showLoading(false);
-                                    //     }
-                                    //   }
+                                      if(widget.customerData.shopAssigned.toString()=="Yes"){
+                                        Location location = new Location();
+                                        var _location = await location.getLocation();
+                                       await PostEmployeeVisit(
+                                            employeeCode: userData.id,
+                                            customerCode: widget.customerData.customerCode,
+                                            purpose: 'Check In',
+                                            lat: _location.latitude.toString(),
+                                            long: _location.longitude.toString(),
+                                            customerData: widget.customerData);
+                                      }
+                                      widget.showLoading(false);
+
+                                      // if(widget.customerData.shopAssigned == 'Yes'){
+                                      //   if (double.parse(userData.usercashReceive) >=
+                                      //       double.parse(userData.usercashLimit)
+                                      //   // || double.parse(userData.usercashReceive) < 0
+                                      //   ) {
+                                      //     limitReachedPopup(
+                                      //         context: context,
+                                      //         height: widget.height,
+                                      //         width: widget.width);
+
+                                          ///for testing
+                                          /*widget.showLoading(true);
+                                    await PostEmployeeVisit(
+                                        customerCode:
+                                            widget.customerData.customerCode,
+                                        purpose: 'Check In',
+                                        lat: templat.toString(),
+                                        long: templong.toString(),
+                                        customerData: widget.customerData);
+                                    widget.showLoading(false);*/
+                                        // } else {
+
+                                        //   //TODO:// set check-in api
+                                        //   // widget.showLoading(true);
+                                        //   // await PostEmployeeVisit(
+                                        //   //     customerCode:
+                                        //   //     widget.customerData.customerCode,
+                                        //   //     purpose: 'Check In',
+                                        //   //     lat: templat.toString(),
+                                        //   //     long: templong.toString(),
+                                        //   //     customerData: widget.customerData);
+                                        //   // widget.showLoading(false);
+                                        // }
+                                      // }
                                     }
                                   } else if (index == 0) {
                                     ///Launch Map
@@ -645,6 +721,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                           widget.customerData.customerAddress,
                                         );
                                       }
+                                      widget.showLoading(false);
                                     }
                                   }
                                 },
@@ -1315,7 +1392,9 @@ Widget customShopDetailsContainer(
       ),
     ),
   );
+  
 }
+
 class CustomLegerContainer extends StatelessWidget {
   double height, width;
   String title, imagePath;
@@ -1700,7 +1779,7 @@ class _SingleProductTileState extends State<SingleProductTile> {
                                 barrierColor: true ? Colors.black : Colors.white,
                                 pageBuilder: (BuildContext context, _, __) {
                                   return FullScreenPage(
-                                    child: _img,
+                                    child: widget.productDetails.imageUrl.toString(),
                                     dark: false,
                                   );
                                 },
@@ -1710,6 +1789,12 @@ class _SingleProductTileState extends State<SingleProductTile> {
                           child: Image.network(
                             widget.productDetails.imageUrl,
                             fit: BoxFit.scaleDown,
+                            cacheWidth: 100,
+                            cacheHeight: 140,
+                            filterQuality: FilterQuality.low,
+                            errorBuilder: (BuildContext context, Object exception, StackTrace stackTrace) {
+                              return Image.asset("assets/images/gear.png");
+                            },
                             loadingBuilder: (BuildContext context,
                                 Widget child,
                                 ImageChunkEvent loadingProgress) {
@@ -1768,8 +1853,8 @@ class _SingleProductTileState extends State<SingleProductTile> {
                               ),
                             ),
                             Container(
-                              height: ratio * 18,
-                              width: ratio * 22,
+                              height: ratio * 19,
+                              width: ratio * 13,
                               //color: Colors.red,
                               child: TextField(
                                 maxLines: 1,
@@ -2154,7 +2239,6 @@ class _SingleProductTileState extends State<SingleProductTile> {
 
   static double calculatePrice({int quantity, ProductModel productDetils}) {
     double dynamicprice = double.parse(productDetils.productPrice.last.price.toStringAsFixed(2));
-    print("calculating price");
     for (var item in productDetils.productPrice) {
       if (item.min <= quantity && item.max >= quantity) {
         dynamicprice = double.parse(item.price.toStringAsFixed(2));
@@ -2171,7 +2255,7 @@ class FullScreenPage extends StatefulWidget {
      this.dark,
   });
 
-   Image child;
+   String child;
    bool dark;
 
   @override
@@ -2215,7 +2299,26 @@ class _FullScreenPageState extends State<FullScreenPage> {
                     panEnabled: true,
                     minScale: 0.5,
                     maxScale: 4,
-                    child: widget.child,
+                    child: Image.network(widget.child,
+                      errorBuilder: (BuildContext context, Object exception, StackTrace stackTrace) {
+                        return Image.asset("assets/images/gear.png");
+                      },
+                      loadingBuilder: (BuildContext context,
+                          Widget child,
+                          ImageChunkEvent loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey[300],
+                          highlightColor: Colors.grey[100],
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -2370,7 +2473,65 @@ class RectangluartextFeildWithPrefix extends StatelessWidget {
         ));
   }
 }
+class CodeField extends StatelessWidget{
 
+  final TextEditingController cont,next_cont;
+  final String hinttext;
+  // final Widget icon;
+  final bool texthidden,readonly;
+  final TextAlign textAlign;
+  Function onComplete;
+
+  CodeField({this.cont,this.hinttext,this.texthidden=false,this.readonly=false,
+    //this.icon,
+    this.onComplete,
+    this.next_cont, this.textAlign=TextAlign.center,});
+
+  @override
+  Widget build(BuildContext context) {
+
+    double radius=10;
+
+    return TextField(
+      onChanged: (x){
+        print("onchange");
+        if(cont.text.isNotEmpty){
+          FocusScope.of(context).nextFocus();
+        }else{
+          FocusScope.of(context).previousFocus();
+        }
+        if(next_cont!=null) {
+          next_cont.text = "";
+        }
+        onComplete(x);
+      },
+      controller: cont,
+      maxLength: 1,
+      obscureText: texthidden,
+      readOnly: readonly,
+      textAlign: textAlign,
+      keyboardType: TextInputType.number,
+      style: TextStyle(fontSize: 18,//fontFamily: fontNormal
+      ),
+      decoration: InputDecoration(counterText: "",
+        contentPadding: EdgeInsets.only(top: 10,bottom: 10,left: 2),
+        border: OutlineInputBorder(
+
+            borderRadius: BorderRadius.circular(radius)
+        ),
+        enabledBorder:OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFE0E0E0),
+                width: 1),
+            borderRadius: BorderRadius.circular(radius)
+        ),
+        fillColor: Colors.white,
+        // fillColor: Colors.black,
+        filled: true,
+        hintText: hinttext,
+      ),
+    );
+  }
+}
 class MyAppBar extends StatefulWidget implements PreferredSizeWidget {
   String title;
   Color color, color2;
@@ -2594,5 +2755,57 @@ class _CheckOutCardsState extends State<CheckOutCards> {
           ),
         ),
       ]),);
+  }
+}
+class ProcessLoading extends StatefulWidget {
+  @override
+  State createState() {
+    return _ProcessLoadingState();
+  }
+}
+
+class _ProcessLoadingState extends State<ProcessLoading>
+    with SingleTickerProviderStateMixin {
+  AnimationController _cont;
+  Animation<Color> _anim;
+
+  @override
+  void initState() {
+    _cont = AnimationController(
+        duration: Duration(
+          seconds: 1,
+        ),
+        vsync: this);
+    _cont.addListener(() {
+      setState(() {
+        //print("val: "+_cont.value.toString());
+      });
+    });
+    ColorTween col = ColorTween(begin: themeColor1, end: themeColor1);
+    _anim = col.animate(_cont);
+    _cont.repeat(reverse: true);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cont.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: Color.fromRGBO(0, 0, 0, 0.5),
+        child: Center(
+          child: Container(
+              width: 50 * _cont.value,
+              height: 50 * _cont.value,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(
+                  _anim.value,
+                ),
+              )),
+        ));
   }
 }

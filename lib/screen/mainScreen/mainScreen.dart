@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -21,10 +22,11 @@ import 'package:salesmen_app_new/screen/History_Screen/history_screen.dart';
 import 'package:salesmen_app_new/screen/agingReport/aging_card.dart';
 
 import 'package:salesmen_app_new/screen/assignShopScreen/AssignShopScreen.dart';
-import 'package:salesmen_app_new/screen/customer_screen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 class MainScreen extends StatefulWidget {
 
   @override
@@ -67,14 +69,13 @@ class _MainScreenState extends State<MainScreen> {
       if (response.statusCode == 200) {
         var data = jsonDecode(utf8.decode(response.bodyBytes));
         //print("Response is" + data.toString());
-        int i=0;
+
         for (var item in data["results"]) {
           double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
           customer.add(CustomerModel.fromModel(item,distance: dist));
-          print(i);
-          i++;
         }
         customer.sort((a,b)=>a.distance.compareTo(b.distance));
+        Provider.of<CustomerList>(context,listen: false).clearList();
         Provider.of<CustomerList>(context,listen: false).add(customer);
         Provider.of<CustomerList>(context,listen: false).getDues(customer);
         Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
@@ -158,244 +159,291 @@ class _MainScreenState extends State<MainScreen> {
     getAllCustomerData();
     super.initState();
   }
-  
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        content: new Text('Do you want to exit an App'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: new Text(
+              'No',
+              style: TextStyle(color: themeColor1),
+            ),
+          ),
+          new FlatButton(
+            onPressed: () => exit(0),
+            child: new Text(
+              'Yes',
+              style: TextStyle(color: themeColor1),
+            ),
+          ),
+        ],
+      ),
+    )) ??
+        false;
+  }
   @override
   Widget build(BuildContext context) {
+    var address=Provider.of<CustomerList>(context).address;
     final userData = Provider.of<UserModel>(context, listen: true);
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0.0,
-          title: Center(child: Text("DashBoard",style: TextStyle(color: Colors.white),)),
-          actions: [
-            SizedBox(width: 15,),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 15),
-            //   child: Center(
-            //     child: VariableText(
-            //       text: actualAddress,
-            //       fontsize: 15,
-            //       fontcolor: Colors.white,
-            //       fontFamily: fontRegular,
-            //       weight: FontWeight.w300,
-            //     ),
-            //   ),
-            // ),
-          ],
-          bottom: TabBar(
-            indicatorColor: Colors.white,
-            tabs: [
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: 0.0,
+            title: Center(child: Text("DashBoard",style: TextStyle(color: Colors.white),)),
+            actions: [
+              SizedBox(width: 15,),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Image.asset("assets/tabviewicon/all.png",color: Colors.white,width: 24,height: 24,),
-                    SizedBox(width: 10,),
-                    Text("All Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Image.asset("assets/tabviewicon/user.png",color: Colors.white,width: 24,height: 24,),
-                    SizedBox(width: 10,),
-                    Text("Assign Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
-                  ],
-                ),
-              ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Row(
-              //     children: [
-              //       Image.asset("assets/icons/delivery.png",color: Colors.white,width: 24,height: 24,),
-              //     ],
-              //   ),
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Row(
-              //     children: [
-              //       Image.asset("assets/icons/alliedmcb.png",color: Colors.white,width: 24,height: 24,),
-              //     ],
-              //   ),
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Image.asset("assets/tabviewicon/dues.png"),
-              // ),
-            ],
-          ),
-        ),
-        drawer: Drawer(
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                DrawerHeader(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/icons/profilepic.png',
-                                scale: 3,
-                              ),
-                              Spacer(),
-                              Image.asset('assets/images/splashlogo.png',
-                                  scale: 8.5)
-                            ],
-                          ),
-                          SizedBox(
-                            height: height * 0.01,
-                          ),
-                          VariableText(
-                            text: "talha ",
-                            fontsize: 16,
-                            fontcolor: textcolorblack,
-                            fontFamily: fontMedium,
-                            weight: FontWeight.w500,
-                          ),
-                          SizedBox(
-                            height: height * 0.0055,
-                          ),
-                          VariableText(
-                            text: "talhaiqbal246@gmail.com",
-                            fontsize: 12,
-                            fontcolor: textcolorgrey,
-                            fontFamily: fontRegular,
-                            weight: FontWeight.w400,
-                          ),
-                          SizedBox(
-                            height: height * 0.0055,
-                          ),
-                          VariableText(
-                            text: "Limit: " +
-                                "1000" + ' / ' +
-                                "2000",
-                            fontsize: 12,
-                            fontcolor: textcolorgrey,
-                            fontFamily: fontRegular,
-                            weight: FontWeight.w400,
-                          ),
-                        ],
-                      ),
-                    )),
-                DrawerList(
-                  text: 'Home',
-                  imageSource: "assets/icons/home.png",
-                  selected: true,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                DrawerList(
-                  text: 'Add Customer',
-                  imageSource: "assets/icons/addcustomer.png",
-                  selected: false,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,MaterialPageRoute(builder: (context)=>AddCustomerScreen()));
-                  },
-                ),
-                DrawerList(
-                  text: 'Reports',
-                  imageSource: "assets/icons/ledger.png",
-                  selected: false,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,MaterialPageRoute(builder: (context)=>LedgerScreen()));
-                  },
-                ),
-                DrawerList(
-                    text: 'Customer Ordes',
-                    imageSource: "assets/icons/totalitem.png",
-                    selected: false,
-                    onTap: () {
-                      // Navigator.of(context).pop();
-                      // Navigator.push(context,
-                      //     NoAnimationRoute(widget: ShowDeliveryScreen()));
-                    }),
-                DrawerList(
-                    text: 'AGING',
-                    imageSource: "assets/icons/aging.png",
-                    selected: false,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                          context,MaterialPageRoute(builder: (context)=>AgingScreen()));
-                    }),
-                DrawerList(
-                    text: 'Bank Account',
-                    imageSource: "assets/icons/bankaccount.png",
-                    selected: false,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                          context,MaterialPageRoute(builder: (context)=>BankAccountScreen(
-
-                      )));
-                    }),
-                DrawerList(
-                  text: 'History',
-                  imageSource: "assets/icons/history.png",
-                  selected: false,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                        context,MaterialPageRoute(builder: (context)=>HistoryScreen(
-
-                    )));
-                  },
-                ),
-                DrawerList(
-                  text: 'Logout',
-                  imageSource: "assets/icons/logout.png",
-                  selected: false,
-                  onTap: () async {
-                    SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                    prefs.remove('phoneno');
-                    prefs.remove('password');
-                    Navigator.push(
-                        context,MaterialPageRoute(builder: (context)=>VerifyPhoneNoScreen(
-
-                    )));
-                  },
-                ),
-                Spacer(),
-                Container(
-                  padding: EdgeInsets.only(left: 0.0, right: 0.0),
-                  color: Color(0xffFCFCFC),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: VariableText(
-                      text: "@ SKR Sales Link 2021. Version 1.0.0",
-                      fontsize: 14.5,
-                      weight: FontWeight.w400,
-                      fontcolor: textcolorgrey,
-                    ),
+                padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 15),
+                child: Center(
+                  child: VariableText(
+                    text: address,
+                    fontsize: 15,
+                    fontcolor: Colors.white,
+                    fontFamily: fontRegular,
+                    weight: FontWeight.w300,
                   ),
                 ),
+              ),
+            ],
+            bottom: TabBar(
+              indicatorColor: Colors.white,
+              tabs: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Image.asset("assets/tabviewicon/all.png",color: Colors.white,width: 24,height: 24,),
+                      SizedBox(width: 10,),
+                      Text("All Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Image.asset("assets/tabviewicon/user.png",color: Colors.white,width: 24,height: 24,),
+                      SizedBox(width: 10,),
+                      Text("Assign Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
+                    ],
+                  ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Row(
+                //     children: [
+                //       Image.asset("assets/icons/delivery.png",color: Colors.white,width: 24,height: 24,),
+                //     ],
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Row(
+                //     children: [
+                //       Image.asset("assets/icons/alliedmcb.png",color: Colors.white,width: 24,height: 24,),
+                //     ],
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Image.asset("assets/tabviewicon/dues.png"),
+                // ),
               ],
             ),
           ),
-        ),
-        body: TabBarView(
-          children: [
-            CustomerScreen( temp: customer,address: actualAddress,),
-            AssignShopScreen(),
-          ],
+          drawer: Drawer(
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  DrawerHeader(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                               ClipRRect(
+                                   borderRadius: BorderRadius.circular(50),
+                                   child: Image.network("https://erp.suqexpress.com${userData.image}",cacheHeight: 70,cacheWidth: 70,
+                                     errorBuilder: (BuildContext context, Object exception, StackTrace stackTrace) {
+                                       return Image.asset("assets/images/gear.png");
+                                     },
+                                     loadingBuilder: (BuildContext context,
+                                         Widget child,
+                                         ImageChunkEvent loadingProgress) {
+                                       if (loadingProgress == null) return child;
+                                       return Shimmer.fromColors(
+                                         baseColor: Colors.grey[300],
+                                         highlightColor: Colors.grey[100],
+                                         child: Container(
+                                           decoration: BoxDecoration(
+                                             color: Colors.black54,
+                                             borderRadius: BorderRadius.circular(5),
+                                           ),
+                                         ),
+                                       );
+                                     },
+                                   )),
+                                Spacer(),
+                                Image.asset('assets/images/splashlogo.png',
+                                    scale: 8.5)
+                              ],
+                            ),
+                            SizedBox(
+                              height: height * 0.01,
+                            ),
+                            VariableText(
+                              text: userData.firstName,
+                              fontsize: 16,
+                              fontcolor: textcolorblack,
+                              fontFamily: fontMedium,
+                              weight: FontWeight.w500,
+                            ),
+                            SizedBox(
+                              height: height * 0.0055,
+                            ),
+                            VariableText(
+                              text: userData.phone.toString(),
+                              fontsize: 12,
+                              fontcolor: textcolorgrey,
+                              fontFamily: fontRegular,
+                              weight: FontWeight.w400,
+                            ),
+                            SizedBox(
+                              height: height * 0.0055,
+                            ),
+                            VariableText(
+                              text: "Limit: " +
+                                  "1000" + ' / ' +
+                                  "2000",
+                              fontsize: 12,
+                              fontcolor: textcolorgrey,
+                              fontFamily: fontRegular,
+                              weight: FontWeight.w400,
+                            ),
+                          ],
+                        ),
+                      )),
+                  DrawerList(
+                    text: 'Home',
+                    imageSource: "assets/icons/home.png",
+                    selected: true,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  DrawerList(
+                    text: 'Add Customer',
+                    imageSource: "assets/icons/addcustomer.png",
+                    selected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>AddCustomerScreen()));
+                    },
+                  ),
+                  DrawerList(
+                    text: 'Reports',
+                    imageSource: "assets/icons/ledger.png",
+                    selected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>LedgerScreen()));
+                    },
+                  ),
+                  DrawerList(
+                      text: 'Customer Ordes',
+                      imageSource: "assets/icons/totalitem.png",
+                      selected: false,
+                      onTap: () {
+                        // Navigator.of(context).pop();
+                        // Navigator.push(context,
+                        //     NoAnimationRoute(widget: ShowDeliveryScreen()));
+                      }),
+                  DrawerList(
+                      text: 'AGING',
+                      imageSource: "assets/icons/aging.png",
+                      selected: false,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                            context,MaterialPageRoute(builder: (context)=>AgingScreen()));
+                      }),
+                  DrawerList(
+                      text: 'Bank Account',
+                      imageSource: "assets/icons/bankaccount.png",
+                      selected: false,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                            context,MaterialPageRoute(builder: (context)=>BankAccountScreen(
+
+                        )));
+                      }),
+                  DrawerList(
+                    text: 'History',
+                    imageSource: "assets/icons/history.png",
+                    selected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>HistoryScreen(
+
+                      )));
+                    },
+                  ),
+                  DrawerList(
+                    text: 'Logout',
+                    imageSource: "assets/icons/logout.png",
+                    selected: false,
+                    onTap: () async {
+                      SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                      prefs.remove('phoneno');
+                      prefs.remove('password');
+                      Navigator.push(
+                          context,MaterialPageRoute(builder: (context)=>VerifyPhoneNoScreen(
+
+                      )));
+                    },
+                  ),
+                  Spacer(),
+                  Container(
+                    padding: EdgeInsets.only(left: 0.0, right: 0.0),
+                    color: Color(0xffFCFCFC),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: VariableText(
+                        text: "@ SKR Sales Link 2021. Version 1.0.0",
+                        fontsize: 14.5,
+                        weight: FontWeight.w400,
+                        fontcolor: textcolorgrey,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              AllShopScreen( temp: customer,address: actualAddress,),
+              AssignShopScreen(),
+            ],
+          ),
         ),
       ),
     );

@@ -3,12 +3,11 @@ import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
+import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 
 
 class SucessFullyRecivePaymentScreen extends StatefulWidget {
-  // CustomerModel shopDetails;
-  // var lat,long;
-  // SucessFullyRecivePaymentScreen({this.shopDetails,this.lat,this.long});
+
   @override
   _SucessFullyRecivePaymentScreenState createState() => _SucessFullyRecivePaymentScreenState();
 }
@@ -25,9 +24,9 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
   void dispose() {
     super.dispose();
   }
-  // Future<bool> _onWillPop(){
-  //   return   Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
-  // }
+  Future<bool> _onWillPop(){
+    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +107,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
             InkWell(
               onTap: (){
                 //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.shopDetails,lat: widget.lat,long: widget.long,fromShop: true,)), (route) => route.isCurrent);
-                Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
               },
               child: Center(
                 child: Container(

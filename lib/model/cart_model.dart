@@ -22,22 +22,19 @@ class CartModel with ChangeNotifier {
     cartItemName = temp;
     notifyListeners();
   }*/
-
-  updateSubTotal(){
-    List name=[];
-    subTotal = 0;
-    double tempPrice;
-    for(var item in cartItemName){
-      tempPrice = double.parse(item.priceModel.last.price.toStringAsFixed(2));
-      for(var item2 in name){
-        if(item2.min<=item.itemCount && item2.max>=item.itemCount){
-          tempPrice = double.parse(item2.price.toStringAsFixed(2));
-        }
-      }
-      subTotal += (item.itemCount * tempPrice);
-    }
-  }
-
+   updateSubTotal(){
+     subTotal = 0;
+     double tempPrice;
+     for(var item in cartItemName){
+       tempPrice = double.parse(item.priceModel.last.price.toStringAsFixed(2));
+       for(var item2 in item.priceModel){
+         if(item2.min<=item.itemCount && item2.max>=item.itemCount){
+           tempPrice = double.parse(item2.price.toStringAsFixed(2));
+         }
+       }
+       subTotal += (item.itemCount * tempPrice);
+     }
+   }
   addToCart({  CartItem item, int itemC}){
     bool hasItem=false;
     if(cartItemName.isEmpty){
@@ -71,24 +68,23 @@ class CartModel with ChangeNotifier {
         dynamicprice=double.parse(item.price.toStringAsFixed(2));
       }
     }
-    return 0.00;
+    return dynamicprice;
   }
 
-  createCart() {
-     List<productPriceModel> priceModel=[];
+   createCart() {
      List<CartItem> temp = [];
-    for (int i = 0; i < 1; i++) {
-      temp.add(CartItem(
-          productName: ProductModel(model: '', name: ''),
-          itemCount: 0,
-          priceModel:priceModel,
-          itemPrice: 0,
-          subTotalPrice: 0,
-      itemcountController: TextEditingController(text: '0'), notifyListeners: () {  }));
-    }
-    cartItemName = temp;
-    notifyListeners();
-  }
+     for (int i = 0; i < 1; i++) {
+       temp.add(CartItem(
+           productName: ProductModel(),
+           itemCount: 0,
+           priceModel:null,
+           itemPrice: 0,
+           subTotalPrice: 0,
+           itemcountController: TextEditingController(text: '0')));
+     }
+     cartItemName = temp;
+     notifyListeners();
+   }
 
   updateCart() {
     List<CartItem> temp = [];
@@ -123,14 +119,14 @@ class CartItem with ChangeNotifier {
    List<productPriceModel> priceModel;
    TextEditingController itemcountController;
 
-  CartItem(
-      { this.productName,
-      this.itemCount = 1,
-         this.priceModel,
-      this.itemPrice,
-      this.subTotalPrice = null,
-        this.itemcountController,
-       notifyListeners()});
+   CartItem(
+       {this.productName = null,
+         this.itemCount = 1,
+         this.priceModel=null,
+         this.itemPrice = null,
+         this.subTotalPrice = null,
+         this.itemcountController,
+         notifyListeners()});
 
 
   
@@ -138,7 +134,7 @@ class CartItem with ChangeNotifier {
     productName=ProductModel(
       price: item.productName.price,
       name: item.productName.name,
-      productCode: item.productName.productCode, model: '',
+      productCode: item.productName.productCode,
 
     );
     priceModel=item.priceModel;

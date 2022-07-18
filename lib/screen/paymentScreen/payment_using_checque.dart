@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -14,11 +15,10 @@ import 'package:salesmen_app_new/widget/loding_indicator.dart';
 //import 'package:image_picker/image_picker.dart';
 
 class PaymentUsingCheck extends StatefulWidget {
-  // var paymentTypedetails;
-  // CustomerModel customerData;
-  // var lat,long;
-  // PaymentUsingCheck({this.paymentTypedetails,required this.customerData,this.lat,this.long});
-  // File _image1;
+  var paymentTypedetails;
+
+  PaymentUsingCheck({this.paymentTypedetails,});
+  File _image1;
 
   @override
   _PaymentUsingCheckState createState() => _PaymentUsingCheckState();

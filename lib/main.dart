@@ -5,6 +5,7 @@ import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/screen/splash_screen/get_started_screen.dart';
@@ -27,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<NewCustomerModel>(
           create: (_) => NewCustomerModel(),
+        ),
+        ChangeNotifierProvider<WalletCapacity>(
+          create: (_) => WalletCapacity(),
         ),
         ChangeNotifierProvider<CartModel>(
           create: (_) => CartModel(),

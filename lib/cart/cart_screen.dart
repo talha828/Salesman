@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/checkout.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -13,11 +15,7 @@ import 'package:shimmer/shimmer.dart';
 
 
 class CartScreen extends StatefulWidget {
-  NewCustomerModel shopDetails;
-  double lat,long;
-  var locationdata;
-  //
-   CartScreen({this.shopDetails, this.lat, this.long, this.locationdata});
+
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -29,7 +27,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     var f = NumberFormat("###,###.0#", "en_US");
-
+    CustomerModel customer=Provider.of<CustomerList>(context).singleCustomer;
     var cartData=Provider.of<CartModel>(context,listen: true).cartItemName;
     var media =MediaQuery.of(context).size;
     double height=media.height;
@@ -60,7 +58,7 @@ class _CartScreenState extends State<CartScreen> {
                       MainAxisAlignment.spaceBetween,
                       children: [
                         VariableText(
-                          text:"Talha",
+                          text:customer.customerShopName,
                           fontsize: 13,
                           fontcolor: textcolorblack,
                           weight: FontWeight.w600,
@@ -72,7 +70,7 @@ class _CartScreenState extends State<CartScreen> {
                           width: height * 0.008,
                         ),
                         VariableText(
-                          text: "0008",
+                          text: customer.customerCode,
                           fontsize: 13,
                           fontcolor: textcolorblack,
                           weight: FontWeight.w400,
@@ -220,7 +218,7 @@ class _CartScreenState extends State<CartScreen> {
                                             children: [
                                               SizedBox(height: height*0.01/2.2,),
                                               VariableText(
-                                                text: "product name",
+                                                text: cartData[index].productName.name,
                                                 fontsize:12,
                                                 textAlign: TextAlign.start,
                                                 fontcolor:Colors.black,
@@ -230,7 +228,7 @@ class _CartScreenState extends State<CartScreen> {
                                               ),
                                               SizedBox(height: height*0.006,),
                                               VariableText(
-                                                text: "brand name",
+                                                text: cartData[index].productName.brand??'-',
                                                 fontsize:9,
                                                 fontcolor:Color(0xff828282),
                                                 weight: FontWeight.w400,
@@ -238,7 +236,7 @@ class _CartScreenState extends State<CartScreen> {
                                               ),
                                               SizedBox(height: 3),
                                               VariableText(
-                                                text: "Model",
+                                                text: cartData[index].productName.model??'-',
                                                 fontsize:9,
                                                 fontcolor:Color(0xff828282),
                                                 weight: FontWeight.w400,
@@ -246,10 +244,9 @@ class _CartScreenState extends State<CartScreen> {
                                               ),
                                               SizedBox(height: height*0.0050,),
                                           VariableText(
-                                            text: 'Rs.2222 '
-                                                /*''
-                                                '${f.format(double.parse((cartData[index].itemCount*calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].productName)).toString()))
-                                              }'*/,
+                                            text: 'Rs. ${f.format(double.parse((cartData[index].itemCount*calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].productName)).toString()))
+                                            }',
+                                            //text: '${f.format(double.parse((cartData[index].itemCount*calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].productName)).toString())) }',
 
                                           fontsize:12,
                                             fontcolor:themeColor1,
@@ -572,7 +569,7 @@ class _CartScreenState extends State<CartScreen> {
           onTap:(){
             cartData.length > 0 ?
             Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckOutScreen(
-            ))) :
+            ))).then((value) =>setState(() {})) :
             Fluttertoast.showToast(msg: "Cart is empty",toastLength: Toast.LENGTH_SHORT);
           },
           child: Container(
@@ -602,9 +599,8 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
   double calculatePrice({int quantity,ProductModel productDetils}){
-    List productDetils=[];
-    double dynamicprice = double.parse("000");
-    for(var item in productDetils){
+    double dynamicprice = double.parse(productDetils.productPrice.last.price.toStringAsFixed(2));
+    for(var item in productDetils.productPrice){
       if(item.min<=quantity && item.max>=quantity){
         dynamicprice=double.parse(item.price.toStringAsFixed(2));
       }
@@ -612,7 +608,6 @@ class _CartScreenState extends State<CartScreen> {
     return dynamicprice;
 
   }
-
 }
 /*void doNothing(BuildContext context,List<CartModel> cartData,int index) {
   cartData.removeAt(index);

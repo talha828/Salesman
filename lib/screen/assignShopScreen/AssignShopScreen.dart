@@ -11,7 +11,8 @@ import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
-import 'package:salesmen_app_new/screen/customer_screen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -155,7 +156,6 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
     var height=MediaQuery.of(context).size.height;
     return Scaffold(
         body: Stack(
-          alignment: Alignment.center,
           children: [
             SingleChildScrollView(
               child: Container(
@@ -224,27 +224,39 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: width *0.78,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5)
-                          ),
-                          child: TextField(
-                            textAlignVertical: TextAlignVertical.center,
-                            decoration: InputDecoration(
-                              suffixIcon: Icon(Icons.search),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                              border: InputBorder.none,
-                              hintText: "Search by shop name",
+                        InkWell(
+                          onTap:(){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => SearchScreen(
+                                      customerModel: index==0?dd.dues:dd.assign,
+                                    )));
+                          },
+                          child: Container(
+                            height: 38,
+                            width: width *0.75,
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5)
                             ),
-                          ),),
+                            child: TextField(
+                              enabled: false,
+                              textAlignVertical: TextAlignVertical.center,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                suffixIcon: Icon(Icons.search),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                border: InputBorder.none,
+                                hintText: "Search by shop name",
+                              ),
+                            ),),
+                        ),
                         IconButton(
                             padding: EdgeInsets.all(0),
                             onPressed: (){
-                              setLoading(true);
-                              getAllCustomerData().then((value) => setLoading(false)).catchError((e)=>setLoading(false));
-                            }, icon: Icon(Icons.refresh,color: themeColor1,size: 30,))
+                              getAllCustomerData();
+                            }, icon: Icon(Icons.refresh,color: themeColor1))
                       ],
                     ),
                     Padding(
@@ -256,7 +268,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                           Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
                         ],),
                     ),
-                    isLoading?Container(
+                    dd.dues.length<1 ||dd.assign.length<1?Container(
                       height: 480,
                       child: Shimmer.fromColors(
                         period: Duration(seconds: 1),
@@ -284,9 +296,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                           },
                         ),
                       ),
-                    ):Consumer<CustomerList>(
-                      builder: (key,customerList,child){
-                        return  Container(
+                    ):  Container(
                             child: index==0?SingleChildScrollView(
                               child: Container(
                                 child: ListView.builder(
@@ -354,13 +364,12 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                 ),
                               ),
                             )
-                        );
-                      },
                     ),
                   ],
                 ),
               ),
             ),
+            isLoading?Positioned.fill(child: ProcessLoading()):Container()
           ],)
     );
   }

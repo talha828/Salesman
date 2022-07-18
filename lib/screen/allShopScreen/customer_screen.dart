@@ -11,6 +11,7 @@ import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -20,23 +21,24 @@ import 'package:shimmer/shimmer.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 
 
-class CustomerScreen extends StatefulWidget {
+class AllShopScreen extends StatefulWidget {
   List<CustomerModel>temp;
   String address;
-  CustomerScreen({this.temp,this.address});
+  AllShopScreen({this.temp,this.address});
   @override
-  State<CustomerScreen> createState() => _CustomerScreenState();
+  State<AllShopScreen> createState() => _AllShopScreenState();
 }
 
-class _CustomerScreenState extends State<CustomerScreen> {
+class _AllShopScreenState extends State<AllShopScreen> {
    Coordinates userLatLng;
   //List<NewCustomerModel> customer=[];
-  bool isLoading=true;
+  bool isLoading=false;
   List<AddressModel>addressList=[];
    loc.Location location = new loc.Location();
   String actualAddress="Searching....";
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
    getAddressFromLatLng() async {
+
      var data =await location.getLocation();
      var lat=data.latitude;
      var lng=data.longitude;
@@ -113,6 +115,8 @@ class _CustomerScreenState extends State<CustomerScreen> {
            }
            customer.sort((a,b)=>a.distance.compareTo(b.distance));
            Provider.of<CustomerList>(context,listen: false).add(customer);
+           Provider.of<CustomerList>(context,listen: false).getDues(customer);
+           Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
            print("done");
            setState(() {
 
@@ -169,34 +173,40 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(child: Text(dd.address,style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500,fontSize: 18),),),
+                    InkWell(
+                      onTap:(){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => SearchScreen(
+                                  customerModel: dd.customerData,
+                                )));
+                      },
+                      child: Container(
+                        height: 38,
+                        width: width *0.75,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(5)
+                        ),
+                        child: TextField(
+                          enabled: false,
+                          style: TextStyle(height: 1),
+                          scrollPadding: EdgeInsets.symmetric(vertical: 0),
+                          textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          suffixIcon: Icon(Icons.search,color:  Colors.grey,),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          border: InputBorder.none,
+                          hintText: "Search by shop name",
+                        ),
+                      ),),
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: width *0.75,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(5)
-                      ),
-                      child: TextField(
-                        textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                        suffixIcon: Icon(Icons.search),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        border: InputBorder.none,
-                        hintText: "Search by shop name",
-                      ),
-                    ),),
                     Spacer(),
                     IconButton(onPressed: (){
                       getAllCustomerData();
-                    }, icon: Icon(Icons.refresh,color: themeColor1,size: 30,))
+                    }, icon: Icon(Icons.refresh,color: themeColor1))
                   ],
                 ),
                 Padding(
@@ -280,7 +290,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
             ),
           ),
         ),
-         // isLoading?LoadingIndicator(width: width, height: height):Container()
+          isLoading?Positioned.fill(child: ProcessLoading()):Container()
       ],)
     );
   }

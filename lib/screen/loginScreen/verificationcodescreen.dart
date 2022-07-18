@@ -171,7 +171,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         ),
         isLoading ? Container(
             alignment: Alignment.center,
-            child: Positioned.fill(child: CircularProgressIndicator())) : Container(),
+            child: Positioned.fill(child: ProcessLoading())) : Container(),
       ],
     );
   }

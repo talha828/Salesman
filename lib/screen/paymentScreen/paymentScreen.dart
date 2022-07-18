@@ -4,7 +4,14 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/screen/paymentScreen/paymentSuccessfull.dart';
+import 'package:salesmen_app_new/screen/paymentScreen/pin_payment_screen.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'dart:math';
@@ -62,6 +69,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    CustomerModel customerData=Provider.of<CustomerList>(context).singleCustomer;
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
@@ -85,7 +93,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               SizedBox(
                 height: height * sizedboxvalue,
               ),
-              paymentDetailsBlock(height, width),
+              paymentDetailsBlock(height, width,customerData),
             ]),
           ),
           /*   bottomNavigationBar: BottomAppBar(
@@ -162,8 +170,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Widget paymentDetailsBlock(double height, double width) {
-    // final userData = Provider.of<UserModel>(context, listen: true);
+  Widget paymentDetailsBlock(double height, double width,CustomerModel customerData) {
+    final userData = Provider.of<UserModel>(context, listen: true);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -209,9 +217,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               horizontal: screenpadding / 2),
                           child: InkWell(
                             onTap: () {
-                              // selectPaymentMethod = true;
-                              // print("print " + index.toString());
-                              // _onselected(index);
+                              selectPaymentMethod = true;
+                              print("print " + index.toString());
+                              _onselected(index);
                               paymentType['payment'][index]['name'] == 'Cash'
                                   ? showDialog(
                                 height,
@@ -222,65 +230,74 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   Name = name;
                                   showAmount = true;
                                   setState(() {
-                                  });}
-                                  )
-                              //     if (validateFields()) {
-                              //       Navigator.of(context).pop();
-                              //       setLoading(true);
-                              //       List<String> tempContact = [];
-                              //       if(widget.customerData.customerContactNumber != null){
-                              //         tempContact.add(widget.customerData.customerContactNumber.substring(0, widget.customerData.customerContactNumber.length));
-                              //       }
-                              //       if(widget.customerData.customerContactNumber2 != null){
-                              //         tempContact.add(widget.customerData.customerContactNumber2);
-                              //       }else{
-                              //         //tempContact.add('+923340243440');
-                              //       }
-                              //       String msgPin = '';
-                              //       var rng = Random();
-                              //       for (var i = 0; i < 4; i++) {
-                              //         msgPin += rng.nextInt(9).toString();
-                              //       }
-                              //       print(msgPin);
-                              //       //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
-                              //       String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کی رقم ادا کی ہے۔";
-                              //       msgData += '\n';
-                              //       msgData += 'آگر یہ رقم درست ہے تو کنفرمیش کے لئے $msgPin ہمارے نمائندے کو بتا دیجئے۔';
-                              //       msgData += '\n';
-                              //       msgData += 'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
-                              //       msgData += '\n';
-                              //       msgData += 'شکریہ۔';
-                              //
-                              //       var response = await OnlineDataBase.sendTextMultiple(tempContact, msgData);
-                              //       if(response.statusCode == 200){
-                              //         setLoading(false);
-                              //         Navigator.push(
-                              //             context,
-                              //             MaterialPageRoute(
-                              //                 builder: (_) => PaymentPin(
-                              //                   pin: msgPin,
-                              //                   contactNumbers: tempContact,
-                              //                   onSuccess: (){
-                              //                     print("@@@@@@@@@@@@@");
-                              //                     //setLoading(false);
-                              //                     postPayment();
-                              //                   },
-                              //                 )
-                              //             ));
-                              //       }else{
-                              //         setLoading(false);
-                              //         Fluttertoast.showToast(
-                              //             msg: "Code not sent, Try again",
-                              //             toastLength: Toast.LENGTH_SHORT);
-                              //       }
-                              //     }
-                              //   },
-                              // )
+                                  });
+                                  if (validateFields()) {
+                                    Navigator.of(context).pop();
+                                    setLoading(true);
+                                    List<String> tempContact = [];
+                                    if(customerData.customerContactNumber != null){
+                                      tempContact.add(customerData.customerContactNumber.substring(0, customerData.customerContactNumber.length));
+                                    }
+                                    // if(widget.customerData.customerContactNumber2 != null){
+                                    //   tempContact.add(widget.customerData.customerContactNumber2);
+                                    // }else{
+                                    //   //tempContact.add('+923340243440');
+                                    // }
+                                    String msgPin = '';
+                                    var rng = Random();
+                                    for (var i = 0; i < 4; i++) {
+                                      msgPin += rng.nextInt(9).toString();
+                                    }
+                                    print(msgPin);
+                                    String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.firstName} %26 Download app https://bit.ly/38uffP8';
+                                    msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
+                                    // msgData += '\n';
+                                    // msgData +=' ';
+                                    // username = userData.userName;
+                                    //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
+                                    // String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کی رقم ادا کی ہے۔";
+                                    // msgData += '\n';
+                                    // msgData += 'آگر یہ رقم درست ہے تو کنفرمیش کے لئے $msgPin ہمارے نمائندے کو بتا دیجئے۔';
+                                    // msgData += '\n';
+                                    // msgData += 'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
+                                    // msgData += '\n';
+                                    // msgData += 'شکریہ۔';
+
+                                    var response = await OnlineDatabase.sendText(tempContact[0], msgData);
+                                    if(response.statusCode == 200){
+                                      setLoading(false);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) => PaymentPin(
+                                                userName:userData.firstName,
+                                                total: totalAmount,
+                                                customer:customerData,
+                                                pin: msgPin,
+                                                contactNumbers: tempContact,
+                                                onSuccess: (){
+                                                  print("@@@@@@@@@@@@@");
+                                                  //setLoading(false);
+                                                  postPayment(customerData);
+                                                },
+                                              )
+                                          ));
+                                    }else{
+                                      setLoading(false);
+                                      Fluttertoast.showToast(
+                                          msg: "Code not sent, Try again",
+                                          toastLength: Toast.LENGTH_SHORT);
+                                    }
+                                  }
+                                },
+                              )
                                   : Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => PaymentUsingCheck()));
-
+                                      builder: (_) => PaymentUsingCheck(
+                                        paymentTypedetails:
+                                        paymentType['payment']
+                                        [index],)));
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -365,6 +382,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
+
+
   bool validateFields() {
     bool ok = false;
     if (Name.isNotEmpty) {
@@ -380,66 +399,67 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
     return ok;
   }
-  // postPayment() async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDataBase.postPayment(customerCode: widget.customerData.customerCode,lat: widget.lat.toString(),long: widget.long.toString(),amount: totalAmount,name: Name,paymentMode: '1');
-  //     print("status code is" + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
-  //       print("response is"+respnseData['results'].toString());
-  //
-  //       List<String> tempContact = [];
-  //       if(widget.customerData.customerContactNumber != null){
-  //         tempContact.add(widget.customerData.customerContactNumber.substring(0, widget.customerData.customerContactNumber.length));
-  //       }
-  //       if(widget.customerData.customerContactNumber2 != null){
-  //         tempContact.add(widget.customerData.customerContactNumber2);
-  //       }else{
-  //         //tempContact.add('+923340243440');
-  //       }
-  //       String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
-  //
-  //       var responseMsg = await OnlineDataBase.sendTextMultiple(tempContact, msgData);
-  //       if(responseMsg.statusCode == 200){
-  //         print("Message sent!!!!!");
-  //       }
-  //
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "Payment Created Successfully",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //       Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen(shopDetails: widget.customerData,long: widget.long,lat: widget.lat,)));
-  //     } else {
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //         msg: "Something went wrong try again later",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0,
-  //       );
-  //     }
-  //   } catch (e,stack) {
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //       msg: "Something went wrong try again later",
-  //       toastLength: Toast.LENGTH_SHORT,
-  //       backgroundColor: Colors.black87,
-  //       textColor: Colors.white,
-  //       fontSize: 16.0,
-  //     );
-  //     print("exception in post payment method is" + e.toString()+stack.toString());
-  //   }
-  // }
-  // bool setLoading(bool loading) {
-  //   setState(() {
-  //     isLoading = loading;
-  //   });
-  // }
+  postPayment(CustomerModel customer) async {
+    try {
+      setLoading(true);
+      var location=await  Location().getLocation();
+      var response = await OnlineDatabase.postPayment(customerCode: customer.customerCode,lat: location.latitude.toString(),long: location.longitude.toString(),amount: totalAmount,name: Name,paymentMode: '1');
+      print("status code is" + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+        print("response is"+respnseData['results'].toString());
+
+        List<String> tempContact = [];
+        if(customer.customerContactNumber != null){
+          tempContact.add(customer.customerContactNumber.substring(0,customer.customerContactNumber.length));
+        }
+        if(customer.customerContactNumber2 != null){
+          tempContact.add(customer.customerContactNumber2);
+        }else{
+          //tempContact.add('+923340243440');
+        }
+        String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
+
+        var responseMsg = await OnlineDatabase.sendTextMultiple(tempContact, msgData);
+        if(responseMsg.statusCode == 200){
+          print("Message sent!!!!!");
+        }
+
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "Payment Created Successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen()));
+      } else {
+        setLoading(false);
+        Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e,stack) {
+      setLoading(false);
+      Fluttertoast.showToast(
+        msg: "Something went wrong try again later",
+        toastLength: Toast.LENGTH_SHORT,
+        backgroundColor: Colors.black87,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      print("exception in post payment method is" + e.toString()+stack.toString());
+    }
+  }
+  bool setLoading(bool loading) {
+    setState(() {
+      isLoading = loading;
+    });
+  }
 
   void showDialog(double height, double width, var paymentTypedetails,
       Function onselected) {

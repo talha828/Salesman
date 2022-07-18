@@ -5,23 +5,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/OrderScreen/sucessfully_generated_order_screen.dart';
 
 
 class CheckOutScreen extends StatefulWidget {
-  NewCustomerModel shopDetails;
-  double lat, long;
-  var locationdata;
 
-  CheckOutScreen({this.shopDetails, this.lat, this.long, this.locationdata});
+
 
   @override
   _CheckOutScreenState createState() => _CheckOutScreenState();
@@ -31,52 +33,54 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   bool skrColor = true;
   bool otherColor = true;
   bool isLoading = false;
-  double walletCapacity = 0;
-  double usedBalance = 0;
-  double availableBalance = 0.0;
-  String orderID = null;
+  String orderID ;
   int navigate = 0;
   List<CartModel> cartList = [];
   List<double> total = [];
   List brandName = [];
-  // void getCustomerTransactionData() async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDatabase.getTranactionDetails(
-  //         customerCode: widget.shopDetails.customerCode);
-  //     //print("Response is: "+response.statusCode.toString()+widget.shopDetails.customerCode );
-  //     print("getTransactionDetails: " + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //       // print("data is"+data.toString());
-  //       var datalist = data['results'];
-  //       walletCapacity =
-  //           double.parse(datalist[0]['CREDIT_LIMIT'].toString()) ?? 0.0;
-  //       usedBalance = double.parse(datalist[0]['BALANCE'].toString()) ?? 0.0;
-  //       availableBalance = walletCapacity - usedBalance;
-  //       Provider.of<WalletCapacity>(context, listen: false)
-  //           .setWalletCapacity(walletCapacity, usedBalance, availableBalance);
-  //       setLoading(false);
-  //     } else {
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "Something went wrong try again later",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //     }
-  //   } catch (e, stack) {
-  //     print('exception is' + e.toString());
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //         msg: "Something went wrong try again later",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //   }
-  // }
+  Future<void> getCustomerTransactionData(String code) async {
+    setLoading(true);
+    try {
+      double walletCapacity = 0;
+      double usedBalance = 0;
+      double availableBalance = 0.0;
+      var response = await OnlineDatabase.getTranactionDetails(
+          customerCode: code);
+      //print("Response is: "+response.statusCode.toString()+widget.shopDetails.customerCode );
+      print("getTransactionDetails: " + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        // print("data is"+data.toString());
+        var datalist = data['results'];
+        walletCapacity =
+            double.parse(datalist[0]['CREDIT_LIMIT'].toString()) ?? 0.0;
+        usedBalance = double.parse(datalist[0]['BALANCE'].toString()) ?? 0.0;
+        availableBalance = walletCapacity - usedBalance;
+        Provider.of<WalletCapacity>(context, listen: false)
+            .setWalletCapacity(walletCapacity, usedBalance, availableBalance);
+        setLoading(false);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Something went wrong try again later",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        setLoading(false);
+
+      }
+    } catch (e, stack) {
+      print('exception is' + e.toString());
+      Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setLoading(false);
+
+    }
+  }
 
   void getTotal(CartModel tempCart, String skr) {
     double temp = 0;
@@ -112,8 +116,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   @override
   Widget build(BuildContext context) {
     var cartData = Provider.of<CartModel>(context, listen: true);
-
     var userDetails = Provider.of<UserModel>(context, listen: true);
+    CustomerModel customer=Provider.of<CustomerList>(context).singleCustomer;
+    WalletCapacity wallet=Provider.of<WalletCapacity>(context);
     // var emp_id =
     //     Provider.of<UserModel>(context, listen: true).userEmpolyeeNumber;
     // var availableBalance =
@@ -122,7 +127,6 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       brandName.add(i.productName.brand);
       print(i.productName.brand);
     }
-    print("aaa: ${availableBalance}");
     cartList.clear();
     total.clear();
     for (var j in brandName.toSet()) {
@@ -213,364 +217,342 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       cartList.addAll(second);
     }
     var f = NumberFormat("###,###.0#", "en_US");
-    Future<bool> _onWillPop() {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => CartScreen(
-                shopDetails: widget.shopDetails,
-                lat: widget.lat,
-                long: widget.long,
-                locationdata: widget.locationdata,
-              )));
-    }
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: MyAppBar(
-              title: 'Checkout',
-              color: themeColor2,
-              color2: textcolorblack,
-              ontap: _onWillPop,
-            ),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.03,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                VariableText(
-                                  text: "Talha"
-                                      .toString(),
-                                  fontsize: 13,
-                                  fontcolor: textcolorblack,
-                                  weight: FontWeight.w600,
-                                  line_spacing: 1.2,
-                                  textAlign: TextAlign.center,
-                                  fontFamily: fontRegular,
-                                ),
-                                SizedBox(
-                                  width: height * 0.008,
-                                ),
-                                VariableText(
-                                  text: "0008"
-                                      .toString(),
-                                  fontsize: 13,
-                                  fontcolor: textcolorblack,
-                                  weight: FontWeight.w400,
-                                  textAlign: TextAlign.start,
-                                  line_spacing: 1.2,
-                                  max_lines: 2,
-                                  fontFamily: fontRegular,
-                                ),
-                              ]),
-                        ),
-                        Container(
-                          child: Row(children: [
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  paymentType = 2;
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3),
-                                    color: (paymentType == 0)
-                                        ? Colors.transparent
-                                        : (paymentType == 2)
-                                        ? themeColor1
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: themeColor1,
-                                    )),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 5),
-                                  child: Text(
-                                    "Cash",
-                                    style: TextStyle(
-                                        color: (paymentType == 0)
-                                            ? themeColor1
-                                            : (paymentType == 2)
-                                            ? Colors.white
-                                            : themeColor1,
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  paymentType = 1;
-                                });
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(3),
-                                    color: (paymentType == 0)
-                                        ? Colors.transparent
-                                        : (paymentType == 1)
-                                        ? themeColor1
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: themeColor1,
-                                    )),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 5),
-                                  child: Text(
-                                    "Credit",
-                                    style: TextStyle(
-                                        color: (paymentType == 0)
-                                            ? themeColor1
-                                            : (paymentType == 1)
-                                            ? Colors.white
-                                            : themeColor1,
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ]),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(screenpadding),
-                    child: Container(
-                      width: width,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: themeColor2,
-                          boxShadow: [
-                            BoxShadow(
-                                color: Color.fromRGBO(31, 31, 31, 0.25),
-                                offset: Offset(0, 0),
-                                blurRadius: 1.5)
-                          ]),
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: MyAppBar(
+            title: 'Checkout',
+            color: themeColor2,
+            color2: textcolorblack,
+            ontap: ()=>Navigator.pop(context),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: height * 0.03,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
-                          children: [
-                            ListView.separated(
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  if (index > -1) {
-                                    return CheckOutCards(
-                                      cartModel: cartList[index],
-                                      total: total[index],
-                                      onTap: () async {
-                                        // if (paymentType != 0) {
-                                        //   setLoading(true);
-                                        //   var response = await OnlineDatabase
-                                        //       .newpostSalesOrder(
-                                        //       brand: cartList[index]
-                                        //           .cartItemName[0]
-                                        //           .productName
-                                        //           .brand,
-                                        //       sub_total: total[index]
-                                        //           .toString(),
-                                        //       emp_id: emp_id,
-                                        //       paymentMethod: paymentType
-                                        //           .toString(),
-                                        //       cartData: cartList[index],
-                                        //       lat:
-                                        //       widget.lat.toString(),
-                                        //       long: widget.long
-                                        //           .toString(),
-                                        //       customerCode: widget
-                                        //           .shopDetails
-                                        //           .customerCode)
-                                        //       .catchError(
-                                        //         (e) => AwesomeDialog(
-                                        //       context: context,
-                                        //       dialogType: DialogType.INFO,
-                                        //       useRootNavigator: false,
-                                        //       animType: AnimType.BOTTOMSLIDE,
-                                        //       title: "Something went wrong",
-                                        //       desc:
-                                        //       "Please check your available balances",
-                                        //       btnCancelText: "Cart Page",
-                                        //       dismissOnTouchOutside: false,
-                                        //       btnOkOnPress: () {},
-                                        //     )..show().then(
-                                        //             (value) => setLoading(false)),
-                                        //   );
-                                        //   if (response.statusCode == 200) {
-                                        //     cartData.cartItemName.removeWhere(
-                                        //             (element) =>
-                                        //         element.productName.brand ==
-                                        //             cartList[index]
-                                        //                 .cartItemName[0]
-                                        //                 .productName
-                                        //                 .brand);
-                                        //     brandName.removeWhere((element) =>
-                                        //     element ==
-                                        //         cartList[index]
-                                        //             .cartItemName[0]
-                                        //             .productName
-                                        //             .brand);
-                                        //     paymentType = 0;
-                                        //     cartList.remove(cartList[index]);
-                                        //     var responseSms =
-                                        //     await OnlineDataBase.sendText(
-                                        //         widget.shopDetails
-                                        //             .customerContactNumber,
-                                        //         "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
-                                        //
-                                        //     // var data = jsonDecode(utf8.decode(response.bodyBytes));
-                                        //     orderID = response.data["message"]
-                                        //         .toString()
-                                        //         .substring(13)
-                                        //         .trim();
-                                        //     print(orderID);
-                                        //     getCustomerTransactionData();
-                                        //     Fluttertoast.showToast(
-                                        //         msg:
-                                        //         "order placed successfully ${availableBalance.toStringAsFixed(2)}",
-                                        //         toastLength: Toast.LENGTH_SHORT,
-                                        //         backgroundColor: Colors.black87,
-                                        //         textColor: Colors.white,
-                                        //         fontSize: 16.0);
-                                        //     if (cartList.length < 1) {
-                                        //       Navigator.push(
-                                        //           context,
-                                        //           MaterialPageRoute(
-                                        //               builder: (context) =>
-                                        //                   SucessFullyGeneratedOrderScreen(
-                                        //                     shopDetails: widget
-                                        //                         .shopDetails,
-                                        //                     long: widget.long,
-                                        //                     lat: widget.lat,
-                                        //                     orderID: orderID,
-                                        //                   )));
-                                        //     }
-                                        //     setLoading(false);
-                                        //   } else {
-                                        //     print("Response is" +
-                                        //         response.statusCode.toString());
-                                        //     Fluttertoast.showToast(
-                                        //         msg:
-                                        //         "Cannot palace order above ${availableBalance.toStringAsFixed(2)}",
-                                        //         toastLength: Toast.LENGTH_SHORT,
-                                        //         backgroundColor: Colors.black87,
-                                        //         textColor: Colors.white,
-                                        //         fontSize: 16.0);
-                                        //   }
-                                        // } else {
-                                        //   Fluttertoast.showToast(
-                                        //       msg:
-                                        //       "Please select Payment Method",
-                                        //       toastLength: Toast.LENGTH_SHORT,
-                                        //       backgroundColor: Colors.black87,
-                                        //       textColor: Colors.white,
-                                        //       fontSize: 16.0);
-                                        // }
-                                      },
-                                      width: width,
-                                      height: height,
-                                    );
-                                  }
-                                  return Container();
-                                },
-                                separatorBuilder: (context, index) {
-                                  return SizedBox(
-                                    height: 10,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              VariableText(
+                                text: customer.customerShopName.length>15?customer.customerShopName.substring(0,15)+"...":customer.customerShopName,
+                                fontsize: 13,
+                                fontcolor: textcolorblack,
+                                weight: FontWeight.w600,
+                                line_spacing: 1.2,
+                                textAlign: TextAlign.center,
+                                fontFamily: fontRegular,
+                              ),
+                              SizedBox(
+                                width: height * 0.008,
+                              ),
+                              VariableText(
+                                text: customer.customerCode.toString()
+                                    .toString(),
+                                fontsize: 13,
+                                fontcolor: textcolorblack,
+                                weight: FontWeight.w400,
+                                textAlign: TextAlign.start,
+                                line_spacing: 1.2,
+                                max_lines: 2,
+                                fontFamily: fontRegular,
+                              ),
+                            ]),
+                      ),
+                      Container(
+                        child: Row(children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                paymentType = 2;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color: (paymentType == 0)
+                                      ? Colors.transparent
+                                      : (paymentType == 2)
+                                      ? themeColor1
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                    color: themeColor1,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 5),
+                                child: Text(
+                                  "Cash",
+                                  style: TextStyle(
+                                      color: (paymentType == 0)
+                                          ? themeColor1
+                                          : (paymentType == 2)
+                                          ? Colors.white
+                                          : themeColor1,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                paymentType = 1;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color: (paymentType == 0)
+                                      ? Colors.transparent
+                                      : (paymentType == 1)
+                                      ? themeColor1
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                    color: themeColor1,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 5),
+                                child: Text(
+                                  "Credit",
+                                  style: TextStyle(
+                                      color: (paymentType == 0)
+                                          ? themeColor1
+                                          : (paymentType == 1)
+                                          ? Colors.white
+                                          : themeColor1,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]),
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(screenpadding),
+                  child: Container(
+                    width: width,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: themeColor2,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(31, 31, 31, 0.25),
+                              offset: Offset(0, 0),
+                              blurRadius: 1.5)
+                        ]),
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          ListView.separated(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                if (index > -1) {
+                                  return CheckOutCards(
+                                    cartModel: cartList[index],
+                                    total: total[index],
+                                    onTap: () async {
+                                      if (paymentType != 0) {
+                                        Location _location=new Location();
+                                        var data =await _location.getLocation();
+                                        setLoading(true);
+                                        var response = await OnlineDatabase
+                                            .newpostSalesOrder(
+                                            brand: cartList[index]
+                                                .cartItemName[0]
+                                                .productName
+                                                .brand,
+                                            sub_total: total[index]
+                                                .toString(),
+                                            emp_id: userDetails.id,
+                                            paymentMethod: paymentType
+                                                .toString(),
+                                            cartData: cartList[index],
+                                            lat:data.latitude.toString(),
+                                            long: data.longitude.toString(),
+                                            customerCode: customer.customerCode)
+                                            .catchError(
+                                              (e) => AwesomeDialog(
+                                            context: context,
+                                            dialogType: DialogType.INFO,
+                                            useRootNavigator: false,
+                                            animType: AnimType.BOTTOMSLIDE,
+                                            title: "Something went wrong",
+                                            desc:
+                                            "Please check your available balances",
+                                            btnCancelText: "Cart Page",
+                                            dismissOnTouchOutside: false,
+                                            btnOkOnPress: () {},
+                                          )..show().then(
+                                                  (value) => setLoading(false)),
+                                        );
+                                        if (response.statusCode == 200) {
+                                          cartData.cartItemName.removeWhere(
+                                                  (element) =>
+                                              element.productName.brand ==
+                                                  cartList[index]
+                                                      .cartItemName[0]
+                                                      .productName
+                                                      .brand);
+                                          brandName.removeWhere((element) =>
+                                          element ==
+                                              cartList[index]
+                                                  .cartItemName[0]
+                                                  .productName
+                                                  .brand);
+                                          paymentType = 0;
+                                          cartList.remove(cartList[index]);
+                                          var responseSms =
+                                          await OnlineDatabase.sendText(
+                                              customer.customerContactNumber,
+                                              "آپ نے ہمارے نمائندے ${userDetails.firstName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
+
+                                          // var data = jsonDecode(utf8.decode(response.bodyBytes));
+                                          orderID = response.data["message"]
+                                              .toString()
+                                              .substring(13)
+                                              .trim();
+                                          print(orderID);
+                                             await getCustomerTransactionData(customer.customerCode);
+                                          Fluttertoast.showToast(
+                                              msg:
+                                              "order placed successfully ${wallet.availableBalance.toStringAsFixed(2)}",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              backgroundColor: Colors.black87,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0);
+                                          if (cartList.length < 1) {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SucessFullyGeneratedOrderScreen(
+                                                          orderID: orderID,
+                                                        )));
+                                          }
+                                          setLoading(false);
+                                        } else {
+                                          print("Response is" +
+                                              response.statusCode.toString());
+                                          Fluttertoast.showToast(
+                                              msg:
+                                              "Cannot palace order above ${wallet.availableBalance.toStringAsFixed(2)}",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              backgroundColor: Colors.black87,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0);
+                                        }
+                                      } else {
+                                        Fluttertoast.showToast(
+                                            msg:
+                                            "Please select Payment Method",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            backgroundColor: Colors.black87,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0);
+                                      }
+                                    },
+                                    width: width,
+                                    height: height,
                                   );
-                                },
-                                itemCount: brandName.toSet().length),
-                            Container(
-                              height: 1,
-                              color: Color(0xffE0E0E0),
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Row(
-                              children: [
-                                VariableText(
-                                  text: 'Available Balances',
-                                  fontsize: 14,
-                                  fontcolor: textcolorgrey,
-                                  weight: FontWeight.w400,
-                                  fontFamily: fontRegular,
-                                ),
-                                Spacer(),
-                                VariableText(
-                                  text: 'Rs. ' +
-                                      f.format(double.parse(
-                                          availableBalance.toStringAsFixed(
-                                              2))), //${subtotal.toString()}',
-                                  fontsize: 14, fontcolor: textcolorgrey,
-                                  weight: FontWeight.w400,
-                                  fontFamily: fontRegular,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: height * 0.01,
-                            ),
-                            Container(
-                              height: 1,
-                              color: Color(0xffE0E0E0),
-                            ),
-                            SizedBox(
-                              height: height * 0.02,
-                            ),
-                            Row(
-                              children: [
-                                VariableText(
-                                  text: 'Sub Total',
-                                  fontsize: 14,
-                                  fontcolor: textcolorgrey,
-                                  weight: FontWeight.w400,
-                                  fontFamily: fontRegular,
-                                ),
-                                Spacer(),
-                                VariableText(
-                                  text: 'Rs. ' +
-                                      f.format(double.parse(
-                                          subtotal.toStringAsFixed(
-                                              2))), //${subtotal.toString()}',
-                                  fontsize: 14, fontcolor: textcolorgrey,
-                                  weight: FontWeight.w400,
-                                  fontFamily: fontRegular,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: height * 0.015,
-                            ),
-                          ],
-                        ),
+                                }
+                                return Container();
+                              },
+                              separatorBuilder: (context, index) {
+                                return SizedBox(
+                                  height: 10,
+                                );
+                              },
+                              itemCount: brandName.toSet().length),
+                          Container(
+                            height: 1,
+                            color: Color(0xffE0E0E0),
+                          ),
+                          SizedBox(
+                            height: height * 0.02,
+                          ),
+                          Row(
+                            children: [
+                              VariableText(
+                                text: 'Available Balances',
+                                fontsize: 14,
+                                fontcolor: textcolorgrey,
+                                weight: FontWeight.w400,
+                                fontFamily: fontRegular,
+                              ),
+                              Spacer(),
+                              VariableText(
+                                text: 'Rs. ' +
+                                    f.format(double.parse(
+                                        wallet.availableBalance.toStringAsFixed(
+                                            2))), //${subtotal.toString()}',
+                                fontsize: 14, fontcolor: textcolorgrey,
+                                weight: FontWeight.w400,
+                                fontFamily: fontRegular,
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Container(
+                            height: 1,
+                            color: Color(0xffE0E0E0),
+                          ),
+                          SizedBox(
+                            height: height * 0.02,
+                          ),
+                          Row(
+                            children: [
+                              VariableText(
+                                text: 'Sub Total',
+                                fontsize: 14,
+                                fontcolor: textcolorgrey,
+                                weight: FontWeight.w400,
+                                fontFamily: fontRegular,
+                              ),
+                              Spacer(),
+                              VariableText(
+                                text: 'Rs. ' +
+                                    f.format(double.parse(
+                                        subtotal.toStringAsFixed(
+                                            2))), //${subtotal.toString()}',
+                                fontsize: 14, fontcolor: textcolorgrey,
+                                weight: FontWeight.w400,
+                                fontFamily: fontRegular,
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: height * 0.015,
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
-          isLoading ? Positioned.fill(child: CircularProgressIndicator(color: themeColor1,)) : Container()
-        ],
-      ),
+        ),
+        isLoading ? Positioned.fill(child: ProcessLoading()) : Container()
+      ],
     );
   }
 

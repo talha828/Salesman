@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,7 +8,13 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/product_model.dart';
+import 'package:salesmen_app_new/model/wallet_capacity.dart';
+import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -19,19 +25,11 @@ import 'package:salesmen_app_new/screen/other/other.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentScreen.dart';
 
 class CheckInScreen extends StatefulWidget {
-
-  // CustomerModel shopDetails;
-  // List<CustomerModel> customerList;
-  // double lat, long;
-  // var locationdata;
-  // bool fromShop;
-  // CheckInScreen(
-  //     {required this.shopDetails,
-  //       required this.customerList,
-  //       required this.lat,
-  //       required this.long,
-  //       required this.fromShop,
-  //       this.locationdata});
+  CustomerModel shopDetails;
+  List<CustomerModel> customerList;
+  CheckInScreen(
+      { this.shopDetails,
+         this.customerList,});
 
   @override
   _CheckInScreenState createState() => _CheckInScreenState();
@@ -39,217 +37,285 @@ class CheckInScreen extends StatefulWidget {
 
 class _CheckInScreenState extends State<CheckInScreen> {
   bool isLoading = false;
-  // double walletCapacity = 0;
-  // double usedBalance = 0;
-  // double availableBalance = 0.0;
-  // late CustomerModel userDetails;
-  // // List<ProductModel> product = [];
-  // var f = NumberFormat("###,###.0#", "en_US");
-  //
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   getUser();
-  //   getCustomerTransactionData();
-  //   showDistance();
-  //   getAllProductData();
-  // }
-  // Coordinates userLatLng;
-  //
-  // calculateDistance(double lat,double long)async{
-  //   Location location = new Location();
-  //   var _location = await location.getLocation();
-  //   print(_location.latitude);
-  //   print(_location.longitude);
-  //   print(widget.lat);
-  //   print(widget.long);
-  //   var distance = geo.Geolocator.distanceBetween(
-  //       _location.latitude, _location.longitude,
-  //       lat, long);
-  //   return distance;
-  // }
-  // void showDistance()async{
-  //   print(widget.shopDetails.);
-  //   print(widget.shopDetails.customerLongitude);
-  //   var dist=await calculateDistance(double.parse(widget.shopDetails.customerLatitude.toString()), double.parse(widget.shopDetails.customerLongitude.toString()));
-  //   if(dist > 100){
-  //     AwesomeDialog(
-  //       context: context,
-  //       dialogType: DialogType.INFO,
-  //       animType: AnimType.BOTTOMSLIDE,
-  //       title: dist.toStringAsFixed(0)+" m",
-  //       desc: "Dukan ki location update karo warna fuel expense nahi milega.",
-  //       btnOkText: "Update",
-  //       btnCancelText: "Ok",
-  //       dismissOnTouchOutside: false,
-  //       btnCancelOnPress: () {
-  //       },
-  //       btnOkOnPress: () async{
-  //         var response = await OnlineDataBase.getSingleCustomer(widget.shopDetails.customerCode);
-  //         print("Response is" + response.statusCode.toString());
-  //         if (response.statusCode == 200) {
-  //           var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //           // print("Response is" + data.toString());
-  //           var userDetail =  CustomerModel.fromModel(data['results'][0]);
-  //           print(userDetail.editable);
-  //           if(userDetail.editable == 'Y'){
-  //             Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(
-  //                     builder: (_) => EditShopScreen(
-  //                       lat: widget.lat,
-  //                       long: widget.long,
-  //                       shopData: widget.shopDetails,
-  //                       locationdata: widget.locationdata,
-  //                     )));
-  //           }else{
-  //             Fluttertoast.showToast(
-  //                 msg: "Edit not allowed. Call to open edit shop",
-  //                 toastLength: Toast.LENGTH_SHORT,
-  //                 backgroundColor: Colors.black87,
-  //                 textColor: Colors.white,
-  //                 fontSize: 16.0);
-  //             showDistance();
-  //           }
-  //         }
-  //         else if (response.statusCode != 200) {
-  //           var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //           setLoading(false);
-  //           Fluttertoast.showToast(
-  //               msg: "Internet Issue",
-  //               toastLength: Toast.LENGTH_SHORT,
-  //               backgroundColor: Colors.black87,
-  //               textColor: Colors.white,
-  //               fontSize: 16.0);
-  //         }
-  //       },
-  //     )..show();
-  //   }
-  // }
-  // void getAllProductData() async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDataBase.getAllPrdouct();
-  //     //print("getAllProduct: " + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //       product = [];
-  //       // print("Response is" + data.toString());
-  //       var datalist = data['results'];
-  //       print("data is " + datalist.toString());
-  //       if (datalist != null) {
-  //         // if(datalist!=null) {
-  //         for (var item in datalist) {
-  //           //   if(item['PRICE'] != null){
-  //           /*   ProductModel productt = ProductModel(
-  //                 price: int.parse(item['SELLING_PRICE'].toStringAsFixed(0)),
-  //                 name:item['PRODUCT'],
-  //                 productCode:item['PROD_CODE']);*/
-  //           product.add(ProductModel.fromJson(item));
-  //           // product.add(item);
-  //           //   }
-  //           /*        if(item['SELLING_PRICE'] != null){
-  //             ProductModel productt = ProductModel(
-  //                 price: int.parse(item['SELLING_PRICE'].toStringAsFixed(0)),
-  //                 name:item['PRODUCT'],
-  //                 productCode:item['PROD_CODE']);
-  //
-  //             product.add(productt);
-  //           }*/
-  //           /*    else{
-  //             continue;
-  //           }*/
-  //         }
-  //         print("new data is " + product.length.toString());
-  //         setLoading(false);
-  //       }
-  //     } else if (response.statusCode == 400) {
-  //       var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "${data['results'].toString()}",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //     }
-  //   } catch (e, stack) {
-  //     print('exception is' + e.toString() + stack.toString());
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //         msg: "Something went wrong try again letter",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //   }
-  // }
-  //
-  // void getCustomerTransactionData() async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDataBase.getTranactionDetails(
-  //         customerCode: widget.shopDetails.customerCode);
-  //     //print("Response is: "+response.statusCode.toString()+widget.shopDetails.customerCode );
-  //     print("getTransactionDetails: " + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //       // print("data is"+data.toString());
-  //       var datalist = data['results'];
-  //       walletCapacity =
-  //           double.parse(datalist[0]['CREDIT_LIMIT'].toString()) ?? 0.0;
-  //       usedBalance = double.parse(datalist[0]['BALANCE'].toString()) ?? 0.0;
-  //       availableBalance = walletCapacity - usedBalance;
-  //       Provider.of<WalletCapacity>(context, listen: false)
-  //           .setWalletCapacity(walletCapacity, usedBalance, availableBalance);
-  //       setLoading(false);
-  //     } else {
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "Something went wrong try again later",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //     }
-  //   } catch (e, stack) {
-  //     print('exception is' + e.toString());
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //         msg: "Something went wrong try again later",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //   }
-  // }
-  //
-  // getUser() async {
-  //   var response =
-  //   await OnlineDataBase.getSingleCustomer(widget.shopDetails.customerCode);
-  //   if (response.statusCode == 200) {
-  //     var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //     print(data.toString());
-  //     userDetails = CustomerModel.fromModel(data['results'][0]);
-  //   } else {
-  //     print("User not found!!!!!");
-  //     setLoading(false);
-  //   }
-  // }
+
+  @override
+  void initState() {
+    super.initState();
+    getCustomerTransactionData();
+    getSliderImage();
+    showDistance();
+    getAllProductCategory();
+    getAllSearchProduct();
+  }
+  void getAllSearchProduct() async {
+    try {
+      List<ProductModel>searchProduct=[];
+      setLoading(true);
+      var response = await OnlineDatabase.getAllproductsubcategory(
+          subTypeId: "", maintypeId: "");
+      print("Response is" + response.statusCode.toString());
+      //print("Response is" + response .toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        searchProduct = [];
+        var datalist = data['results'];
+        // print("data is "+datalist.toString());
+        if (datalist.isNotEmpty) {
+          for (var item in datalist) {
+            searchProduct.add(ProductModel.fromJson(item));
+          }
+          Provider.of<CustomerList>(context,listen: false).addSearchProduct(searchProduct);
+          setLoading(false);
+        } else {
+          setLoading(false);
+          Fluttertoast.showToast(
+              msg: "Product not found",
+              toastLength: Toast.LENGTH_SHORT,
+              backgroundColor: Colors.black87,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      } else if (response.statusCode == 400) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "${data['results'].toString()}",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else if (response.statusCode == 401) {
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "User not found",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Something went wrong try again later",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e, stack) {
+      print('exception is' + e.toString() + stack.toString());
+      setLoading(false);
+      Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+  void getCustomerTransactionData() async {
+    setLoading(true);
+    try {
+      double walletCapacity = 0;
+      double usedBalance = 0;
+      double availableBalance = 0.0;
+      var response = await OnlineDatabase.getTranactionDetails(
+          customerCode: widget.shopDetails.customerCode);
+      //print("Response is: "+response.statusCode.toString()+widget.shopDetails.customerCode );
+      print("getTransactionDetails: " + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        // print("data is"+data.toString());
+        var datalist = data['results'];
+        walletCapacity =
+            double.parse(datalist[0]['CREDIT_LIMIT'].toString()) ?? 0.0;
+        usedBalance = double.parse(datalist[0]['BALANCE'].toString()) ?? 0.0;
+        availableBalance = walletCapacity - usedBalance;
+        Provider.of<WalletCapacity>(context, listen: false)
+            .setWalletCapacity(walletCapacity, usedBalance, availableBalance);
+        setLoading(false);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Something went wrong try again later",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        setLoading(false);
+
+      }
+    } catch (e, stack) {
+      print('exception is' + e.toString());
+      Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      setLoading(false);
+
+    }
+  }
+  getSliderImage()async{
+    List<Widget> imageContainer=[];
+    Uri url=Uri.parse("https://suqexpress.com/api/getsliderimages");
+    var response= await http.get(url).then((response) {
+      print(response.body);
+      if(response.statusCode==200){
+        var data=jsonDecode(utf8.decode(response.bodyBytes));
+        var item=data['data'];
+        for (var image in item){
+          var temp=ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(image['url'],fit: BoxFit.fill,cacheHeight: 200,width: 500,filterQuality: FilterQuality.low,),
+          );
+          print(image["url"]);
+          imageContainer.add(temp);
+          Provider.of<CustomerList>(context,listen: false).clearSliderImage();
+          Provider.of<CustomerList>(context,listen: false).sliderPicture(imageContainer);
+        }
+      }
+    });
+  }
+  void getAllProductCategory() async {
+    try {
+      var response = await OnlineDatabase.getAllCategories();
+      print("Response is" + response.statusCode.toString());
+      //print("Response is" + response .toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        List<ProductModel>  product = [];
+        var datalist = data['results'];
+        // print("data is "+datalist.toString());
+        if (datalist.isNotEmpty) {
+          for (var item in datalist) {
+            product.add(ProductModel.getProductMainCategory(item));
+          }
+          Provider.of<CustomerList>(context,listen: false).clearProductList();
+          Provider.of<CustomerList>(context,listen: false).addProduct(product);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Product not found",
+              toastLength: Toast.LENGTH_SHORT,
+              backgroundColor: Colors.black87,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      } else if (response.statusCode == 400) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        Fluttertoast.showToast(
+            msg: "${data['results'].toString()}",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else if (response.statusCode == 401) {
+        Fluttertoast.showToast(
+            msg: "User not found",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Something went wrong try again later",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e, stack) {
+      print('exception is' + e.toString() + stack.toString());
+      Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+  calculateDistance(double lat,double long)async{
+    Location location = new Location();
+    var _location = await location.getLocation();
+    print(_location.latitude);
+    print(_location.longitude);
+    var distance = geo.Geolocator.distanceBetween(
+        _location.latitude, _location.longitude,
+        lat, long);
+    return distance;
+  }
+  void showDistance()async{
+       var dist=await calculateDistance(double.parse(widget.shopDetails.customerLatitude.toString()), double.parse(widget.shopDetails.customerLongitude.toString()));
+    if(dist > 100){
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.INFO,
+        animType: AnimType.BOTTOMSLIDE,
+        title: dist.toStringAsFixed(0)+" m",
+        desc: "Dukan ki location update karo warna fuel expense nahi milega.",
+        btnOkText: "Update",
+        btnCancelText: "Ok",
+        dismissOnTouchOutside: false,
+        btnCancelOnPress: () {
+        },
+        btnOkOnPress: () async{
+          var response = await OnlineDatabase.getSingleCustomer(widget.shopDetails.customerCode);
+          print("Response is" + response.statusCode.toString());
+          if (response.statusCode == 200) {
+            var data = jsonDecode(utf8.decode(response.bodyBytes));
+            // print("Response is" + data.toString());
+            var userDetail =  CustomerModel.fromModel(data['results'][0]);
+            print(userDetail.editable);
+            if(userDetail.editable == 'Y'){
+              // Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (_) => EditShopScreen(
+              //           lat: widget.lat,
+              //           long: widget.long,
+              //           shopData: widget.shopDetails,
+              //           locationdata: widget.locationdata,
+              //         )));
+            }else{
+              Fluttertoast.showToast(
+                  msg: "Edit not allowed. Call to open edit shop",
+                  toastLength: Toast.LENGTH_SHORT,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+              showDistance();
+            }
+          }
+          else if (response.statusCode != 200) {
+            var data = jsonDecode(utf8.decode(response.bodyBytes));
+            setLoading(false);
+            Fluttertoast.showToast(
+                msg: "Internet Issue",
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.black87,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        },
+      )..show();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    // var cartData = Provider.of<CartModel>(context, listen: true).cartItemName;
-    // var returncartData =
-    //     Provider.of<RetrunCartModel>(context, listen: true).returncartItemName;
+    CustomerModel myCustomer=Provider.of<CustomerList>(context).singleCustomer;
+    WalletCapacity wallet=Provider.of<WalletCapacity>(context);
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: Text("Check In",style: TextStyle(color: Colors.white),),),
+          appBar: MyAppBar(
+            title: 'Check-In',
+            ontap: () {
+              Navigator.pop(context);
+            },
+          ),
           body: SingleChildScrollView(
             child: Column(children: [
               Container(
@@ -272,37 +338,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(5),
-                            child: Image.asset("assets/icons/person.png"),
-                            // LayoutBuilder(
-                            //   builder: (_, constraints) =>
-                            //   //     Image.network(
-                            //   //           "https://www.google.com/imgres?imgurl=https%3A%2F%2Fuxwing.com%2Fwp-content%2Fthemes%2Fuxwing%2Fdownload%2F12-peoples-avatars%2Fman-person.svg&imgrefurl=https%3A%2F%2Fuxwing.com%2Fman-person-icon%2F&tbnid=MrN-edLXXKXDuM&vet=12ahUKEwjtt_zikof4AhXP34UKHYgJA28QMygEegUIARDnAQ..i&docid=KGgvFIic4jls2M&w=787&h=800&q=person%20icon&ved=2ahUKEwjtt_zikof4AhXP34UKHYgJA28QMygEegUIARDnAQ"
-                            //   //   //   widget.shopDetails.customerImage
-                            //   //   //       .toString() ==
-                            //   //   //       "No Image" ||
-                            //   //   //       widget.shopDetails.customerImage ==
-                            //   //   //           null
-                            //   //   //       ? "https://i.stack.imgur.com/y9DpT.jpg"
-                            //   //   //       : widget.shopDetails.customerImage
-                            //   //   //       .split('{"')[1]
-                            //   //   //       .split('"}')[0],
-                            //   //   //   fit: BoxFit.fill, loadingBuilder:
-                            //   //   //   (BuildContext context, Widget child,
-                            //   //   //   ImageChunkEvent loadingProgress) {
-                            //   //   // if (loadingProgress == null) return child;
-                            //   //   // return Center(
-                            //   //   //   child: CircularProgressIndicator(
-                            //   //   //     value: loadingProgress
-                            //   //   //         .expectedTotalBytes !=
-                            //   //   //         null
-                            //   //   //         ? loadingProgress
-                            //   //   //         .cumulativeBytesLoaded /
-                            //   //   //         loadingProgress.expectedTotalBytes
-                            //   //   //         : null,
-                            //   //   //   ),
-                            //   //   // );}
-                            //   // ),
-                            // ),
+                            child: Image.asset("assets/icons/person.png",color: Colors.grey,),
                           ),
                         ),
                       ),
@@ -317,7 +353,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                               children: [
                                 // SizedBox(height: height*0.0055,),
                                 VariableText(
-                                  text: "Hadi Autos"
+                                  text: myCustomer.customerShopName.toString()
                                       .toString(),
                                   //text: widget.shopDetails['name'],
                                   fontsize: 15, fontcolor: textcolorblack,
@@ -336,7 +372,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                       child: Padding(
                                         padding: EdgeInsets.only(top: 0.0),
                                         child: VariableText(
-                                          text: "13235",
+                                          text: myCustomer.customerCode,
                                           // text: widget.shopDetails['address'],
                                           fontsize: 14,
                                           fontcolor: textcolorgrey,
@@ -358,83 +394,11 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           ),
                         ),
                       ),
-                      // Expanded(
-                      //   flex: 3,
-                      //   child: InkWell(
-                      //     onTap: () {
-                      //       Navigator.push(
-                      //           context,
-                      //           MaterialPageRoute(
-                      //               builder: (_) => EditShopScreen(
-                      //                     lat: widget.lat,
-                      //                     long: widget.long,
-                      //                     shopData: widget.shopDetails,
-                      //                     locationdata: widget.locationdata,
-                      //                   )));
-                      //     },
-                      //     child: Container(
-                      //       height: height * 0.045,
-                      //       decoration: BoxDecoration(
-                      //           color: themeColor1 /*:Color(0xff1F92F6)*/,
-                      //           borderRadius: BorderRadius.circular(5)),
-                      //       child: Padding(
-                      //         padding: const EdgeInsets.all(8.0),
-                      //         child: Center(
-                      //           child: VariableText(
-                      //             text: 'Edit Shop',
-                      //             fontsize: 11,
-                      //             fontcolor: themeColor2,
-                      //             weight: FontWeight.w700,
-                      //             fontFamily: fontRegular,
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // )
+
                     ],
                   ),
                 ),
               ),
-              // SizedBox(
-              //   height: height * 0.01,
-              // ),
-              // Container(
-              //   height: height * 0.07,
-              //   width: width,
-              //   color: Color.fromARGB(80, 246, 130, 31),
-              //   child: Padding(
-              //     padding: EdgeInsets.symmetric(horizontal: screenpadding),
-              //     child: Row(
-              //       crossAxisAlignment: CrossAxisAlignment.center,
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         Expanded(
-              //           child: Text.rich(TextSpan(
-              //               text: 'Alert: ',
-              //               style: TextStyle(
-              //                 fontSize: 16, color: themeColor1,
-              //                 fontWeight: FontWeight.w500,
-              //                 fontFamily: fontMedium,
-              //                 //: 2,
-              //               ),
-              //               children: <InlineSpan>[
-              //                 TextSpan(
-              //                   text:
-              //                       'Clear your remaining amount to buy more favourite items. Thank you',
-              //                   style: TextStyle(
-              //                     fontSize: 14, color: themeColor1,
-              //                     fontWeight: FontWeight.w500,
-              //                     fontFamily: fontRegular,
-              //                     //max_lines: 2,
-              //                   ),
-              //                 )
-              //               ])),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
               SizedBox(
                 height: height * 0.01,
               ),
@@ -483,8 +447,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                 ),
                                 Spacer(),
                                 VariableText(
-                                  text: "Rs. " +
-                                      f.format(double.parse("15000")),
+                                  text:wallet.capacity.toString()=="null"?"- -": "Rs. " +
+                                      f.format(double.parse(wallet.capacity.toString().length<5?wallet.capacity.toString(): wallet.capacity.toStringAsFixed(2),)),
 
                                   fontsize: 14,
                                   fontcolor: Color(0xff1F92F6),
@@ -511,8 +475,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                 ),
                                 Spacer(),
                                 VariableText(
-                                  text:
-                                  "Rs " + f.format(double.parse("15000")),
+                                  text:wallet.usedBalance.toString()=="null"?"- -":
+                                  "Rs " + f.format(double.parse(wallet.usedBalance.toString().length<5? wallet.usedBalance.toString(): wallet.usedBalance.toStringAsFixed(2),)),
 
                                   fontsize: 14,
                                   fontcolor: textcolorblack,
@@ -535,9 +499,9 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                 ),
                                 Spacer(),
                                 VariableText(
-                                  text: "Rs. " +
-                                      f.format(double.parse("15000")),
-
+                                  text:wallet.availableBalance.toString()=="null"?"- -":
+                                  "Rs. " +
+                                      f.format(double.parse(wallet.availableBalance.toString().length<5?wallet.availableBalance.toString(): wallet.availableBalance.toStringAsFixed(2))),
                                   fontsize: 14,
                                   fontcolor: themeColor1,
                                   weight: FontWeight.w500,
@@ -705,7 +669,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
             ]),
           ),
         ),
-        isLoading ? Positioned.fill(child: LoadingIndicator(height: height,width: width,)) : Container(),
+        isLoading ? Positioned.fill(child: ProcessLoading()) : Container(),
       ],
     );
   }
@@ -715,55 +679,4 @@ class _CheckInScreenState extends State<CheckInScreen> {
       isLoading = loading;
     });
   }
-
-  // void PostEmployeeVisit(
-  //     {required String customerCode,
-  //       required String purpose,
-  //       required String lat,
-  //       required String long,
-  //       required CustomerModel customerData}) async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDataBase.postEmployeeVisit(
-  //         customerCode: customerCode, purpose: purpose, long: long, lat: lat);
-  //     print("Response is" + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       ;
-  //       Provider.of<CartModel>(context, listen: false).clearCart();
-  //       Provider.of<RetrunCartModel>(context, listen: false).retrunclearCart();
-  //       var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //       print("data is" + data.toString());
-  //       Fluttertoast.showToast(
-  //           msg: 'Check Out Successfully',
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //       setLoading(false);
-  //       //Navigator.pop(context);
-  //       Navigator.push(
-  //           context, MaterialPageRoute(builder: (_) => MainMenuScreen()));
-  //     } else {
-  //       setLoading(false);
-  //       print("data is" + response.statusCode.toString());
-  //
-  //       Fluttertoast.showToast(
-  //           msg: 'Some thing went wrong',
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //     }
-  //   } catch (e, stack) {
-  //     setLoading(false);
-  //     print('exception is' + e.toString());
-  //
-  //     Fluttertoast.showToast(
-  //         msg: "Something went wrong try again letter",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //   }
-  // }
 }

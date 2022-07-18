@@ -13,21 +13,14 @@ import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/searchProductScreen/search_product_screen.dart';
 import 'package:shimmer/shimmer.dart';
 
 
 class ProductListScreen extends StatefulWidget {
   String productmaintypeId, productsubtypeId;
-  NewCustomerModel shopDetails;
-  double lat, long;
-  var locationdata;
-  List<NewCustomerModel> customerList;
   ProductListScreen(
-      {this.shopDetails,
-        this.customerList,
-        this.lat,
-        this.long,
-        this.locationdata,
+      {
         this.productmaintypeId,
         this.productsubtypeId});
 
@@ -135,8 +128,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
     try {
       setLoading(true);
       var response = await OnlineDatabase.getAllproductsubcategory(
-          maintypeId: "001",
-          subTypeId: "");
+          maintypeId: widget.productmaintypeId.toString(),
+          subTypeId: widget.productsubtypeId.toString());
       print("Response is" + response.statusCode.toString());
       if (response.statusCode == 200) {
         var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -357,32 +350,28 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           children: [
                             InkWell(
                               onTap: () {
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (_) =>
-                                //             SearchProductScreen(
-                                //               productModel: product,
-                                //               shopDetails: widget.shopDetails,
-                                //               lat: widget.lat,
-                                //               long: widget.long,
-                                //               locationdata: widget.locationdata,
-                                //               onAddToCart: (){
-                                //                 setState(() {
-                                //                   addToCart = true;
-                                //                 });
-                                //               },
-                                //             )
-                                //     )).then((value){
-                                //   getAllProductData();
-                                //   addToCart = false;
-                                //   if (Provider.of<CartModel>(context, listen: false)
-                                //       .cartItemName
-                                //       .isNotEmpty) {
-                                //     addToCart = true;
-                                //   }
-                                //   setState(() {});
-                                // });
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            SearchProductScreen(
+                                              productModel: product,
+                                              onAddToCart: (){
+                                                setState(() {
+                                                  addToCart = true;
+                                                });
+                                              },
+                                            )
+                                    )).then((value){
+                                  getAllProductData();
+                                  addToCart = false;
+                                  if (Provider.of<CartModel>(context, listen: false)
+                                      .cartItemName
+                                      .isNotEmpty) {
+                                    addToCart = true;
+                                  }
+                                  setState(() {});
+                                });
                               },
                               child: RectangluartextFeild(
                                 bordercolor: Color(0xffEBEAEA),
@@ -393,7 +382,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                 enable: false,
                                 keytype: TextInputType.text,
                                 textlength: 25,
-                                // onChanged: searchOperation,
+                                //onChanged: searchOperation,
                               ),
                             ),
                             Align(
@@ -421,12 +410,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             childAspectRatio: 1.4,
                             //   height: height*0.38 ,
                           ),
-                          itemCount:10,
+                          itemCount:product.length,
                           itemBuilder:
                               (BuildContext context, int index) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: SingleProductTile(
+                              child:
+
+                              SingleProductTile(
                                 productDetails: product[index],
                                 ontap: () {
                                   if (productCartbtn[index] == false) {
@@ -441,8 +432,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                               product[index],
                                               itemCount: 1,
                                               itemPrice:
-                                              product[index]
-                                                  .price,
+                                              product[index].price,
                                               subTotalPrice:
                                               product[index]
                                                   .price,
@@ -534,10 +524,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
               context,
               MaterialPageRoute(
                   builder: (_) => CartScreen(
-                    shopDetails: widget.shopDetails,
-                    lat: widget.lat,
-                    long: widget.long,
-                    locationdata: widget.locationdata,
                   ))).then((value) {
             getAllProductData();
             addToCart = false;
