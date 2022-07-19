@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 
 
-class SucessFullyRecivePaymentScreen extends StatefulWidget {
+class SucessFullySubmitComplaintScreen extends StatefulWidget {
+
 
   @override
-  _SucessFullyRecivePaymentScreenState createState() => _SucessFullyRecivePaymentScreenState();
+  _SucessFullySubmitComplaintScreenState createState() => _SucessFullySubmitComplaintScreenState();
 }
 
-class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymentScreen> {
+class _SucessFullySubmitComplaintScreenState extends State<SucessFullySubmitComplaintScreen> {
 
 
   @override
@@ -25,7 +25,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
     super.dispose();
   }
   Future<bool> _onWillPop(){
-    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
   }
 
   @override
@@ -34,11 +34,11 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
     double height = media.height;
     var width = media.width;
     return WillPopScope(
-      onWillPop: _onWillPop,
+      onWillPop:_onWillPop,
       child: Scaffold(
         backgroundColor: Color(0xffFFEEE0),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenpadding),
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -50,8 +50,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                   InkWell(
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
-
-                    },
+                      },
                     child: Image.asset(
                       "assets/icons/cross.png",
                       scale: 3.5,
@@ -62,15 +61,15 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
               Spacer(),
               Center(
                 child: Image.asset(
-                  "assets/icons/payment_success.png",
-                  scale: 1.5,
+                  "assets/icons/checked.png",
+                  scale: 3,
                 ),
               ),
               SizedBox(
                 height: height * 0.03,),
               Center(
                 child: VariableText(
-                  text: "Payment Recieved",
+                  text: "Complaint Submitted",
                   fontsize: 18,
                   textAlign: TextAlign.start,
                   line_spacing: 1,
@@ -83,7 +82,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                 height: height * 0.015,),
               Center(
                 child: VariableText(
-                  text: "Congratulations, Your payment has",
+                  text: "Thank you for contacting us. We",
                   fontsize: 15,
                   textAlign: TextAlign.start,
                   line_spacing: 1,
@@ -92,10 +91,12 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                   weight: FontWeight.w400,
                 ),
               ),
+              SizedBox(
+                height: height * 0.0055,),
 
               Center(
                 child: VariableText(
-                  text: "been recieved successfully.",
+                  text: "will soon into the matter.",
                   fontsize: 15,
                   textAlign: TextAlign.start,
                   line_spacing: 1,
@@ -108,9 +109,8 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                 height: height * 0.02,),
               InkWell(
                 onTap: (){
-                  //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.shopDetails,lat: widget.lat,long: widget.long,fromShop: true,)), (route) => route.isCurrent);
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
-                },
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+ },
                 child: Center(
                   child: Container(
                     height: height*0.06,
@@ -138,6 +138,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
               ),
               Spacer(),
               Spacer(),
+
 
 
 

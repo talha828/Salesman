@@ -1317,7 +1317,7 @@ Widget customShopDetailsContainer(
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5),
-                child: Image.asset("assets/icons/person.png")
+                child: Image.asset("assets/icons/person.png",color: textcolorlightgrey2,)
                 // LayoutBuilder(
                 //   builder: (_, constraints) => Image.network(
                 //       imageurl.toString() == "No Image" || imageurl == null
@@ -1394,7 +1394,58 @@ Widget customShopDetailsContainer(
   );
   
 }
+class ProcessLoadingWhite extends StatefulWidget {
+  @override
+  State createState() {
+    return _ProcessLoadingWhiteState();
+  }
+}
 
+class _ProcessLoadingWhiteState extends State<ProcessLoadingWhite>
+    with SingleTickerProviderStateMixin {
+  AnimationController _cont;
+  Animation<Color> _anim;
+
+  @override
+  void initState() {
+    _cont = AnimationController(
+        duration: Duration(
+          seconds: 1,
+        ),
+        vsync: this);
+    _cont.addListener(() {
+      setState(() {
+        //print("val: "+_cont.value.toString());
+      });
+    });
+    ColorTween col = ColorTween(begin: Color(0xffFBC69A), end: themeColor1);
+    _anim = col.animate(_cont);
+    _cont.repeat(reverse: true);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cont.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: Color.fromRGBO(0, 0, 0, 0),
+        child: Center(
+          child: Container(
+              width: 50 * _cont.value,
+              height: 50 * _cont.value,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(
+                  _anim.value,
+                ),
+              )),
+        ));
+  }
+}
 class CustomLegerContainer extends StatelessWidget {
   double height, width;
   String title, imagePath;

@@ -9,8 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/delivery_model.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
@@ -46,6 +48,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     showDistance();
     getAllProductCategory();
     getAllSearchProduct();
+    //getMainDeliveryDetails();
   }
   void getAllSearchProduct() async {
     try {
@@ -243,7 +246,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     return distance;
   }
   void showDistance()async{
-       var dist=await calculateDistance(double.parse(widget.shopDetails.customerLatitude.toString()), double.parse(widget.shopDetails.customerLongitude.toString()));
+       var dist=await calculateDistance(double.parse(widget.shopDetails.customerLatitude.toString().toUpperCase()=="NULL"?1.toString():widget.shopDetails.customerLatitude.toString()), double.parse(widget.shopDetails.customerLongitude.toString().toUpperCase()=="NULL"?1.toString():widget.shopDetails.customerLongitude.toString()));
     if(dist > 100){
       AwesomeDialog(
         context: context,
@@ -298,6 +301,9 @@ class _CheckInScreenState extends State<CheckInScreen> {
       )..show();
     }
   }
+
+  // Delivery Api`s
+
 
 
   @override
@@ -562,7 +568,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => DeliveryScreen()));
+                                            builder: (context) => DeliveryScreen(shopDetails: myCustomer,)));
                                   },
                                   text: 'Delivery',
                                   image: 'assets/icons/delivery.png',
@@ -599,7 +605,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (_) => LedgerScreen()));
+                                            builder: (_) => LedgerScreen(balance: wallet.availableBalance.toString(),shopDetails: myCustomer,)));
                                   },
                                   text: 'Ledger',
                                   image: 'assets/icons/ledger.png',

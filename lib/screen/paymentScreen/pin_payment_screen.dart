@@ -87,7 +87,7 @@ class _PaymentPinState extends State<PaymentPin> {
   }
   @override
   void initState() {
-    name1=widget.customer.name;
+    name1=widget.customer.customerContactPersonName.toString().toUpperCase()=="NULL"?"Name not Found":widget.customer.customerContactPersonName;
     name2=widget.customer.customerContactPersonName2;
     name3="NULL";
     number1=widget.customer.customerContactNumber;
@@ -123,7 +123,7 @@ class _PaymentPinState extends State<PaymentPin> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            VariableText(text: name1,
+                            VariableText(text:name1,
                               fontsize: height * 0.020,
                               textAlign: TextAlign.start,
                               line_spacing: 1,
@@ -220,14 +220,15 @@ class _PaymentPinState extends State<PaymentPin> {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
                           decoration: BoxDecoration(
+                            border: Border.all(color: _start==0?themeColor1.withOpacity(0.7):Colors.grey),
                             borderRadius: BorderRadius.circular(2),
-                            color: _start==0?themeColor1:Colors.white,
+                            color: Colors.white,
                           ),
                           child: VariableText(text: "Resend: ${_start}",
                               fontsize: height * 0.025,
                               textAlign: TextAlign.start,
                               line_spacing: 1,
-                              fontcolor: _start==0?Colors.white:textcolorblack,
+                              fontcolor: _start==0?themeColor1.withOpacity(0.7):Colors.grey,
                               fontFamily: fontRegular),
                         ),
                       ),
@@ -269,8 +270,8 @@ class _PaymentPinState extends State<PaymentPin> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: _start==0?themeColor1:Colors.grey,
-                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: _start==0?themeColor1:Colors.grey),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         height: 50,
                         child: Padding(
@@ -286,23 +287,24 @@ class _PaymentPinState extends State<PaymentPin> {
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       VariableText(
-                                        text: name2.toString()== "NULL"?"Number not Found":name2.toString(),
+                                        text: name2.toString().toUpperCase()== "NULL"?"Number not Found":name2.toString(),
                                         textAlign: TextAlign.center,
                                         fontsize: 15,
-                                        fontcolor: themeColor2,
+                                        fontcolor: _start==0?themeColor1:Colors.grey,
                                         fontFamily: fontMedium,
                                       ),
                                       VariableText(
-                                        text: number2.toString()== "NULL" || number2.toString()== 1.toString()?"":number2.toString(),
+                                        text: number2.toString().toUpperCase()== "NULL" || number2.toString()== 1.toString()?"":number2.toString(),
                                         textAlign: TextAlign.center,
                                         fontsize: 15,
-                                        fontcolor: themeColor2,
+                                        fontcolor: _start==0?themeColor1:Colors.grey,
                                         fontFamily: fontMedium,
                                       ),
                                     ],),
                                   Spacer(),
                                   Image.asset(
                                     'assets/icons/arrow_forward.png',
+                                    color: _start==0?themeColor1:Colors.grey,
                                     scale: 2.5,
                                   ),
                                 ],
@@ -348,8 +350,8 @@ class _PaymentPinState extends State<PaymentPin> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: _start==0?themeColor1:Colors.grey,
-                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color:_start==0?themeColor1:Colors.grey),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         height: 50,
                         child: Padding(
@@ -365,17 +367,17 @@ class _PaymentPinState extends State<PaymentPin> {
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       VariableText(
-                                        text: name3.toString()== "NULL"?"Number not Found":name3.toString(),
+                                        text: name3.toString().toUpperCase()== "NULL"?"Number not Found":name3.toString(),
                                         textAlign: TextAlign.center,
                                         fontsize: 15,
-                                        fontcolor: themeColor2,
+                                        fontcolor: _start==0?themeColor1:Colors.grey,
                                         fontFamily: fontMedium,
                                       ),
                                       VariableText(
-                                        text: number3.toString()== "NULL" ||number3.toString()== 1.toString()?"":number3.toString(),
+                                        text: number3.toString().toUpperCase()== "NULL" ||number3.toString()== 1.toString()?"":number3.toString(),
                                         textAlign: TextAlign.center,
                                         fontsize: 15,
-                                        fontcolor: themeColor2,
+                                        fontcolor: _start==0?themeColor1:Colors.grey,
                                         fontFamily: fontMedium,
                                       ),
                                     ],),
@@ -383,6 +385,7 @@ class _PaymentPinState extends State<PaymentPin> {
                                   Image.asset(
                                     'assets/icons/arrow_forward.png',
                                     scale: 2.5,
+                                    color: _start==0?themeColor1:Colors.grey,
                                   ),
                                 ],
                               ),

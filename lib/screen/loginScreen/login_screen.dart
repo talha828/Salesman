@@ -349,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 backgroundColor: themeColor1,
                 onPressed: () =>getLogin(context),
-                )),isLoading ? LoadingIndicator(width: width, height: height) : Container(),
+                )),isLoading ?Positioned.fill(child: ProcessLoading()) : Container(),
       ],
     );
   }

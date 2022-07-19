@@ -6,9 +6,7 @@ import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 
 
 class SucessFullyDelieveredOrderScreen extends StatefulWidget {
-  // CustomerModel shopDetails;
-  // var lat,long;
-  // SucessFullyDelieveredOrderScreen({required this.shopDetails,this.lat,this.long});
+
   @override
   _SucessFullyDelieveredOrderScreenState createState() => _SucessFullyDelieveredOrderScreenState();
 }

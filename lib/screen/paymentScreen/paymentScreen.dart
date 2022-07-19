@@ -295,6 +295,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (_) => PaymentUsingCheck(
+                                        customerData: customerData,
                                         paymentTypedetails:
                                         paymentType['payment']
                                         [index],)));

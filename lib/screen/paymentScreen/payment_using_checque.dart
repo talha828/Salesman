@@ -6,19 +6,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
+import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/paymentScreen/paymentSuccessfull.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 ///image picker use here
 //import 'package:image_picker/image_picker.dart';
 
 class PaymentUsingCheck extends StatefulWidget {
+  CustomerModel customerData;
   var paymentTypedetails;
 
-  PaymentUsingCheck({this.paymentTypedetails,});
-  File _image1;
+  PaymentUsingCheck({this.paymentTypedetails,this.customerData});
+
 
   @override
   _PaymentUsingCheckState createState() => _PaymentUsingCheckState();
@@ -69,21 +76,25 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
         startDate=picked.toString().split(" ")[0];
         date.text = startDate;
       });
+  }
+  _imgFromGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    // Pick an image
+    final XFile image1 = await _picker.pickImage(source: ImageSource.gallery);
+    //File image = await  ImagePicker().pickImage(source:ImageSource.gallery, imageQuality: 50);
+       if(image1 != null){
+         setState(() {
+           this.image = File(image1.path);
+           showImage=true;
+         });
+
 
   }
-  //
-  // _imgFromGallery() async {
-  //   var image = await  ImagePicker.pickImage(source:ImageSource.gallery, imageQuality: 50);
-  //   if(image != null){
-  //     setState(() {
-  //      this.image = image ;
-  //       showImage=true;
-  //     });
-  //   }
-  // }
+  }
 
   @override
   Widget build(BuildContext context) {
+
     var media=MediaQuery.of(context).size;
     double height=media.height;
     double width=media.width;
@@ -429,7 +440,7 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Container(
-                                     height: height*0.14,
+                                    height: height*0.14,
                                     width: width,
                                     decoration: BoxDecoration(
                                         color: Color(0xffFFEEE0),
@@ -437,13 +448,13 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
                                     ),
                                     child: GestureDetector(
                                         onTap: (){
-                                          // _imgFromGallery();
+                                          _imgFromGallery();
                                         },
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                          //  Spacer(),
+                                            //  Spacer(),
                                             Image.asset("assets/icons/folder.png",scale: 3.5,),
                                             SizedBox(height: height*0.02,),
                                             VariableText(text: "Select Cheque image from gallery",
@@ -554,15 +565,14 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
                       InkWell(
                         onTap: (){
                           if (validateFields()) {
-                            //Navigator.of(context).pop();
-                            // startPost();
+                            startPost();
                           }
                        },
 
                         child: Container(
                           height: height*0.06,
                           decoration: BoxDecoration(
-                            color:/*  showImage!=true ?Color(0xffBDBDBD):*/themeColor1,
+                            color:  showImage!=true ?Color(0xffBDBDBD):themeColor1,
                             borderRadius: BorderRadius.circular(4),
 
                           ),
@@ -617,85 +627,86 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
     return ok;
   }
 
-  // Future<void> startPost() async {
-  //   setLoading(true);
-  //   if(image != null){
-  //     var tempImage = await MultipartFile.fromFile(image!.path,
-  //         filename: "${DateTime.now().millisecondsSinceEpoch.toString()}.${image!.path.split('.').last}",
-  //         contentType: new MediaType('image', 'jpg'));
-  //     print(tempImage.filename);
-  //     postImage(tempImage);
-  //   }else{
-  //     postPayment('');
-  //   }
-  // }
+  Future<void> startPost() async {
+    setLoading(true);
+    if(image != null){
+      var tempImage = await MultipartFile.fromFile(image.path,
+          filename: "${DateTime.now().millisecondsSinceEpoch.toString()}.${image.path.split('.').last}",
+          contentType: new MediaType('image', 'jpg'));
+      print(tempImage.filename);
+      postImage(tempImage);
+    }else{
+      postPayment('');
+    }
+  }
 
-  // postPayment(String imageUrl) async {
-  //   try {
-  //     setLoading(true);
-  //     var response = await OnlineDataBase.postPayment(customerCode: widget.customerData.customerCode, imageUrl: imageUrl,lat: widget.lat.toString(),long: widget.long.toString(),amount: amount.text,name: name.text,checkNumber: checkNumber.text,paymentMode: '2', date: startDate);
-  //     print("status code is: " + response.statusCode.toString());
-  //     if (response.statusCode == 200) {
-  //       var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
-  //       print("response is: "+respnseData['results'].toString());
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //           msg: "Payment Created Successfully",
-  //           toastLength: Toast.LENGTH_SHORT,
-  //           backgroundColor: Colors.black87,
-  //           textColor: Colors.white,
-  //           fontSize: 16.0);
-  //       Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen(shopDetails: widget.customerData,long: widget.long,lat: widget.lat,)));
-  //     } else {
-  //       setLoading(false);
-  //       Fluttertoast.showToast(
-  //         msg: "Something went wrong try again later",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         backgroundColor: Colors.black87,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0,
-  //       );
-  //     }
-  //   } catch (e,stack) {
-  //     setLoading(false);
-  //     Fluttertoast.showToast(
-  //       msg: "Something went wrong try again later",
-  //       toastLength: Toast.LENGTH_SHORT,
-  //       backgroundColor: Colors.black87,
-  //       textColor: Colors.white,
-  //       fontSize: 16.0,
-  //     );
-  //     print("exception in post payment method is" + e.toString()+stack.toString());
-  //   }
-  // }
-  //
-  // void postImage(var image) async {
-  //   try {
-  //     var response = await OnlineDataBase.uploadImage(
-  //         type: 'cheqdeposit',
-  //         image: image
-  //     );
-  //     if(response){
-  //       setLoading(false);
-  //       print("Success");
-  //       String imageUrl = 'https://suqexpress.com/assets/images/cheqdeposit/${image.filename}';
-  //       postPayment(imageUrl);
-  //     }else{
-  //       setLoading(false);
-  //       print("failed");
-  //       Fluttertoast.showToast(msg: 'Image upload failed', toastLength: Toast.LENGTH_SHORT);
-  //     }
-  //
-  //   } catch (e, stack) {
-  //     setLoading(false);
-  //     print('exception is: ' + e.toString());
-  //     setLoading(false);
-  //   }
-  // }
-  //
-  // bool setLoading(bool loading) {
-  //   setState(() {
-  //     isLoading = loading;
-  //   });
-  // }
+  postPayment(String imageUrl) async {
+    try {
+      var location =await Location().getLocation();
+      setLoading(true);
+      var response = await OnlineDatabase.postPayment(customerCode: widget.customerData.customerCode, imageUrl: imageUrl,lat: location.latitude.toString(),long:location.longitude.toString(),amount: amount.text,name: name.text,checkNumber: checkNumber.text,paymentMode: '2', date: startDate);
+      print("status code is: " + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+        print("response is: "+respnseData['results'].toString());
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "Payment Created Successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen()));
+      } else {
+        setLoading(false);
+        Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e,stack) {
+      setLoading(false);
+      Fluttertoast.showToast(
+        msg: "Something went wrong try again later",
+        toastLength: Toast.LENGTH_SHORT,
+        backgroundColor: Colors.black87,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      print("exception in post payment method is" + e.toString()+stack.toString());
+    }
+  }
+
+  void postImage(var image) async {
+    try {
+      var response = await OnlineDatabase.uploadImage(
+          type: 'cheqdeposit',
+          image: image
+      );
+      if(response){
+        setLoading(false);
+        print("Success");
+        String imageUrl = 'https://suqexpress.com/assets/images/cheqdeposit/${image.filename}';
+        postPayment(imageUrl);
+      }else{
+        setLoading(false);
+        print("failed");
+        Fluttertoast.showToast(msg: 'Image upload failed', toastLength: Toast.LENGTH_SHORT);
+      }
+
+    } catch (e, stack) {
+      setLoading(false);
+      print('exception is: ' + e.toString());
+      setLoading(false);
+    }
+  }
+
+  bool setLoading(bool loading) {
+    setState(() {
+      isLoading = loading;
+    });
+  }
 }

@@ -2,25 +2,38 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
-import 'package:salesmen_app_new/widget/loding_indicator.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/ledger_screen.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/ledger_duration.dart';
+import 'package:salesmen_app_new/model/legder_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/CustomerPdf.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/cashPdf.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/chequePdf.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/pdfapi.dart';
+import 'package:salesmen_app_new/screen/ledgerScreen/show_cutomer_ledger.dart';
+
+import 'duesPdf.dart';
+import 'dues_ledger.dart';
 
 class LedgerScreen extends StatefulWidget {
-
+  CustomerModel shopDetails;
+  String balance;
+  double lat,long;
+  LedgerScreen({this.shopDetails,this.lat,this.long,this.balance});
   @override
   _LedgerScreenState createState() => _LedgerScreenState();
 }
 class _LedgerScreenState extends State<LedgerScreen> {
   double sizedboxvalue=0.03;
   bool selectedValue=false;
-  // List<LedgerDuration> durationList=[];
-  // LedgerDuration selectedDuration;
+  List<LedgerDuration> durationList=[];
+  LedgerDuration selectedDuration;
   bool isLoading=false;
-   String startDate="12/05/2022";
-   String endDate="14/058/2022";
-  // List<LedgerModel> ledgerData=[];
+  String startDate,endDate;
+  List<LedgerModel> ledgerData=[];
   DateTime now=new DateTime.now();
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -29,7 +42,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
         firstDate: DateTime(1900, 8),
         lastDate: DateTime(2101),
         helpText: "Select From Date",
-        builder: (context, child) {
+        builder: (BuildContext context, Widget child) {
           return  Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
@@ -60,7 +73,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
         firstDate: DateTime(1900, 8),
         lastDate: DateTime(2101),
         helpText: "Select To Date",
-        builder: (context,child) {
+        builder: (BuildContext context, Widget child) {
           return  Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
@@ -84,20 +97,20 @@ class _LedgerScreenState extends State<LedgerScreen> {
       });
 
   }
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   durationList.add(LedgerDuration(id:0,name:'Today',duration: 0));
-  //   durationList.add(LedgerDuration(id:1,name:'Yesterday',duration: 1));
-  //   durationList.add(LedgerDuration(id: 2,name: 'Last Week',duration: 7));
-  //   durationList.add(LedgerDuration(id: 3,name: 'This Month',duration: 30));
-  //   durationList.add(LedgerDuration(id: 4,name: 'Last 2 Month',duration: 60));
-  //   durationList.add(LedgerDuration(id: 5,name: 'Last 3 Month',duration: 90));
-  //   //DateTime now=DateTime.now();
-  //   //startDate=now.toString().split(" ")[0];
-  //
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    durationList.add(LedgerDuration(id:0,name:'Today',duration: 0));
+    durationList.add(LedgerDuration(id:1,name:'Yesterday',duration: 1));
+    durationList.add(LedgerDuration(id: 2,name: 'Last Week',duration: 7));
+    durationList.add(LedgerDuration(id: 3,name: 'This Month',duration: 30));
+    durationList.add(LedgerDuration(id: 4,name: 'Last 2 Month',duration: 60));
+    durationList.add(LedgerDuration(id: 5,name: 'Last 3 Month',duration: 90));
+    //DateTime now=DateTime.now();
+    //startDate=now.toString().split(" ")[0];
+
+  }
   setLoading(bool loading){
     setState(() {
       isLoading=loading;
@@ -113,7 +126,9 @@ class _LedgerScreenState extends State<LedgerScreen> {
     return Stack(
       children: [
         Scaffold(
-          appBar:AppBar(title: Text("Ledger Screen",style: TextStyle(color: Colors.white),),),
+          appBar: MyAppBar(title: 'Ledger Details',ontap: (){
+            Navigator.pop(context);
+          },) ,
           body:Padding(
             padding:  EdgeInsets.symmetric(horizontal: screenpadding),
             child: Column(
@@ -307,12 +322,12 @@ class _LedgerScreenState extends State<LedgerScreen> {
                     //     },)),
                     //     SizedBox(width: width*0.04,),
                     Expanded( flex:1,child: CustomLegerContainer(height: height,width: width,title: 'User Cash Ledger as pdf',imagePath:'assets/icons/UserCashLedger.png',selectedValue:  startDate!=null&&endDate!=null?true:false,onTap: (){
-                      // getLedger(height: height,width: width,ledgerType: 'PCLEDGER',onScreen: false);
+                      getLedger(height: height,width: width,ledgerType: 'PCLEDGER',onScreen: false);
 
                     },)),
                     SizedBox(width: width*0.04,),
                     Expanded( flex:1,child: CustomLegerContainer(height: height,width: width,title: 'User Cash Ledger view',imagePath:'assets/icons/UserCashLedger.png',selectedValue:  startDate!=null&&endDate!=null?true:false,onTap: (){
-                      // getLedger(height: height,width: width,ledgerType: 'PCLEDGER',onScreen: true);
+                      getLedger(height: height,width: width,ledgerType: 'PCLEDGER',onScreen: true);
 
                     },)),
                     // SizedBox(width: width*0.04,),
@@ -330,11 +345,11 @@ class _LedgerScreenState extends State<LedgerScreen> {
                     //   },)),
                     // SizedBox(width: width*0.04,),
                     Expanded( flex:1,child: CustomLegerContainer(height: height,width: width,title: 'Show Customer Ledger',imagePath:'assets/icons/CustomerLedger.png', selectedValue:  startDate!=null&&endDate!=null?true:false,onTap: (){
-                      // getLedger(height: height,width: width,ledgerType: 'PLEDGER',onScreen: true);
+                      getLedger(height: height,width: width,ledgerType: 'PLEDGER',onScreen: true);
                     },)),
                     SizedBox(width: width*0.04,),
                     Expanded( flex:1,child: CustomLegerContainer(height: height,width: width,title: 'Show Dues Ledger',imagePath:'assets/icons/CustomerLedger.png',selectedValue:  startDate!=null&&endDate!=null?true:false,onTap: (){
-                      // getLedger(height: height,width: width,ledgerType: 'DUESLEDGER',onScreen: true);
+                      getLedger(height: height,width: width,ledgerType: 'DUESLEDGER',onScreen: true);
                     },)),
                   ],
                 )
@@ -343,229 +358,228 @@ class _LedgerScreenState extends State<LedgerScreen> {
             ),
           ) ,
         ),
-        isLoading?Positioned.fill(child: LoadingIndicator(width: width,height: height,)):Container()
+        isLoading?Positioned.fill(child: ProcessLoading()):Container()
       ],
     );
   }
+  getLedger({String ledgerType,double height,double width,bool onScreen}) async {
+    setLoading(true);
+    var response=await OnlineDatabase.getLedger(customerCode:  widget.shopDetails.customerCode,ledgerType: ledgerType,fromDate: startDate,toDate: endDate);
+    if(response.statusCode==200){
+      var data=jsonDecode(utf8.decode(response.bodyBytes));
+      print(data.toString());
+      var dataList=data['results'];
+
+      if(ledgerType=='PLEDGER'){
+        if(dataList.isNotEmpty){
+          print("list is"+dataList.toString());
+
+          for(var item in dataList){
+            ledgerData.add(LedgerModel.customerLedgerDate(item));
+          }
+          if(onScreen){
+            setLoading(false);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>LedgerOnScreen(ledgerData: ledgerData,)));
+          }
+          else{
+            final pdfFile = await CustomerPdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopName: widget.shopDetails.customerShopName);
+            setLoading(false);
+            PdfApi.openFile(pdfFile);
+            ledgerData.clear();
+          }
+        }
+        else{
+          setLoading(false);
+          Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
+
+        }
+        // showDialog(height,width,'Customer Ledger');
+      }
+      else if(ledgerType=='PCLEDGER'){
+        if(dataList.isNotEmpty){
+          for(var item in dataList){
+            ledgerData.add(LedgerModel.cashLedgerDate(item));
+          }
+          if(onScreen){
+            setLoading(false);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowCustomerLedger(ledgerData: ledgerData,shopDetails: widget.shopDetails,)));
+          }
+          else{
+            final pdfFile = await CashPdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopDetals: widget.shopDetails,balance: widget.balance);
+            setLoading(false);
+            PdfApi.openFile(pdfFile);
+            ledgerData.clear();
+          }
+        }
+        else{
+          setLoading(false);
+          Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
+
+        }
+        // showDialog(height,width,'User Cash Ledger');
+      }
+      else if(ledgerType=='PQLEDGER'){
+        if(dataList!=null){
+          for(var item in dataList){
+            ledgerData.add(LedgerModel.chequeLedgerDate(item));
+          }
+          final pdfFile = await ChequePdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopDetals: widget.shopDetails,balance: widget.balance);
+          setLoading(false);
+          PdfApi.openFile(pdfFile);
+          ledgerData.clear();
+
+
+        }
+        //showDialog(height,width,'User Cheque Ledger');
+      }
+      else if(ledgerType=='DUESLEDGER'){
+        if(dataList.isNotEmpty){
+          print("list is: "+dataList.toString());
+
+          for(var item in dataList){
+            ledgerData.add(LedgerModel.duesLedgerDate(item));
+          }
+          if(onScreen){
+            setLoading(false);
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowDuesLedger(ledgerData: ledgerData,)));
+          }
+          else {
+            final pdfFile = await DuesPdf.generate(ledgerDataList: ledgerData,
+                startdate: startDate,
+                endate: endDate,
+                shopName: widget.shopDetails.customerName);
+            setLoading(false);
+            PdfApi.openFile(pdfFile);
+            ledgerData.clear();
+          }
+        }
+        else{
+          setLoading(false);
+          Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
+
+        }
+      }
+    }
+    else{
+      setLoading(false);
+      Fluttertoast.showToast(msg: "Some thing went wrong",toastLength: Toast.LENGTH_SHORT);
+    }
+  }
+
+
+  void showDialog(double height,double width,String text ) {
+    showGeneralDialog(
+      barrierLabel: "Barrier",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: Duration(milliseconds: 500),
+      context: context,
+      pageBuilder: (_, __, ___) {
+        return ShowPdfDialouge(height: height,width: width,text:text);
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return SlideTransition(
+          position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+          child: child,
+        );
+      },
+    );
+  }
 }
-//   getLedger({String ledgerType,double height,double width,bool onScreen}) async {
-//     setLoading(true);
-//     var response=await OnlineDataBase.getLedger(customerCode:  widget.shopDetails.customerCode,ledgerType: ledgerType,fromDate: startDate,toDate: endDate);
-//     if(response.statusCode==200){
-//       var data=jsonDecode(utf8.decode(response.bodyBytes));
-//       print(data.toString());
-//       var dataList=data['results'];
-//
-//       if(ledgerType=='PLEDGER'){
-//         if(dataList.isNotEmpty){
-//           print("list is"+dataList.toString());
-//
-//           for(var item in dataList){
-//             ledgerData.add(LedgerModel.customerLedgerDate(item));
-//           }
-//           if(onScreen){
-//             setLoading(false);
-//             Navigator.push(context, MaterialPageRoute(builder: (context)=>LedgerOnScreen(ledgerData: ledgerData,)));
-//           }
-//           else{
-//             final pdfFile = await CustomerPdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopName: widget.shopDetails.customerShopName);
-//             setLoading(false);
-//             PdfApi.openFile(pdfFile);
-//             ledgerData.clear();
-//           }
-//         }
-//         else{
-//           setLoading(false);
-//           Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
-//
-//         }
-//         // showDialog(height,width,'Customer Ledger');
-//       }
-//       else if(ledgerType=='PCLEDGER'){
-//         if(dataList.isNotEmpty){
-//           for(var item in dataList){
-//             ledgerData.add(LedgerModel.cashLedgerDate(item));
-//           }
-//           if(onScreen){
-//             setLoading(false);
-//             Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowCustomerLedger(ledgerData: ledgerData,shopDetails: widget.shopDetails,)));
-//           }
-//           else{
-//             final pdfFile = await CashPdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopDetals: widget.shopDetails,balance: widget.balance);
-//             setLoading(false);
-//             PdfApi.openFile(pdfFile);
-//             ledgerData.clear();
-//           }
-//         }
-//         else{
-//           setLoading(false);
-//           Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
-//
-//         }
-//         // showDialog(height,width,'User Cash Ledger');
-//       }
-//       else if(ledgerType=='PQLEDGER'){
-//         if(dataList!=null){
-//           for(var item in dataList){
-//             ledgerData.add(LedgerModel.chequeLedgerDate(item));
-//           }
-//           final pdfFile = await ChequePdf.generate(ledgerDataList:ledgerData,startdate: startDate,endate: endDate,shopDetals: widget.shopDetails,balance: widget.balance);
-//           setLoading(false);
-//           PdfApi.openFile(pdfFile);
-//           ledgerData.clear();
-//
-//
-//         }
-//         //showDialog(height,width,'User Cheque Ledger');
-//       }
-//       else if(ledgerType=='DUESLEDGER'){
-//         if(dataList.isNotEmpty){
-//           print("list is: "+dataList.toString());
-//
-//           for(var item in dataList){
-//             ledgerData.add(LedgerModel.duesLedgerDate(item));
-//           }
-//           if(onScreen){
-//             setLoading(false);
-//             Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowDuesLedger(ledgerData: ledgerData,)));
-//           }
-//           else {
-//             final pdfFile = await DuesPdf.generate(ledgerDataList: ledgerData,
-//                 startdate: startDate,
-//                 endate: endDate,
-//                 shopName: widget.shopDetails.customerName);
-//             setLoading(false);
-//             PdfApi.openFile(pdfFile);
-//             ledgerData.clear();
-//           }
-//         }
-//         else{
-//           setLoading(false);
-//           Fluttertoast.showToast(msg: "Record not found",toastLength: Toast.LENGTH_SHORT);
-//
-//         }
-//       }
-//     }
-//     else{
-//       setLoading(false);
-//       Fluttertoast.showToast(msg: "Some thing went wrong",toastLength: Toast.LENGTH_SHORT);
-//     }
-//   }
-//
-//
-//   void showDialog(double height,double width,String text ) {
-//     showGeneralDialog(
-//       barrierLabel: "Barrier",
-//       barrierDismissible: true,
-//       barrierColor: Colors.black.withOpacity(0.5),
-//       transitionDuration: Duration(milliseconds: 500),
-//       context: context,
-//       pageBuilder: (_, __, ___) {
-//         return ShowPdfDialouge(height: height,width: width,text:text);
-//       },
-//       transitionBuilder: (_, anim, __, child) {
-//         return SlideTransition(
-//           position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
-//           child: child,
-//         );
-//       },
-//     );
-//   }
-// }
-// class ShowPdfDialouge extends StatefulWidget {
-//   double height,width;
-//   String text;
-//   ShowPdfDialouge({this.height,this.width,this.text});
-//
-//   @override
-//   _ShowPdfDialougeState createState() => _ShowPdfDialougeState();
-// }
-//
-// class _ShowPdfDialougeState extends State<ShowPdfDialouge> {
-//   @override
-//   double sizedboxvalue=0.02;
-//
-//   TextEditingController amount=new TextEditingController();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Stack(
-//       children: [
-//         AlertDialog(
-//           shape:
-//           RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10)),
-//           contentPadding: EdgeInsets.only(left: 16,right: 16,top: 60),
-//           content:  RichText(
-//             text: new TextSpan(
-//               style: new TextStyle(
-//                 fontSize: 14.0,
-//                 color: textcolorblack,
-//                 fontWeight: FontWeight.w400,
-//                 fontFamily: fontRegular,
-//               ),
-//               children: <TextSpan>[
-//                 new TextSpan(text: 'Do you want to download '),
-//                 new TextSpan(text: widget.text, style: new TextStyle(       fontSize: 14.0,
-//                     color: textcolorblack,
-//                     fontWeight: FontWeight.w500,
-//                     fontFamily: fontBold)),
-//                 new TextSpan(text: ' file on your device? '),
-//
-//               ],
-//             ),
-//           ),
-//           actions: <Widget>[
-//             new FlatButton(
-//               onPressed: () {
-//                 Navigator.of(context, rootNavigator: true)
-//                     .pop(false); // dismisses only the dialog and returns false
-//               },
-//               child:   VariableText(
-//                 text: 'Cancel',
-//                 fontsize:12,fontcolor:themeColor1,
-//                 weight: FontWeight.w500,
-//                 fontFamily: fontRegular,
-//               ),
-//             ),
-//             FlatButton(
-//               onPressed: () {
-//                 Navigator.of(context, rootNavigator: true)
-//                     .pop(true); // dismisses only the dialog and returns true
-//               },
-//               child:  VariableText(
-//                 text: 'Download',
-//                 fontsize:12,fontcolor:themeColor1,
-//                 weight: FontWeight.w500,
-//                 fontFamily: fontRegular,
-//               ),
-//             ),
-//           ],
-//         ),
-//         Padding(
-//           padding:  EdgeInsets.only(bottom: widget.height*0.20),
-//           child: Align(
-//             alignment: Alignment.center,
-//
-//             child:  FloatingActionButton(
-//                 mini: false,
-//                 shape: StadiumBorder(
-//                     side: BorderSide(
-//                         color: Colors.white, width: 1)),
-//                 backgroundColor: Color(0xffF6821F),
-//                 child: Image.asset('assets/icons/download.png',scale: 4,),
-//                 onPressed: () {
-//                 }),
-//           ),
-//         ),
-//       ],
-//     );
-//
-//   }
-//
-//
-//
-//
-// }
+class ShowPdfDialouge extends StatefulWidget {
+  double height,width;
+  String text;
+  ShowPdfDialouge({this.height,this.width,this.text});
+
+  @override
+  _ShowPdfDialougeState createState() => _ShowPdfDialougeState();
+}
+
+class _ShowPdfDialougeState extends State<ShowPdfDialouge> {
+  @override
+  double sizedboxvalue=0.02;
+
+  TextEditingController amount=new TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        AlertDialog(
+          shape:
+          RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10)),
+          contentPadding: EdgeInsets.only(left: 16,right: 16,top: 60),
+          content:  RichText(
+            text: new TextSpan(
+              style: new TextStyle(
+                fontSize: 14.0,
+                color: textcolorblack,
+                fontWeight: FontWeight.w400,
+                fontFamily: fontRegular,
+              ),
+              children: <TextSpan>[
+                new TextSpan(text: 'Do you want to download '),
+                new TextSpan(text: widget.text, style: new TextStyle(       fontSize: 14.0,
+                    color: textcolorblack,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: fontBold)),
+                new TextSpan(text: ' file on your device? '),
+
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true)
+                    .pop(false); // dismisses only the dialog and returns false
+              },
+              child:   VariableText(
+                text: 'Cancel',
+                fontsize:12,fontcolor:themeColor1,
+                weight: FontWeight.w500,
+                fontFamily: fontRegular,
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true)
+                    .pop(true); // dismisses only the dialog and returns true
+              },
+              child:  VariableText(
+                text: 'Download',
+                fontsize:12,fontcolor:themeColor1,
+                weight: FontWeight.w500,
+                fontFamily: fontRegular,
+              ),
+            ),
+          ],
+        ),
+        Padding(
+          padding:  EdgeInsets.only(bottom: widget.height*0.20),
+          child: Align(
+            alignment: Alignment.center,
+
+            child:  FloatingActionButton(
+                mini: false,
+                shape: StadiumBorder(
+                    side: BorderSide(
+                        color: Colors.white, width: 1)),
+                backgroundColor: Color(0xffF6821F),
+                child: Image.asset('assets/icons/download.png',scale: 4,),
+                onPressed: () {
+                }),
+          ),
+        ),
+      ],
+    );
+
+  }
+
+
+
+
+}
 
 
 
