@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/model/addressModel.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
-
+import 'package:location/location.dart' as loc;
+import 'package:http/http.dart'as http;
 
 class SucessFullyVerifiedForgetPasswordScreen extends StatefulWidget {
   @override
@@ -12,10 +19,40 @@ class SucessFullyVerifiedForgetPasswordScreen extends StatefulWidget {
 
 class _SucessFullyVerifiedForgetPasswordScreenState extends State<SucessFullyVerifiedForgetPasswordScreen> {
 
-
+  var actualAddress = "Searching....";
+  Coordinates userLatLng;
+  loc.Location location = new loc.Location();
+  getAddressFromLatLng() async {
+    var data =await location.getLocation();
+    userLatLng=Coordinates(data.latitude,data.longitude);
+    var lat=data.latitude;
+    var lng=data.longitude;
+    //userLatLng=Coordinates(lat, lng);setState(() {});
+    List<AddressModel>addressList=[];
+    String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+    String _host = 'https://maps.google.com/maps/api/geocode/json';
+    final url = '$_host?key=$mapApiKey&language=en&latlng=$lat,$lng';
+    print(url);
+    if(lat != null && lng != null){
+      var response = await http.get(Uri.parse(url));
+      if(response.statusCode == 200) {
+        Map data = jsonDecode(response.body);
+        String _formattedAddress = data["results"][0]["formatted_address"];
+        var address = data["results"][0]["address_components"];
+        for(var i in address){
+          addressList.add(AddressModel.fromJson(i));
+        }
+        actualAddress=addressList[3].shortName;
+        Provider.of<CustomerList>(context).updateAddress(actualAddress);
+        print("response ==== $_formattedAddress");
+        return _formattedAddress;
+      } else return null;
+    } else return null;
+  }
   @override
   void initState() {
     super.initState();
+    getAddressFromLatLng();
   }
 
   @override

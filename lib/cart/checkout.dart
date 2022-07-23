@@ -380,7 +380,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                 .brand,
                                             sub_total: total[index]
                                                 .toString(),
-                                            emp_id: userDetails.id,
+                                            emp_id: userDetails.userEmpolyeeNumber,
                                             paymentMethod: paymentType
                                                 .toString(),
                                             cartData: cartList[index],
@@ -421,7 +421,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                           var responseSms =
                                           await OnlineDatabase.sendText(
                                               customer.customerContactNumber,
-                                              "آپ نے ہمارے نمائندے ${userDetails.firstName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
+                                              "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
 
                                           // var data = jsonDecode(utf8.decode(response.bodyBytes));
                                           orderID = response.data["message"]

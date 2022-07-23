@@ -268,7 +268,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                           Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
                         ],),
                     ),
-                    dd.dues.length<1 ||dd.assign.length<1?Container(
+                    dd.dues.length<1 && dd.assign.length<1?Container(
                       height: 480,
                       child: Shimmer.fromColors(
                         period: Duration(seconds: 1),

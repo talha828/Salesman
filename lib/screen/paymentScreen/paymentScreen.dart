@@ -249,7 +249,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       msgPin += rng.nextInt(9).toString();
                                     }
                                     print(msgPin);
-                                    String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.firstName} %26 Download app https://bit.ly/38uffP8';
+                                    String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.userName} %26 Download app https://bit.ly/38uffP8';
                                     msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
                                     // msgData += '\n';
                                     // msgData +=' ';
@@ -270,7 +270,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (_) => PaymentPin(
-                                                userName:userData.firstName,
+                                                userName:userData.userName,
                                                 total: totalAmount,
                                                 customer:customerData,
                                                 pin: msgPin,
@@ -278,7 +278,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                 onSuccess: (){
                                                   print("@@@@@@@@@@@@@");
                                                   //setLoading(false);
-                                                  postPayment(customerData);
+                                                  postPayment(userData,customerData);
                                                 },
                                               )
                                           ));
@@ -400,28 +400,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
     return ok;
   }
-  postPayment(CustomerModel customer) async {
+  postPayment(UserModel user,CustomerModel customer) async {
     try {
+      var location=await Location().getLocation();
       setLoading(true);
-      var location=await  Location().getLocation();
-      var response = await OnlineDatabase.postPayment(customerCode: customer.customerCode,lat: location.latitude.toString(),long: location.longitude.toString(),amount: totalAmount,name: Name,paymentMode: '1');
+      var response = await OnlineDatabase.newpostPayment(emp_id: user.userID,customerCode: customer.customerCode,lat: location.latitude.toString(),long: location.longitude.toString(),amount: totalAmount,name: Name,paymentMode: '1');
       print("status code is" + response.statusCode.toString());
       if (response.statusCode == 200) {
-        var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
-        print("response is"+respnseData['results'].toString());
+        // var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+        // print("response is"+respnseData['results'].toString());
 
         List<String> tempContact = [];
         if(customer.customerContactNumber != null){
-          tempContact.add(customer.customerContactNumber.substring(0,customer.customerContactNumber.length));
+          tempContact.add(customer.customerContactNumber.substring(0, customer.customerContactNumber.length));
         }
-        if(customer.customerContactNumber2 != null){
-          tempContact.add(customer.customerContactNumber2);
-        }else{
-          //tempContact.add('+923340243440');
-        }
-        String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
+        // if(widget.customerData.customerContactNumber2 != null){
+        //   tempContact.add(widget.customerData.customerContactNumber2);
+        // }else{
+        //   //tempContact.add('+923340243440');
+        // }
+        // final userData = Provider.of<UserModel>(context, listen: false);
+        String msgData ="Thankyou for your payment of Rs $totalAmount to  ${user.userName}";
+        msgData+= " %26 Download app https://bit.ly/38uffP8 ID: ${tempContact[0]} Pass: 555 or Call 03330133520";
+        // String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
 
-        var responseMsg = await OnlineDatabase.sendTextMultiple(tempContact, msgData);
+        var responseMsg = await OnlineDatabase.sendText(tempContact[0], msgData);
         if(responseMsg.statusCode == 200){
           print("Message sent!!!!!");
         }
@@ -447,7 +450,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } catch (e,stack) {
       setLoading(false);
       Fluttertoast.showToast(
-        msg: "Something went wrong try again later",
+        msg: "Error: "+e.toString(),
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.black87,
         textColor: Colors.white,
@@ -456,6 +459,62 @@ class _PaymentScreenState extends State<PaymentScreen> {
       print("exception in post payment method is" + e.toString()+stack.toString());
     }
   }
+  // postPayment(CustomerModel customer) async {
+  //   try {
+  //     setLoading(true);
+  //     var location=await  Location().getLocation();
+  //     var response = await OnlineDatabase.postPayment(customerCode: customer.customerCode,lat: location.latitude.toString(),long: location.longitude.toString(),amount: totalAmount,name: Name,paymentMode: '1');
+  //     print("status code is" + response.statusCode.toString());
+  //     if (response.statusCode == 200) {
+  //       var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+  //       print("response is"+respnseData['results'].toString());
+  //
+  //       List<String> tempContact = [];
+  //       if(customer.customerContactNumber != null){
+  //         tempContact.add(customer.customerContactNumber.substring(0,customer.customerContactNumber.length));
+  //       }
+  //       if(customer.customerContactNumber2 != null){
+  //         tempContact.add(customer.customerContactNumber2);
+  //       }else{
+  //         //tempContact.add('+923340243440');
+  //       }
+  //       String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
+  //
+  //       var responseMsg = await OnlineDatabase.sendTextMultiple(tempContact, msgData);
+  //       if(responseMsg.statusCode == 200){
+  //         print("Message sent!!!!!");
+  //       }
+  //
+  //       setLoading(false);
+  //       Fluttertoast.showToast(
+  //           msg: "Payment Created Successfully",
+  //           toastLength: Toast.LENGTH_SHORT,
+  //           backgroundColor: Colors.black87,
+  //           textColor: Colors.white,
+  //           fontSize: 16.0);
+  //       Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen()));
+  //     } else {
+  //       setLoading(false);
+  //       Fluttertoast.showToast(
+  //         msg: "Something went wrong try again later",
+  //         toastLength: Toast.LENGTH_SHORT,
+  //         backgroundColor: Colors.black87,
+  //         textColor: Colors.white,
+  //         fontSize: 16.0,
+  //       );
+  //     }
+  //   } catch (e,stack) {
+  //     setLoading(false);
+  //     Fluttertoast.showToast(
+  //       msg: "Something went wrong try again later",
+  //       toastLength: Toast.LENGTH_SHORT,
+  //       backgroundColor: Colors.black87,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0,
+  //     );
+  //     print("exception in post payment method is" + e.toString()+stack.toString());
+  //   }
+  // }
   bool setLoading(bool loading) {
     setState(() {
       isLoading = loading;

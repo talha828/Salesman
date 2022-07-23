@@ -13,6 +13,7 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentSuccessfull.dart';
@@ -91,10 +92,12 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
 
   }
   }
-
+  var userdata;
   @override
   Widget build(BuildContext context) {
-
+    setState(() {
+      userdata=Provider.of<UserModel>(context);
+    });
     var media=MediaQuery.of(context).size;
     double height=media.height;
     double width=media.width;
@@ -644,11 +647,11 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
     try {
       var location =await Location().getLocation();
       setLoading(true);
-      var response = await OnlineDatabase.postPayment(customerCode: widget.customerData.customerCode, imageUrl: imageUrl,lat: location.latitude.toString(),long:location.longitude.toString(),amount: amount.text,name: name.text,checkNumber: checkNumber.text,paymentMode: '2', date: startDate);
+      var response = await OnlineDatabase.newpostPayment(emp_id: userdata.userEmpolyeeNumber,customerCode: widget.customerData.customerCode, imageUrl: imageUrl,lat: location.latitude.toString(),long: location.longitude.toString(),amount: amount.text,name: name.text,checkNumber: checkNumber.text,paymentMode: '2', date: startDate);
       print("status code is: " + response.statusCode.toString());
       if (response.statusCode == 200) {
-        var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
-        print("response is: "+respnseData['results'].toString());
+        // var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+        // print("response is: "+respnseData['results'].toString());
         setLoading(false);
         Fluttertoast.showToast(
             msg: "Payment Created Successfully",
@@ -670,7 +673,7 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
     } catch (e,stack) {
       setLoading(false);
       Fluttertoast.showToast(
-        msg: "Something went wrong try again later",
+        msg: "Error: "+e.toString(),
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.black87,
         textColor: Colors.white,

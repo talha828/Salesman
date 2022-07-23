@@ -1142,7 +1142,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                             msgPin += rng.nextInt(9).toString();
                           }
                           print(msgPin);
-                          String msgData = 'Use $msgPin to confirm goods receive of Rs ${boxDetails.totalAmount} from ${userData.firstName} %26 Download app https://bit.ly/38uffP8';
+                          String msgData = 'Use $msgPin to confirm goods receive of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8';
                           msgData += ' ID: ${tempContact[0]} Pass: 555';
                           //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
                           // String msgData =
@@ -1165,7 +1165,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => PaymentPin(
-                                    userName:userData.firstName ,
+                                    userName:userData.userName ,
                                     customer:widget.shopDetails ,
                                     total:boxDetails.totalAmount,
                                     pin: msgPin,
@@ -1189,7 +1189,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                             utf8.decode(response.bodyBytes));
                                         print("Post box Response is: " +
                                             data.toString());
-                                        String msgData = "Thankyou, you have receive goods of Rs ${boxDetails.totalAmount} from ${userData.firstName} %26 Download app https://bit.ly/38uffP8";
+                                        String msgData = "Thankyou, you have receive goods of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8";
                                         msgData+= " ID: ${tempContact[0]} Pass: 555";
                                         //     "آپ ${boxDetails.totalAmount} روپے کا سامان لے چکے ہیں۔ شکریہ۔";
 

@@ -47,7 +47,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
     var media=MediaQuery.of(context).size;
     double height=media.height;
     var width=media.width;
-   var data= Provider.of<UserModel>(context).token;
+   var data= Provider.of<UserModel>(context);
    print(data);
     return Stack(
       children: [
@@ -113,7 +113,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
                      //var _credential = PhoneAuthProvider.credential(verificationId: widget.verificationCode, smsCode: otpCode.toString());
                     print("Completed");
 
-                     verifyOtp();
+                     verifyOtp(data);
                   },
                   onChanged: (value) {
                     setState(() {
@@ -178,7 +178,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
       isLoading = loading;
     });
   }
-  void verifyOtp() async{
+  void verifyOtp(UserModel data) async{
     setLoading(true);
     FirebaseAuth _auth=FirebaseAuth.instance;
     try{
@@ -190,6 +190,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('phoneno', widget.phoneNo.toString());
         prefs.setString('password',widget.password.toString());
+        prefs.setString("name",data.userName );
         phoneNumber = prefs.getString('phoneno');
         password = prefs.getString('password');
         Fluttertoast.showToast(

@@ -925,7 +925,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                           if (validateFields()) {
                             setLoading(true);
                           Response response = await  addCustomer(
-                              emp_id: userData.id,
+                              emp_id: userData.userEmpolyeeNumber,
                               shopName: shopname.text,
                               shopAddress: actualaddress,
                               person1: name.text,

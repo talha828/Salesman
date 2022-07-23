@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/history_model.dart';
 import 'package:salesmen_app_new/model/history_model_new.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -317,7 +318,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //getHistory();
+    getHistory();
 /*    List a=history['historyDetails'];
     for(int i=0;i<a.length;i++){
       var item=a[i];
@@ -335,27 +336,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
       isLoading=loading;
     });
   }
-  // getHistory() async{
-  //   setLoading(true);
-  //   var response=await OnlineDataBase.getHistory();
-  //   var data=jsonDecode(utf8.decode(response.bodyBytes));
-  //   if(response.statusCode==200){
-  //     var dataList=data['results'];
-  //     print("history data is"+dataList.toString());
-  //     if(dataList!=null){
-  //       for(var item in dataList){
-  //         historyData.add(HistoryModel.fromJson(item));
-  //       }
-  //     }
-  //     setLoading(false);
-  //
-  //   }
-  //   else{
-  //     setLoading(false);
-  //     Fluttertoast.showToast(msg: "Some thing went wrong",toastLength: Toast.LENGTH_SHORT);
-  //   }
-  //   print("history length is"+historyData.length.toString());
-  // }
+  getHistory() async{
+    setLoading(true);
+    var response=await OnlineDatabase.getHistory();
+    var data=jsonDecode(utf8.decode(response.bodyBytes));
+    if(response.statusCode==200){
+      var dataList=data['results'];
+      print("history data is"+dataList.toString());
+      if(dataList!=null){
+        for(var item in dataList){
+          historyData.add(HistoryModel.fromJson(item));
+        }
+      }
+      setLoading(false);
+
+    }
+    else{
+      setLoading(false);
+      Fluttertoast.showToast(msg: "Some thing went wrong",toastLength: Toast.LENGTH_SHORT);
+    }
+    print("history length is"+historyData.length.toString());
+  }
 
   @override
   Widget build(BuildContext context) {

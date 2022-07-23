@@ -34,7 +34,7 @@ class DeliveryDetails {
     cONTACTPERSON = json['CONTACT_PERSON'];
     lONGITUDE = json['LONGITUDE'];
     lATITUDE = json['LATITUDE'];
-    cREDITLIMIT = double.parse(json['CREDIT_LIMIT'].toString());
+    cREDITLIMIT =json['CREDIT_LIMIT']==null? 0.0:double.parse(json['CREDIT_LIMIT'].toString());
     oRDERNO = double.parse(json['ORDER_NO'].toString());
     oRDERDATE = json['ORDERDATE'];  
     sALESMAN = json['SALESMAN'];

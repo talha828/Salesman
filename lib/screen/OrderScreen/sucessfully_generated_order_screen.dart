@@ -30,7 +30,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
   }
   Future<bool> _onWillPop(){
     clearCart();
-    return Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+    return Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
   }
 
   @override
@@ -57,7 +57,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
                   InkWell(
                     onTap: (){
                       //Provider.of<CartModel>(context, listen: false).createCart();
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
 
                     },
                     child: Image.asset(
@@ -118,7 +118,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
                 onTap: (){
                   //Provider.of<CartModel>(context, listen: false).createCart();
 
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
 
                 },
                 child: Center(

@@ -62,9 +62,10 @@ class _LoginScreenState extends State<LoginScreen> {
     var response=await Auth.getLogin(phoneNo:widget.phoneNumber, password:_passController.text,onSuccess: (response)async{
       //print("status ${response.statusCode}");
       if(response.statusCode==200){
-        var data=jsonDecode(response.toString());
-          print(data['success']);
-         await  Provider.of<UserModel>(context,listen: false).fetchData(data);
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+       // var data=jsonDecode(response.toString());
+         // print(data['success']);
+         await  Provider.of<UserModel>(context,listen: false).userSignIn(data);
         FirebaseAuth _auth=  FirebaseAuth.instance;
         _auth.verifyPhoneNumber(
             phoneNumber: widget.phoneNumber,

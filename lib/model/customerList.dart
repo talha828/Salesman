@@ -73,6 +73,9 @@ class CustomerList extends ChangeNotifier{
   void clearProductList(){
     product.clear();
   }
+  void clearProductSearchList(){
+    searchProduct.clear();
+  }
   void addSearchProduct(List<ProductModel> value){
     searchProduct.addAll(value);
   }

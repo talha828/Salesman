@@ -177,7 +177,8 @@ class _PaymentPinState extends State<PaymentPin> {
                       print(enteredPin);
                       print(code);
                       if(enteredPin.toString() == code.toString()){
-                        Navigator.of(context).pop();
+                        //Navigator.of(context).pop();
+                        setLoading(true);
                         widget.onSuccess();
                       }else{
                         Fluttertoast.showToast(

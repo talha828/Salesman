@@ -6,15 +6,17 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
+import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/bank_account_model.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 
 class BankAccountScreen extends StatefulWidget {
-  var lat,long;
-  List<NewCustomerModel> shopDetails;
-  BankAccountScreen({this.shopDetails,this.lat,this.long});
+  List<CustomerModel> shopDetails;
+  BankAccountScreen({this.shopDetails});
 
 
   @override
@@ -60,26 +62,26 @@ bool showSelectedBank=false;
   List<BankAccountModel> bankaccounts=[];
   BankAccountModel sel_account;
 
-  // Future<List<BankAccountModel>> getAllBankAccount() async{
-  // setState(() {
-  //   isLoading2=true;
-  // });
-  //   List<BankAccountModel> tempbank = await OnlineDataBase.getbankAccount();
-  //  // isLoading=false;
-  //   setState(() {
-  //     bankaccounts = tempbank;
-  //   });
-  // setState(() {
-  //   isLoading2=false;
-  // });
-  //
-  // }
+  Future<List<BankAccountModel>> getAllBankAccount() async{
+  setState(() {
+    isLoading2=true;
+  });
+    List<BankAccountModel> tempbank = await OnlineDatabase.getbankAccount();
+   // isLoading=false;
+    setState(() {
+      bankaccounts = tempbank;
+    });
+  setState(() {
+    isLoading2=false;
+  });
+
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //getAllBankAccount();
+    getAllBankAccount();
   }
 
   _onSelected(int i){
@@ -88,31 +90,31 @@ bool showSelectedBank=false;
     });
   }
 
-  // _uploadImg(bool fromCamera) async {
-  //   if(fromCamera){
-  //     File image = await ImagePicker.pickImage(
-  //         source: ImageSource.camera, imageQuality: 50
-  //     );
-  //     if(image !=null){
-  //       print(image.path);
-  //       setState(() {
-  //         this.image = image;
-  //         showImage = true;
-  //       });
-  //     }
-  //   }else{
-  //     File image = await ImagePicker.pickImage(
-  //         source: ImageSource.gallery, imageQuality: 50
-  //     );
-  //     if(image !=null){
-  //       print(image.path);
-  //       setState(() {
-  //         this.image = image;
-  //         showImage = true;
-  //       });
-  //     }
-  //   }
-  // }
+  _uploadImg(bool fromCamera) async {
+    if(fromCamera){
+      XFile image = await ImagePicker().pickImage(
+          source: ImageSource.camera, imageQuality: 50
+      );
+      if(image !=null){
+        print(image.path);
+        setState(() {
+          this.image = File(image.path);
+          showImage = true;
+        });
+      }
+    }else{
+      XFile image = await ImagePicker().pickImage(
+          source: ImageSource.gallery, imageQuality: 50
+      );
+      if(image !=null){
+        print(image.path);
+        setState(() {
+          this.image = File(image.path);
+          showImage = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +189,7 @@ bool showSelectedBank=false;
                         //color: Colors.red
                       ),
                       child:
-                      isLoading2?CircularProgressIndicator(color: themeColor1,):
+                      isLoading2?ProcessLoadingWhite():
                       ListView.separated(
 
                           separatorBuilder: (context, index) => Padding(
@@ -440,7 +442,7 @@ bool showSelectedBank=false;
                                   color: Color(0xffE5E5E5),
                                   child: GestureDetector(
                                       onTap: (){
-                                       // _uploadImg(true);
+                                        _uploadImg(true);
                                       },
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -470,7 +472,7 @@ bool showSelectedBank=false;
                                   color: Color(0xffE5E5E5),
                                   child: GestureDetector(
                                       onTap: (){
-                                       // _uploadImg(false);
+                                        _uploadImg(false);
                                       },
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -545,7 +547,7 @@ bool showSelectedBank=false;
                         InkWell(
                           onTap: (){
                             if(validateFeilds()){
-                             // postCashDeposit();
+                              postCashDeposit();
                             }
                          },
                           child: Center(
@@ -586,7 +588,7 @@ bool showSelectedBank=false;
           ),
 
         ),
-        isLoading?Positioned.fill(child: CircularProgressIndicator(color: themeColor1,)):Container(),
+        isLoading?Positioned.fill(child: ProcessLoading()):Container(),
       ],
     );
   }
@@ -608,59 +610,60 @@ bool showSelectedBank=false;
     });
   }
 
-  // postCashDeposit() async {
-  //   FocusScope.of(context).unfocus();
-  //   setLoading(true);
-  //   if(image != null){
-  //     var tempImage = await MultipartFile.fromFile(image.path,
-  //         filename: "${DateTime.now().millisecondsSinceEpoch.toString()}.${image.path.split('.').last}",
-  //         contentType: new MediaType('image', 'jpg'));
-  //     print(tempImage.filename);
-  //     postImage(tempImage);
-  //   }else{
-  //     postData('');
-  //   }
-  // }
+  postCashDeposit() async {
+    FocusScope.of(context).unfocus();
+    setLoading(true);
+    if(image != null){
+      var tempImage = await MultipartFile.fromFile(image.path,
+          filename: "${DateTime.now().millisecondsSinceEpoch.toString()}.${image.path.split('.').last}",
+          contentType: new MediaType('image', 'jpg'));
+      print(tempImage.filename);
+      postImage(tempImage);
+    }else{
+      postData('');
+    }
+  }
 
-  // postData(String imageUrl) async {
-  //   var response=await OnlineDataBase.postCashDeposite(imageUrl: imageUrl, long: widget.long.toString(),lat: widget.lat.toString(),accountNumber: selectedBankData.accountNumber,amount: amount.text);
-  //   var data = jsonDecode(utf8.decode(response.bodyBytes));
-  //   if(response.statusCode==200){
-  //     setLoading(false);
-  //     Fluttertoast.showToast(msg: "Cash deposit successfully",toastLength: Toast.LENGTH_SHORT);
-  //     setState(() {
-  //       amount.clear();
-  //       showSelectedBank = false;
-  //       bankSelect=-1;
-  //     });
-  //     //Navigator.push(context, MaterialPageRoute(builder: (_)=>MainMenuScreen()));
-  //   }
-  //   else{
-  //     setLoading(false);
-  //     Fluttertoast.showToast(msg: "Something went wrong",toastLength: Toast.LENGTH_SHORT);
-  //   }
-  // }
-  //
-  // void postImage(var image) async {
-  //   try {
-  //     var response = await OnlineDataBase.uploadImage(
-  //         type: 'bankdeposit',
-  //         image: image
-  //     );
-  //     if(response){
-  //       setLoading(false);
-  //       print("Success");
-  //       String imageUrl = 'https://suqexpress.com/assets/images/customer/${image.filename}';
-  //       postData(imageUrl);
-  //     }else{
-  //       setLoading(false);
-  //       print("failed");
-  //       Fluttertoast.showToast(msg: 'Image upload failed', toastLength: Toast.LENGTH_SHORT);
-  //     }
-  //   } catch (e, stack) {
-  //     setLoading(false);
-  //     print('exception is: ' + e.toString());
-  //     Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
-  //   }
-  // }
+  postData(String imageUrl) async {
+    var location=await Location().getLocation();
+    var response=await OnlineDatabase.postCashDeposite(imageUrl: imageUrl, long: location.longitude.toString(),lat: location.latitude.toString(),accountNumber: selectedBankData.accountNumber,amount: amount.text);
+    var data = jsonDecode(utf8.decode(response.bodyBytes));
+    if(response.statusCode==200){
+      setLoading(false);
+      Fluttertoast.showToast(msg: "Cash deposit successfully",toastLength: Toast.LENGTH_SHORT);
+      setState(() {
+        amount.clear();
+        showSelectedBank = false;
+        bankSelect=-1;
+      });
+      //Navigator.push(context, MaterialPageRoute(builder: (_)=>MainMenuScreen()));
+    }
+    else{
+      setLoading(false);
+      Fluttertoast.showToast(msg: "Something went wrong",toastLength: Toast.LENGTH_SHORT);
+    }
+  }
+
+  void postImage(var image) async {
+    try {
+      var response = await OnlineDatabase.uploadImage(
+          type: 'bankdeposit',
+          image: image
+      );
+      if(response){
+        setLoading(false);
+        print("Success");
+        String imageUrl = 'https://suqexpress.com/assets/images/customer/${image.filename}';
+        postData(imageUrl);
+      }else{
+        setLoading(false);
+        print("failed");
+        Fluttertoast.showToast(msg: 'Image upload failed', toastLength: Toast.LENGTH_SHORT);
+      }
+    } catch (e, stack) {
+      setLoading(false);
+      print('exception is: ' + e.toString());
+      Fluttertoast.showToast(msg: e.toString(), toastLength: Toast.LENGTH_LONG);
+    }
+  }
 }

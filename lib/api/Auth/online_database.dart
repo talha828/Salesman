@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart'as http;
 import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/area_model.dart';
+import 'package:salesmen_app_new/model/bank_account_model.dart';
 import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/city_model.dart';
@@ -81,7 +82,7 @@ class OnlineDatabase{
     }
 
   }
-  static Future<dynamic> getLedger({String customerCode,String ledgerType,String fromDate,String toDate}) async {
+   static Future<dynamic> getLedger({String customerCode,String ledgerType,String fromDate,String toDate}) async {
     var url=Uri.parse(directory+'gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_datatype=$ledgerType&pin_fromdate=$fromDate&pin_todate=$toDate');
     print('get ledger url is: '+url.toString());
     var response= await http.get(url);
@@ -384,24 +385,39 @@ class OnlineDatabase{
     return response;
   }
   static Future<dynamic> postEmployee({String customerCode,String purpose,String lat,String long,String emp_id}) async {
-    var url =Uri.parse(directory+'postempvisitlog?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_loc_code=&pin_longitude='+'$long'+'&pin_latitude='+'$lat'+'&pin_purpose=$purpose&pin_photo');
-     print('post employee url is'+url.toString());
-    final response = await http.get(url);
-    // Map<String,dynamic> data={
-    //   "employee_id":emp_id,
-    //   "customer_id":customerCode,
-    //   "phone":phoneNumber,
-    //   "password":password,
-    //   "lat":lat,
-    //   "long":long,
-    // };
-    // var dio = Dio();
-    // String url='http://erp.suqexpress.com/api/checkin';
-    // print(data);
-    // FormData formData = new FormData.fromMap(data);
-    // var response=await dio.post(url,data: formData);
+    // var url =Uri.parse(directory+'postempvisitlog?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_loc_code=&pin_longitude='+'$long'+'&pin_latitude='+'$lat'+'&pin_purpose=$purpose&pin_photo');
+    //  print('post employee url is'+url.toString());
+    // final response = await http.get(url);
+    Map<String,dynamic> data={
+      "employee_id":emp_id,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+    };
+    var dio = Dio();
+    String url='http://erp.suqexpress.com/api/checkin';
+    print(data);
+    FormData formData = new FormData.fromMap(data);
+    var response=await dio.post(url,data: formData);
     return response;
   }
+  static Future<dynamic> editShop({String customerCode,String imageUrl, String lat,String long,String address,String customerName,String customerName2,String customerPhoneNo,String CustomerPhoneNo2, String shopname,String partyCategory,String city,String area ,}){
+    String url=directory+'posteditshop?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_shopname=${shopname}&pin_address=$address&pin_partycategory=$partyCategory&'
+        'pin_image_url=${imageUrl}&pin_city=${city??''}&pin_mobile=${customerPhoneNo}&pin_phone1=${customerPhoneNo}&pin_phone2=$CustomerPhoneNo2&pin_ntn=1'
+        '&pin_person1=$customerName&pin_person2=$customerName2&pin_longitude=$long&pin_latitude=$lat&po_cust_code&pin_area=${area??''}';
+    print("edit customer url is: "+url);
+    print("edit area url is: "+area);
+    try{
+      var response=http.post(Uri.parse(url),body: null);
+      return response;
+    }
+    catch(e){
+      print("exception in edit shop api is"+e.toString());
+    }
+  }
+
   static Future<dynamic> getTranactionDetails({String customerCode}) async {
     var url =Uri.parse(directory+ 'getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_datatype=CRLB');
     print('getTranactionDetails url is: '+url.toString());
@@ -525,6 +541,57 @@ class OnlineDatabase{
     print(url);
     var response = await http.post(Uri.parse(url));
     print(response.statusCode.toString());
+    return response;
+  }
+  static Future<dynamic> getOrderDetails(String startDate,String endDate,String empNo)async{
+    Uri url=Uri.parse("http://124.29.202.191:8181/ords/skr2/app/gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=PSO&pin_order_no=&pin_fromdate=$startDate&pin_todate=$endDate&pin_app_for=&pin_cmp_id=&pin_cust_code=&pin_emp_userid=$empNo");
+    var response =await http.get(url);
+    print(url);
+    print(response.statusCode.toString());
+    return response;
+  }
+  static Future<List<BankAccountModel>> getbankAccount() async{
+    List<BankAccountModel> bankaccounts;
+    var url=Uri.parse(directory+'getbankaccounts?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_bacc_no=');
+    print(url.toString());
+    await http.get(url).then((response){
+      print(response.statusCode.toString());
+      var data=jsonDecode(utf8.decode(response.bodyBytes));
+      if(response.statusCode==200){
+        var dataList=data['results'];
+        if(dataList!=null){
+          bankaccounts=[];
+          for(var item in dataList){
+            bankaccounts.add(BankAccountModel.fromJson(item));
+          }
+        }
+      }
+      else{
+        Fluttertoast.showToast(msg: "Some thing went wrong", toastLength: Toast.LENGTH_SHORT);
+      }
+    } ).catchError((ex,stack){
+      Fluttertoast.showToast(msg: "Some thing went wrong", toastLength: Toast.LENGTH_SHORT);
+      print('exception in get bank account is'+ex.toString());
+    });
+    return bankaccounts;
+  }
+  static Future<dynamic> postCashDeposite({String lat,String long,String accountNumber,String amount, String imageUrl}){
+    var url=Uri.parse(directory+'postcashdeposit?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_longitud=$long&pin_latitude=$long&pin_acc_no=$accountNumber&pin_amount=$amount&pin_image_url=$imageUrl');
+    var response=http.post(url,body: null);
+    return response;
+  }
+  static Future<dynamic> getHistory(){
+    var url=Uri.parse(directory+'getempvisitlog?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=&pin_loguserid=$phoneNumber&pin_longitude=&pin_latitude=&pin_from_date=&pin_to_date=');
+    print('history url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> signIn2(String phoneno,String password) async {
+    var url=Uri.parse(directory+'getlogin?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneno&pin_password=$password&pin_version=230622');
+    print("login url is: "+url.toString());
+    final response = await http.get(url);
+    print(response.statusCode.toString());
+    print("login data is: "+response.body.toString());
     return response;
   }
 }

@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'dart:math' show cos, sqrt, asin;
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,10 +11,13 @@ import 'package:geocoder/geocoder.dart';
 import 'package:http/http.dart'as http;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/globalvariable.dart';
+import 'package:salesmen_app_new/locationServices/location_callback_handler.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
@@ -22,9 +29,8 @@ import 'package:geolocator/geolocator.dart' as geo;
 
 
 class AllShopScreen extends StatefulWidget {
-  List<CustomerModel>temp;
-  String address;
-  AllShopScreen({this.temp,this.address});
+  AllShopScreen({this.user});
+  UserModel user;
   @override
   State<AllShopScreen> createState() => _AllShopScreenState();
 }
@@ -63,6 +69,39 @@ class _AllShopScreenState extends State<AllShopScreen> {
          return _formattedAddress;
        } else return null;
      } else return null;
+   }
+   Future<void> startLocationService() async {
+
+     await BackgroundLocator.initialize();
+     Map<String, dynamic> data = {
+       'countInit': 1,
+       'userNumber': phoneNumber,
+       'userName': widget.user.userName,
+     };
+     print(phoneNumber);
+     print(widget.user.userName);
+     return await BackgroundLocator.registerLocationUpdate(
+         LocationCallbackHandler.callback,
+         initCallback: LocationCallbackHandler.initCallback,
+         initDataCallback: data,
+         disposeCallback: LocationCallbackHandler.disposeCallback,
+         autoStop: false,
+         iosSettings: IOSSettings(
+             accuracy: LocationAccuracy.NAVIGATION, distanceFilter: 0),
+         androidSettings: AndroidSettings(
+             accuracy: LocationAccuracy.NAVIGATION,
+             interval: 120,
+             distanceFilter: 0,
+             androidNotificationSettings: AndroidNotificationSettings(
+                 notificationChannelName: 'Location tracking',
+                 notificationTitle: 'Start Location Tracking',
+                 notificationMsg: 'Track location in background',
+                 notificationBigMsg:
+                 'Background location is on to keep the app up-tp-date with your location. This is required for main features to work properly when the app is not running.',
+                 notificationIcon: '',
+                 notificationIconColor: Colors.grey,
+                 notificationTapCallback:
+                 LocationCallbackHandler.notificationCallback)));
    }
    calculateDistance(double lat1,double long1,double lat2,double long2) {
      var distance = geo.Geolocator.distanceBetween(lat2,
@@ -150,14 +189,12 @@ class _AllShopScreenState extends State<AllShopScreen> {
   }
   @override
   void initState() {
-     //customer.addAll(widget.temp);
-    //getAddressFromLatLng();
-     //getAllCustomerData();
+    startLocationService();
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-     CustomerList dd=Provider.of<CustomerList>(context,listen: true);
+     CustomerList dd=Provider.of<CustomerList>(context);
      print(customer.length);
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;

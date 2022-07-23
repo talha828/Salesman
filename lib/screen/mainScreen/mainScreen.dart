@@ -2,11 +2,17 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/globalvariable.dart';
+import 'package:salesmen_app_new/locationServices/location_callback_handler.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
@@ -19,8 +25,9 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:salesmen_app_new/screen/AddCustomer/add_customer_screen.dart';
 import 'package:salesmen_app_new/screen/BankAccountScreen/bank_account_screen.dart';
 import 'package:salesmen_app_new/screen/History_Screen/history_screen.dart';
-import 'package:salesmen_app_new/screen/agingReport/aging_card.dart';
-
+import 'package:salesmen_app_new/screen/ReportsScreen/report_screen.dart';
+import 'package:salesmen_app_new/screen/ShowDelivery/show_delivery_screen.dart';
+import 'package:salesmen_app_new/screen/agingScreen/aging_card.dart';
 import 'package:salesmen_app_new/screen/assignShopScreen/AssignShopScreen.dart';
 import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
@@ -41,6 +48,7 @@ class _MainScreenState extends State<MainScreen> {
         long2, lat1, long1);
     return distance / 1000;
   }
+
   void getAllCustomerData() async {
     try {
       var data =await location.getLocation();
@@ -104,33 +112,7 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
   Coordinates userLatLng;
-  getAddressFromLatLng() async {
-    var data =await location.getLocation();
-    userLatLng=Coordinates(data.latitude,data.longitude);
-    var lat=data.latitude;
-    var lng=data.longitude;
-    //userLatLng=Coordinates(lat, lng);setState(() {});
-    List<AddressModel>addressList=[];
-    String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
-    String _host = 'https://maps.google.com/maps/api/geocode/json';
-    final url = '$_host?key=$mapApiKey&language=en&latlng=$lat,$lng';
-    print(url);
-    if(lat != null && lng != null){
-      var response = await http.get(Uri.parse(url));
-      if(response.statusCode == 200) {
-        Map data = jsonDecode(response.body);
-        String _formattedAddress = data["results"][0]["formatted_address"];
-        var address = data["results"][0]["address_components"];
-        for(var i in address){
-          addressList.add(AddressModel.fromJson(i));
-        }
-        actualAddress=addressList[3].shortName;
-        Provider.of<CustomerList>(context).updateAddress(actualAddress);
-        print("response ==== $_formattedAddress");
-        return _formattedAddress;
-      } else return null;
-    } else return null;
-  }
+
   var actualAddress = "Searching....";
 
    List<CustomerModel> customer=[];
@@ -155,8 +137,8 @@ class _MainScreenState extends State<MainScreen> {
   
   @override
   void initState() {
-    //getAddressFromLatLng();
-    getAllCustomerData();
+   getAllCustomerData();
+
     super.initState();
   }
   Future<bool> _onWillPop() async {
@@ -276,9 +258,9 @@ class _MainScreenState extends State<MainScreen> {
                               children: [
                                ClipRRect(
                                    borderRadius: BorderRadius.circular(50),
-                                   child: Image.network("https://erp.suqexpress.com${userData.image}",cacheHeight: 70,cacheWidth: 70,
+                                   child: Image.network("https://erp.suqexpress.com${userData.userName}",cacheHeight: 70,cacheWidth: 70,
                                      errorBuilder: (BuildContext context, Object exception, StackTrace stackTrace) {
-                                       return Image.asset("assets/images/gear.png");
+                                       return Image.asset("assets/images/gear.png",width: 50,height: 50,);
                                      },
                                      loadingBuilder: (BuildContext context,
                                          Widget child,
@@ -305,7 +287,7 @@ class _MainScreenState extends State<MainScreen> {
                               height: height * 0.01,
                             ),
                             VariableText(
-                              text: userData.firstName,
+                              text: userData.userName,
                               fontsize: 16,
                               fontcolor: textcolorblack,
                               fontFamily: fontMedium,
@@ -315,7 +297,7 @@ class _MainScreenState extends State<MainScreen> {
                               height: height * 0.0055,
                             ),
                             VariableText(
-                              text: userData.phone.toString(),
+                              text: userData.phoneNumber.toString(),
                               fontsize: 12,
                               fontcolor: textcolorgrey,
                               fontFamily: fontRegular,
@@ -361,7 +343,7 @@ class _MainScreenState extends State<MainScreen> {
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.push(
-                          context,MaterialPageRoute(builder: (context)=>LedgerScreen()));
+                          context,MaterialPageRoute(builder: (context)=>ReportsScreen(userdata: userData,)));
                     },
                   ),
                   DrawerList(
@@ -369,9 +351,8 @@ class _MainScreenState extends State<MainScreen> {
                       imageSource: "assets/icons/totalitem.png",
                       selected: false,
                       onTap: () {
-                        // Navigator.of(context).pop();
-                        // Navigator.push(context,
-                        //     NoAnimationRoute(widget: ShowDeliveryScreen()));
+                         Navigator.of(context).pop();
+                        Navigator.push(context,MaterialPageRoute(builder: (context)=> ShowDeliveryScreen()));
                       }),
                   DrawerList(
                       text: 'AGING',
@@ -440,7 +421,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           body: TabBarView(
             children: [
-              AllShopScreen( temp: customer,address: actualAddress,),
+              AllShopScreen(user:userData),
               AssignShopScreen(),
             ],
           ),

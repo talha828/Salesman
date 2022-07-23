@@ -25,7 +25,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
     super.dispose();
   }
   Future<bool> _onWillPop(){
-    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
   }
 
   @override
@@ -109,7 +109,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
               InkWell(
                 onTap: (){
                   //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.shopDetails,lat: widget.lat,long: widget.long,fromShop: true,)), (route) => route.isCurrent);
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
                 },
                 child: Center(
                   child: Container(

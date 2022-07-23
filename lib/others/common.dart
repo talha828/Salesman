@@ -161,10 +161,10 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
        var response = await OnlineDatabase.postEmployee(emp_id: employeeCode, customerCode: customerCode, purpose: purpose, long: long, lat: lat);
        print("Response is" + response.statusCode.toString());
        if (response.statusCode == 200) {
-        // print("data is" + response.data["message"].toString());
-         //Provider.of<CartModel>(context, listen: false).createCart();
-         // Location location = new Location();
-         // var _location = await location.getLocation();
+        print("data is" + response.data["data"]["distance"].toString());
+         Provider.of<CartModel>(context, listen: false).createCart();
+         Location location = new Location();
+         var _location = await location.getLocation();
          Fluttertoast.showToast(
              msg: 'Check In Successfully',
              toastLength: Toast.LENGTH_SHORT,
@@ -176,7 +176,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
              context,
              MaterialPageRoute(
                  builder: (_) => CheckInScreen(
-                     customerList: widget.customerList,
+                   distance:double.parse(response.data["data"]["distance"].toString()) ,
                      //locationdata: _locationData,
                      shopDetails: customerData,)));
        } else {
@@ -650,7 +650,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                         Location location = new Location();
                                         var _location = await location.getLocation();
                                        await PostEmployeeVisit(
-                                            employeeCode: userData.id,
+                                            employeeCode: userData.userEmpolyeeNumber,
                                             customerCode: widget.customerData.customerCode,
                                             purpose: 'Check In',
                                             lat: _location.latitude.toString(),
