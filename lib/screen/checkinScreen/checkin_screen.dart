@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:badges/badges.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/screen/EditShop/edit_shop.dart';
+import 'package:salesmen_app_new/screen/MechanicScreen/mechanicScreen.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -321,14 +323,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
       child: Stack(
         children: [
           Scaffold(
-
             floatingActionButton: FloatingActionButton.extended(
-              tooltip: "Add Mechanic",
+              tooltip: "Mechanic",
               autofocus: true,
               backgroundColor: themeColor1,
-              icon:Icon(Icons.person_add_alt_1_rounded,color: Colors.white,),
-              label:Text("Add MC",style: TextStyle(color: Colors.white),) ,
-              onPressed: (){},),
+              label:Row(
+                children: [
+                  Text("Mechanic",style: TextStyle(color: Colors.white),),
+                  SizedBox(width: 15,),
+                  Icon(Icons.arrow_forward,color: Colors.white,),
+                ],
+              ) ,
+              onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen())),),
             appBar: MyAppBar(
               title: 'Check-In',
               ontap: () =>_willPopScope(),

@@ -2860,3 +2860,78 @@ class _ProcessLoadingState extends State<ProcessLoading>
         ));
   }
 }
+class MyTextFields extends StatefulWidget {
+  String title;
+  String hint;
+  TextEditingController controller;
+  MyTextFields({this.controller,this.title,this.hint});
+
+
+  @override
+  State<MyTextFields> createState() => _MyTextFieldsState();
+}
+
+class _MyTextFieldsState extends State<MyTextFields> {
+  @override
+  Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+    double height = media.height;
+    double width = media.width;
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: height * 0.03,
+          ),
+          VariableText(
+            text: widget.title,
+            fontsize: 12,
+            fontFamily: fontMedium,
+            weight: FontWeight.w500,
+            fontcolor: textcolorblack,
+          ),
+          SizedBox(
+            height: height * 0.01,
+          ),
+          RectangluartextFeild(
+            hinttext: widget.hint,
+            cont: widget.controller,
+            //onChanged: enableBtn(email.text),
+            keytype: TextInputType.text,
+            textlength: 25,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MyButton extends StatelessWidget {
+  MyButton({this.onTap});
+  final onTap;
+  @override
+  Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+    double height = media.height;
+    return InkWell(
+      onTap:onTap ,
+      child: Container(
+        height: height * 0.06,
+        decoration: BoxDecoration(
+          color: themeColor1,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: VariableText(
+            text: 'Add Mechanic',
+            weight: FontWeight.w700,
+            fontsize: 16,
+            fontFamily: fontRegular,
+            fontcolor: themeColor2,
+          ),
+        ),
+      ),
+    );
+  }
+}

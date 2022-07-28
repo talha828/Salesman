@@ -43,6 +43,8 @@ class _AllShopScreenState extends State<AllShopScreen> {
    loc.Location location = new loc.Location();
   String actualAddress="Searching....";
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
+   TextEditingController search=TextEditingController();
+
    getAddressFromLatLng() async {
 
      var data =await location.getLocation();
@@ -210,36 +212,90 @@ class _AllShopScreenState extends State<AllShopScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    InkWell(
-                      onTap:(){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => SearchScreen(
-                                  customerModel: dd.customerData,
-                                )));
-                      },
-                      child: Container(
+                    // InkWell(
+                    //   onTap:(){
+                    //     Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (_) => SearchScreen(
+                    //               customerModel: dd.customerData,
+                    //             )));
+                    //   },
+                       Container(
                         height: 38,
                         width: width *0.75,
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(5)
                         ),
-                        child: TextField(
-                          enabled: false,
-                          style: TextStyle(height: 1),
-                          scrollPadding: EdgeInsets.symmetric(vertical: 0),
-                          textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          suffixIcon: Icon(Icons.search,color:  Colors.grey,),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          border: InputBorder.none,
-                          hintText: "Search by shop name",
-                        ),
-                      ),),
-                    ),
+                        child: Autocomplete<CustomerModel>(
+                          optionsBuilder: ( textEditingValue){
+                            return dd.customerData
+                                .where((CustomerModel county) => county.customerShopName.toLowerCase()
+                                .startsWith(textEditingValue.text.toLowerCase())).toList();
+                          },
+                          optionsViewBuilder: (context,AutocompleteOnSelected<CustomerModel>onSelected,Iterable<CustomerModel> customer){
+                            return Scaffold(
+                              body: SingleChildScrollView(
+                                child: Container(
+                                 // height: width,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: customer.length>10?10:customer.length,
+                                    itemBuilder: (context, index) {
+                                      var width=MediaQuery.of(context).size.width;
+                                      var height=MediaQuery.of(context).size.height;
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width:width *0.9,
+                                            child: CustomShopContainer(
+                                              customerList: customer,
+                                              height: height,
+                                              width: width,
+                                              customerData:customer.first,
+                                              //isLoading2: isLoading2,
+                                              //enableLocation: _serviceEnabled,
+                                              lat: 1.0,
+                                              long:1.0,
+                                              showLoading: (value) {
+                                                setState(() {
+                                                  isLoading = value;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: height * 0.025,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      //   TextField(
+                      //     controller: search,
+                      //     style: TextStyle(height: 1),
+                      //     scrollPadding: EdgeInsets.symmetric(vertical: 0),
+                      //     textAlignVertical: TextAlignVertical.center,
+                      //   decoration: InputDecoration(
+                      //     isDense: true,
+                      //     suffixIcon: Icon(Icons.search,color:  Colors.grey,),
+                      //     contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                      //     border: InputBorder.none,
+                      //     hintText: "Search by shop name",
+                      //   ),
+                      // ),
+
+                       ),
+                    //),
                     Spacer(),
                     IconButton(onPressed: (){
                       getAllCustomerData();

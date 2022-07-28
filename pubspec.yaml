@@ -60,6 +60,7 @@ dependencies:
   path_provider: ^2.0.3
   background_locator: ^1.6.12
   rive: 0.7.0
+  badges: ^2.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

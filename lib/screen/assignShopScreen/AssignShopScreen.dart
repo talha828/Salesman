@@ -224,34 +224,77 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap:(){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => SearchScreen(
-                                      customerModel: index==0?dd.dues:dd.assign,
-                                    )));
-                          },
-                          child: Container(
+                        // InkWell(
+                          // onTap:(){
+                          //   Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //           builder: (_) => SearchScreen(
+                          //             customerModel: index==0?dd.dues:dd.assign,
+                          //           )));
+                          // },
+                           Container(
                             height: 38,
                             width: width *0.75,
                             decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(5)
                             ),
-                            child: TextField(
-                              enabled: false,
-                              textAlignVertical: TextAlignVertical.center,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                suffixIcon: Icon(Icons.search),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                                border: InputBorder.none,
-                                hintText: "Search by shop name",
-                              ),
+                            child: Autocomplete<CustomerModel>(
+                              optionsBuilder: ( textEditingValue){
+                                return index==0?dd.dues
+                                    .where((CustomerModel county) => county.customerShopName.toLowerCase()
+                                    .startsWith(textEditingValue.text.toLowerCase())).toList():dd.assign
+                                    .where((CustomerModel county) => county.customerShopName.toLowerCase()
+                                    .startsWith(textEditingValue.text.toLowerCase())).toList();
+                              },
+                              optionsViewBuilder: (context,AutocompleteOnSelected<CustomerModel>onSelected,Iterable<CustomerModel> customer){
+                                return Scaffold(
+                                  body: SingleChildScrollView(
+                                    child: Container(
+                                      // height: width,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.vertical,
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: customer.length>10?10:customer.length,
+                                        itemBuilder: (context, index) {
+                                          var width=MediaQuery.of(context).size.width;
+                                          var height=MediaQuery.of(context).size.height;
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                width:width *0.9,
+                                                child: CustomShopContainer(
+                                                  customerList: customer,
+                                                  height: height,
+                                                  width: width,
+                                                  customerData:customer.first,
+                                                  //isLoading2: isLoading2,
+                                                  //enableLocation: _serviceEnabled,
+                                                  lat: 1.0,
+                                                  long:1.0,
+                                                  showLoading: (value) {
+                                                    setState(() {
+                                                      isLoading = value;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: height * 0.025,
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),),
-                        ),
+                        // ),
                         IconButton(
                             padding: EdgeInsets.all(0),
                             onPressed: (){
