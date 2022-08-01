@@ -1167,6 +1167,190 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
   //   }
   // }
 }
+renderDeletePopup(BuildContext context, double height, double width,
+    CustomerModel customerData) {
+  showGeneralDialog(
+    barrierLabel: "Barrier",
+    barrierDismissible: false,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 100),
+    context: context,
+    pageBuilder: (_, __, ___) {
+      return PopupWithHeader(
+        height: height,
+        width: width,
+        customerData: customerData,
+      );
+    },
+    transitionBuilder: (_, anim, __, child) {
+      return FadeTransition(
+        opacity: anim,
+        //position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+        child: child,
+      );
+    },
+  );
+}
+class PopupWithHeader extends StatelessWidget {
+  double height;
+  double width;
+  CustomerModel customerData;
+  PopupWithHeader({this.height, this.width, this.customerData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Align(
+        alignment: Alignment.center,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Container(
+            height: height * 0.50,
+            width: width * 0.90,
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: width * 0.03, vertical: height * 0.04),
+                  child: Container(
+                    height: height * 0.50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: screenpadding),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: height * 0.07,
+                          ),
+                          VariableText(
+                            text: "Customer Information",
+                            fontsize: 18,
+                            weight: FontWeight.w600,
+                            fontcolor: Color(0xff1F1F1F),
+                            fontFamily: fontRegular,
+                          ),
+                          SizedBox(
+                            height: height * 0.0075,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(right: 0.0),
+                            child: Container(
+                              height: 1,
+                              width: width,
+                              color: Color(0xffE0E0E0),
+                            ),
+                          ),
+                          SizedBox(
+                            height: height * 0.02,
+                          ),
+                          SingleChildScrollView(
+                            child: Container(
+                              height: width * 0.5,
+                              child: ListView.builder(
+                               // physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: customerData.customerinfo.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return customRow(
+                                        title1:
+                                        customerData.customerinfo[index].key,
+                                        title2:
+                                        customerData.customerinfo[index].value);
+                                  }),
+                            ),
+                          ),
+                          /* customRow(title1: 'Kashif',title2: '0321-333-4556'),
+                          customRow(title1: 'Last Visit Date',title2: '12-Dec-21'),
+                          customRow(title1: 'Last Visit',title2: 'Delivery'),
+                          customRow(title1: 'Last Trans Date',title2: '15-Dec-21'),
+                          customRow(title1: 'Last Trans Amount',title2: '3000'),
+                          customRow(title1: 'Due Days',title2: '3'),*/
+
+                          InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              height: height * 0.05,
+                              width: width * 0.30,
+                              decoration: BoxDecoration(
+                                  color: themeColor1,
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: Center(
+                                child: VariableText(
+                                  text: "Close",
+                                  fontsize: 18,
+                                  fontcolor: themeColor2,
+                                  fontFamily: fontRegular,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    height: height * 0.1,
+                    width: height * 0.1,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: themeColor1, width: 2),
+                        borderRadius: BorderRadius.circular(55)),
+                    child: Center(
+                        child: Image.asset(
+                          "assets/icons/i.png",
+                          scale: 4.2,
+                        )),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget customRow({String title1, title2}) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            VariableText(
+              text: title1,
+              fontsize: 14,
+              fontFamily: fontRegular,
+              weight: FontWeight.w500,
+              fontcolor: Color(0xff333333),
+            ),
+            VariableText(
+              text: title2,
+              textAlign: TextAlign.center,
+              fontsize: 14,
+              fontcolor: Color(0xff828282),
+              fontFamily: fontRegular,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: height * 0.015,
+        )
+      ],
+    );
+  }
+}
 class DrawerList extends StatelessWidget {
   final String text;
   void Function()  onTap;
@@ -1623,7 +1807,7 @@ class RectangluartextFeild extends StatelessWidget {
   final bool texthidden, readonly, expands;
   final double radius;
   final String fontFamily;
-
+  final dynamic fieldFocusNode;
   final TextInputType keytype;
 
   // final FocusNode focusNode;
@@ -1644,6 +1828,7 @@ class RectangluartextFeild extends StatelessWidget {
     this.textlength = 20,
     this.text = "temp",
     this.enable = true,
+    this.fieldFocusNode,
     this.enableborder = true,
      this.onChanged,
     this.obscureText = false,
@@ -1679,6 +1864,7 @@ class RectangluartextFeild extends StatelessWidget {
         ),
         height: height * 0.065,
         child: TextFormField(
+          focusNode: fieldFocusNode,
           enabled: enable,
           inputFormatters: [
             LengthLimitingTextInputFormatter(textlength),

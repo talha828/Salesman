@@ -14,10 +14,12 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/locationServices/location_callback_handler.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
+import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
@@ -44,7 +46,59 @@ class _AllShopScreenState extends State<AllShopScreen> {
   String actualAddress="Searching....";
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
    TextEditingController search=TextEditingController();
+   void PostEmployeeVisit(
+       {String customerCode,
+         String employeeCode,
+         String purpose,
+         String lat,
+         String long,
+         CustomerModel customerData}) async {
+     try {
+       /*   setState(() {
+      widget.isLoading2=true;
+    });*/
+       var response = await OnlineDatabase.postEmployee(emp_id: employeeCode, customerCode: customerCode, purpose: purpose, long: long, lat: lat, );
+       print("Response is" + response.statusCode.toString());
+       if (response.statusCode == 200) {
+         print("data is" + response.data["data"]["distance"].toString());
+         Provider.of<CartModel>(context, listen: false).createCart();
+         loc.Location location = new loc.Location();
+         var _location = await location.getLocation();
+         Fluttertoast.showToast(
+             msg: 'Check In Successfully',
+             toastLength: Toast.LENGTH_SHORT,
+             backgroundColor: Colors.black87,
+             textColor: Colors.white,
+             fontSize: 16.0);
+         Provider.of<CustomerList>(context,listen: false).myCustomer(customerData);
+         Navigator.push(
+             context,
+             MaterialPageRoute(
+                 builder: (_) => CheckInScreen(
+                   distance:double.parse(response.data["data"]["distance"].toString()) ,
+                   //locationdata: _locationData,
+                   shopDetails: customerData,)));
+       } else {
+         print("data is" + response.statusCode.toString());
 
+         Fluttertoast.showToast(
+             msg: 'Some thing went wrong',
+             toastLength: Toast.LENGTH_SHORT,
+             backgroundColor: Colors.black87,
+             textColor: Colors.white,
+             fontSize: 16.0);
+       }
+     } catch (e, stack) {
+       print('exception is' + e.toString());
+
+       Fluttertoast.showToast(
+           msg: "Error: " + e.toString(),
+           toastLength: Toast.LENGTH_SHORT,
+           backgroundColor: Colors.black87,
+           textColor: Colors.white,
+           fontSize: 16.0);
+     }
+   }
    getAddressFromLatLng() async {
 
      var data =await location.getLocation();
@@ -200,6 +254,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
      print(customer.length);
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
+    var userData=Provider.of<UserModel>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -221,80 +276,53 @@ class _AllShopScreenState extends State<AllShopScreen> {
                     //               customerModel: dd.customerData,
                     //             )));
                     //   },
-                       Container(
-                        height: 38,
-                        width: width *0.75,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(5)
-                        ),
-                        child: Autocomplete<CustomerModel>(
-                          optionsBuilder: ( textEditingValue){
-                            return dd.customerData
-                                .where((CustomerModel county) => county.customerShopName.toLowerCase()
-                                .startsWith(textEditingValue.text.toLowerCase())).toList();
+                    SizedBox(
+                      height: height * 0.03,
+                    ),
+                    Stack(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => SearchScreen(customerModel: dd.customerData,)));
                           },
-                          optionsViewBuilder: (context,AutocompleteOnSelected<CustomerModel>onSelected,Iterable<CustomerModel> customer){
-                            return Scaffold(
-                              body: SingleChildScrollView(
-                                child: Container(
-                                 // height: width,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: customer.length>10?10:customer.length,
-                                    itemBuilder: (context, index) {
-                                      var width=MediaQuery.of(context).size.width;
-                                      var height=MediaQuery.of(context).size.height;
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width:width *0.9,
-                                            child: CustomShopContainer(
-                                              customerList: customer,
-                                              height: height,
-                                              width: width,
-                                              customerData:customer.first,
-                                              //isLoading2: isLoading2,
-                                              //enableLocation: _serviceEnabled,
-                                              lat: 1.0,
-                                              long:1.0,
-                                              showLoading: (value) {
-                                                setState(() {
-                                                  isLoading = value;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: height * 0.025,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width:width * 0.75 ,
+                                child: RectangluartextFeild(
+                                  bordercolor: Color(0xffEBEAEA),
+                                  hinttext: "Search by shop name",
+                                  containerColor: Color(0xFFFFFF),
+                                  enableborder: true,
+                                  enable: false,
+                                  keytype: TextInputType.text,
+                                  textlength: 25,
+                                  //onChanged: searchOperation,
                                 ),
                               ),
-                            );
-                          },
-                        )
-                      //   TextField(
-                      //     controller: search,
-                      //     style: TextStyle(height: 1),
-                      //     scrollPadding: EdgeInsets.symmetric(vertical: 0),
-                      //     textAlignVertical: TextAlignVertical.center,
-                      //   decoration: InputDecoration(
-                      //     isDense: true,
-                      //     suffixIcon: Icon(Icons.search,color:  Colors.grey,),
-                      //     contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                      //     border: InputBorder.none,
-                      //     hintText: "Search by shop name",
-                      //   ),
-                      // ),
-
-                       ),
+                              SizedBox(width: 5,),
+                              // InkWell(
+                              //   onTap: (){
+                              //     setLoading(true);
+                              //     //onStop();
+                              //   },
+                              //   child: Image.asset(
+                              //     'assets/icons/referesh.png',
+                              //     scale: 1.5,
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
                     //),
                     Spacer(),
                     IconButton(onPressed: (){

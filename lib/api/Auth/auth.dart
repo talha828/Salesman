@@ -7,10 +7,8 @@ class Auth{
     var url=Uri.parse(directory+'getlogin?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNo&pin_password=$password&pin_version=260722');
     print("login url is: "+url.toString());
     final response = await http.get(url).then(onSuccess,onError: onError);
-    print(response.statusCode.toString());
-    print("login data is: "+response.body.toString());
-
-
+    //print(response.statusCode.toString());
+    //print("login data is: "+response.body.toString());
     return response;
   }
 }

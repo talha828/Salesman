@@ -30,6 +30,7 @@ import 'package:salesmen_app_new/screen/ShowDelivery/show_delivery_screen.dart';
 import 'package:salesmen_app_new/screen/agingScreen/aging_card.dart';
 import 'package:salesmen_app_new/screen/assignShopScreen/AssignShopScreen.dart';
 import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/duesShop/duesShopScreen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -177,7 +178,7 @@ class _MainScreenState extends State<MainScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
           appBar: AppBar(
             elevation: 0.0,
@@ -200,46 +201,33 @@ class _MainScreenState extends State<MainScreen> {
             bottom: TabBar(
               indicatorColor: Colors.white,
               tabs: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                   // Image.asset("assets/images/dues.png",color: Colors.white,width: 20,height: 20,),
+                    //SizedBox(width: 5,),
+                    Text("Dues Shop",style: TextStyle(color: Colors.white,fontSize: 15),)
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                   // Image.asset("assets/tabviewicon/user.png",color: Colors.white,width: 20,height: 20,),
+                    //SizedBox(width: 4,),
+                    Text("Assign Shop",style: TextStyle(color: Colors.white,fontSize: 15),)
+                  ],
+                ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset("assets/tabviewicon/all.png",color: Colors.white,width: 24,height: 24,),
-                      SizedBox(width: 10,),
-                      Text("All Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
+                     // Image.asset("assets/tabviewicon/all.png",color: Colors.white,width: 20,height: 20,),
+                     // SizedBox(width: 5,),
+                      Text("All Shop",style: TextStyle(color: Colors.white,fontSize: 15),)
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Image.asset("assets/tabviewicon/user.png",color: Colors.white,width: 24,height: 24,),
-                      SizedBox(width: 10,),
-                      Text("Assign Shop",style: TextStyle(color: Colors.white,fontSize: 16),)
-                    ],
-                  ),
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: Row(
-                //     children: [
-                //       Image.asset("assets/icons/delivery.png",color: Colors.white,width: 24,height: 24,),
-                //     ],
-                //   ),
-                // ),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: Row(
-                //     children: [
-                //       Image.asset("assets/icons/alliedmcb.png",color: Colors.white,width: 24,height: 24,),
-                //     ],
-                //   ),
-                // ),
-                // Padding(
-                //   padding: const EdgeInsets.all(8.0),
-                //   child: Image.asset("assets/tabviewicon/dues.png"),
-                // ),
               ],
             ),
           ),
@@ -421,8 +409,9 @@ class _MainScreenState extends State<MainScreen> {
           ),
           body: TabBarView(
             children: [
-              AllShopScreen(user:userData),
+              DuesShopScreen(),
               AssignShopScreen(),
+              AllShopScreen(user:userData),
             ],
           ),
         ),
