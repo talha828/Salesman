@@ -243,9 +243,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
                 weight: FontWeight.w600,
               ),
             ),
-            body: isLoading
-                ? ProcessLoadingWhite()
-                : SingleChildScrollView(
+            body:
+                 SingleChildScrollView(
                     child: Column(
                     children: [
                       Container(
@@ -1085,6 +1084,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               // if(userDetails.editable != null)
                               InkWell(
                                 onTap: () async{
+                                  setLoading(true);
                                   var location=await Location().getLocation();
                                   neweditShop(
                                       emp_id: userData.userEmpolyeeNumber,
@@ -1145,6 +1145,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
                       ),
                     ],
                   ))),
+        isLoading ? Positioned.fill(child: ProcessLoading()) : Container(),
       ],
     );
   }
@@ -1265,7 +1266,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
         backgroundColor: Colors.black87,
         textColor: Colors.white,
         fontSize: 16.0);
-   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen(loadCustomer: false,)));
   }
 
   bool setLoading(bool loading) {

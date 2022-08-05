@@ -11,8 +11,9 @@ import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
-import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
+import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
+import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -82,7 +83,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
              i++;
            }
            customer.sort((a,b)=>a.distance.compareTo(b.distance));
-           Provider.of<CustomerList>(context,listen: false).add(customer);
+           Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
            Provider.of<CustomerList>(context,listen: false).getDues(customer);
            Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
            print("done");
@@ -137,6 +138,16 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
       });
     }
   }
+   getLocation()async{
+     var location=await loc.Location().getLocation();
+     userLatLng=Coordinates(location.latitude,location.longitude);
+     Provider.of<CustomerList>(context,listen: false).updateList(userLatLng);
+   }
+   // getLocation()async{
+   //   var location=await loc.Location().getLocation();
+   //   userLatLng=Coordinates(location.latitude,location.longitude);
+   //   setState(() {});
+   // }
   var dues;
   void setLoading(bool value){
     setState(() {
@@ -144,16 +155,18 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
     });
   }
   int index = 0;
-  @override
-  void initState() {
-    //initData();
-    super.initState();
-  }
+   @override
+   void initState() {
+    // getLocation();
+     super.initState();
+   }
   @override
   Widget build(BuildContext context) {
     var dd=Provider.of<CustomerList>(context);
+    var dds=Provider.of<CustomerList>(context).assign;
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
+    //dds.length>0?getLocation():false;
     return Scaffold(
         body: Stack(
           children: [
@@ -162,77 +175,12 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
                 child: Column(
                   children: [
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 15),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       InkWell(
-                    //         onTap: (){
-                    //           setState(() {
-                    //             index=0;
-                    //           });
-                    //         },
-                    //         child: Container(
-                    //           decoration: BoxDecoration(
-                    //               color: (index==0)?themeColor1:Colors.white,
-                    //               border: Border.all(color: themeColor1)
-                    //           ),
-                    //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //           child: Text("Dues Shop",style: TextStyle(color:index==0?Colors.white:themeColor1),),
-                    //         ),
-                    //       ),
-                    //       InkWell(
-                    //         onTap: (){
-                    //           setState(() {
-                    //             index=1;
-                    //           });
-                    //         },
-                    //         child: Container(
-                    //           decoration: BoxDecoration(
-                    //             color: (index==1)?themeColor1:Colors.white,
-                    //             border: Border.all(color:themeColor1),
-                    //           ),
-                    //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //           child: Text("Near By",style: TextStyle(color:index==1?Colors.white:themeColor1),),
-                    //         ),
-                    //       ),
-                    //       // InkWell(
-                    //       //   onTap: (){
-                    //       //     setState(() {
-                    //       //       index=2;
-                    //       //     });
-                    //       //     getNearByCustomerData();
-                    //       //     setState(() {
-                    //       //     });
-                    //       //   },
-                    //       //   child: Container(
-                    //       //     decoration: BoxDecoration(
-                    //       //         color: (index==2)?themeColor1:Colors.white,
-                    //       //         border: Border.all(color:themeColor1)
-                    //       //     ),
-                    //       //     padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //       //     child: Text("Dues",style: TextStyle(color:index==2?Colors.white:themeColor1),),
-                    //       //   ),
-                    //       // ),
-                    //     ],
-                    //   ),
-                    // ),
                     SizedBox(
                       height: height * 0.015,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // InkWell(
-                          // onTap:(){
-                          //   Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (_) => SearchScreen(
-                          //             customerModel: index==0?dd.dues:dd.assign,
-                          //           )));
-                          // },
                         SizedBox(
                           height: height * 0.03,
                         ),
@@ -249,7 +197,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Container(
-                                    width:width * 0.75 ,
+                                    width:width * 0.6 ,
                                     child: RectangluartextFeild(
                                       bordercolor: Color(0xffEBEAEA),
                                       hinttext: "Search by shop name",
@@ -262,16 +210,6 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                     ),
                                   ),
                                   SizedBox(width: 5,),
-                                  // InkWell(
-                                  //   onTap: (){
-                                  //     setLoading(true);
-                                  //     //onStop();
-                                  //   },
-                                  //   child: Image.asset(
-                                  //     'assets/icons/referesh.png',
-                                  //     scale: 1.5,
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),
@@ -285,7 +223,12 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                             padding: EdgeInsets.all(0),
                             onPressed: (){
                               getAllCustomerData();
-                            }, icon: Icon(Icons.refresh,color: themeColor1))
+                            }, icon: Icon(Icons.refresh,color: themeColor1)),
+                        IconButton(
+                            padding: EdgeInsets.all(0),
+                            onPressed: (){
+                              getLocation();
+                            }, icon: Image.asset("assets/images/update.png",color: themeColor1,width: 25,height: 25,))
                       ],
                     ),
                     Padding(
@@ -293,14 +236,45 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Near by you (${customers.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
-                          Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
+                          Text("Near by you (${dds.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
+                          InkWell(
+                              onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>ViewAllScreen(customer: dds,))),
+                              child: Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,))
                         ],),
                     ),
-                    dd.assign.length<1? Container():
+                    dd.loading? Container(
+                      height: 480,
+                      child: Shimmer.fromColors(
+                        period: Duration(seconds: 1),
+                        baseColor: Colors.grey.withOpacity(0.4),
+                        highlightColor: Colors.grey.shade100,
+                        enabled: true,
+                        child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: 4,
+                          itemBuilder:
+                              (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                CustomShopContainerLoading(
+                                  height: height,
+                                  width: width,
+                                ),
+                                SizedBox(
+                                  height: height * 0.025,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ):
                     SingleChildScrollView(
                               child: Container(
-                                child: ListView.builder(
+                                child:
+                                ListView.builder(
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
@@ -336,7 +310,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                 ),
               ),
             ),
-            dd.assign.length<1  ?
+            dd.assign.length<1 &&dd.loading != true ?
             Container(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

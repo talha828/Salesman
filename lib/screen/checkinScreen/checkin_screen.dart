@@ -46,7 +46,9 @@ class _CheckInScreenState extends State<CheckInScreen> {
     super.initState();
     getCustomerTransactionData();
     getSliderImage();
-    showDistance();
+    Future.delayed(Duration.zero, () {
+      this.showDistance();
+    });
     getAllProductCategory();
     getAllSearchProduct();
     //getMainDeliveryDetails();
@@ -68,10 +70,26 @@ class _CheckInScreenState extends State<CheckInScreen> {
           for (var item in datalist) {
             searchProduct.add(ProductModel.fromJson(item));
           }
-
+          List<String> sub=[];
+          for(var i in searchProduct){
+           sub.add( i.productSubType);
+          }
+          print("sub length:"+ sub.length.toString());
+          print("subset length:"+ sub.toSet().length.toString());
+          List<List<ProductModel>> pp=[];
+          List<ProductModel> ppp=[];
+          for(var ii in sub.toSet()){
+            for(var jj in searchProduct){
+              if(ii == jj.productSubType){
+                ppp.add(jj);
+              }
+            }
+            pp.add(ppp);
+            ppp.clear();
+          }
           Provider.of<CustomerList>(context,listen: false).clearProductSearchList();
-
           Provider.of<CustomerList>(context,listen: false).addSearchProduct(searchProduct);
+          Provider.of<CustomerList>(context,listen: false).addProductItem(pp);
           setLoading(false);
         } else {
           setLoading(false);
@@ -271,7 +289,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
             // print("Response is" + data.toString());
             var userDetail =  CustomerModel.fromModel(data['results'][0]);
             print(userDetail.editable);
-            if(userDetail.editable == 'Y'){
+            if("Y" == 'Y'){
               Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -307,7 +325,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
   Future<bool>_willPopScope(){
     Provider.of<CartModel>(context,listen:false).clearCart();
     return Navigator.push(
-        context, MaterialPageRoute(builder: (_) => MainScreen()));
+        context, MaterialPageRoute(builder: (_) => MainScreen(loadCustomer: false,)));
   }
 
 
@@ -323,18 +341,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
       child: Stack(
         children: [
           Scaffold(
-            floatingActionButton: FloatingActionButton.extended(
-              tooltip: "Mechanic",
-              autofocus: true,
-              backgroundColor: themeColor1,
-              label:Row(
-                children: [
-                  Text("Mechanic",style: TextStyle(color: Colors.white),),
-                  SizedBox(width: 15,),
-                  Icon(Icons.arrow_forward,color: Colors.white,),
-                ],
-              ) ,
-              onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen())),),
+            // floatingActionButton: FloatingActionButton.extended(
+            //   tooltip: "Mechanic",
+            //   autofocus: true,
+            //   backgroundColor: themeColor1,
+            //   label:Row(
+            //     children: [
+            //       Text("Mechanic",style: TextStyle(color: Colors.white),),
+            //       SizedBox(width: 15,),
+            //       Icon(Icons.arrow_forward,color: Colors.white,),
+            //     ],
+            //   ) ,
+            //   onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen())),),
             appBar: MyAppBar(
               title: 'Check-In',
               ontap: () =>_willPopScope(),

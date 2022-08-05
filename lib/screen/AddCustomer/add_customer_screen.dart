@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:geolocator/geolocator.dart' as geo;
 ///image picker use here
 //import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +18,8 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/area_model.dart';
 import 'package:salesmen_app_new/model/city_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/partycategories.dart';
 import 'package:salesmen_app_new/model/town_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
@@ -58,7 +60,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   List<Town> townList = [];
   List s_r_imageList2 = [];
 
-  String CustomerId="00";
+  String CustomerId;
   bool isLoading = false;
   bool hasArea = false;
   bool hasPartyCategory = false;
@@ -921,10 +923,10 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                         height: height * 0.03,
                       ),
                       InkWell(
-                        onTap: () async{
+                        onTap: () {
                           if (validateFields()) {
                             setLoading(true);
-                          Response response = await  addCustomer(
+                            addCustomer(
                               emp_id: userData.userEmpolyeeNumber,
                               shopName: shopname.text,
                               shopAddress: actualaddress,
@@ -939,22 +941,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                               area: sel_areas.areaCode,
                               category:
                               sel_party_categories.partyCategoriesCode,
-                            ).then((response) {
-                             SucessFullyCreatCustomer(
-                                 CustomerId: CustomerId);
-                             Fluttertoast.showToast(
-                                 msg: "Shop Successfully Created",
-                                 toastLength: Toast.LENGTH_LONG);
-                              // var data=jsonDecode(utf8.decode(response.bodyBytes));
-                              // var str =data['results'][0].toString();
-                              // CustomerId=str.toString().split("y ")[1].split("}")[0];
-                              // print("str is"+str.toString());
-                              // const start = ";";
-                              // const end = "}";
-                              // final startIndex = str.indexOf(start);
-                              // final endIndex = str.indexOf(end, startIndex + start.length);
-                              // final resultToast=str.substring(startIndex + start.length, endIndex);
-                            }).catchError((ex, stack) {
+                            ).catchError((ex, stack) {
                               setLoading(false);
                               print("exception is" +
                                   ex.toString() +
@@ -968,14 +955,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                                   msg: _timeoutString,
                                   toastLength: Toast.LENGTH_SHORT);
                             });
-                           if(response.statusCode==200){
-                             SucessFullyCreatCustomer(
-                                 CustomerId: CustomerId);
-                             Fluttertoast.showToast(
-                                 msg: "Shop Successfully Created",
-                                 toastLength: Toast.LENGTH_LONG);
-                           }
-                            //addShopNew();
+
+                            // addShopNew();
                           }
                         },
                         child: Container(
@@ -1128,6 +1109,24 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         print(data);
         FormData formData = new FormData.fromMap(data);
         var response = await dio.post(url, data: formData);
+        if (response.statusCode == 200) {
+          print(response.data["data"]["cust_code"]);
+          print("data is" + response.toString());
+          var add =await OnlineDatabase.getSingleCustomer(response.data["data"]["cust_code"].toString());
+          var data = jsonDecode(utf8.decode(add.bodyBytes));
+          CustomerModel dd= CustomerModel.fromModel(data["results"][0],distance: 0.0);
+          Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
+          SucessFullyCreatCustomer(
+              CustomerId: response.data["data"]["cust_code"].toString());
+          Fluttertoast.showToast(
+              msg: response.data["message"].toString(),
+              toastLength: Toast.LENGTH_LONG);
+        } else {
+          setLoading(false);
+          Fluttertoast.showToast(
+              msg: "Something went Wrong",
+              toastLength: Toast.LENGTH_LONG);
+        }
         return response;
       });
     } else {
@@ -1156,10 +1155,27 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       print(data);
       FormData formData = new FormData.fromMap(data);
       var response = await dio.post(url, data: formData);
+      if (response.statusCode == 200) {
+        print(response.data["data"]["cust_code"]);
+        print("data is" + response.toString());
+        SucessFullyCreatCustomer(
+            CustomerId: response.data["data"]["cust_code"].toString());
+        var add =await OnlineDatabase.getSingleCustomer(response.data["data"]["cust_code"].toString());
+        var data = jsonDecode(utf8.decode(add.bodyBytes));
+        CustomerModel dd= CustomerModel.fromModel(data["results"][0]);
+        Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
+        Fluttertoast.showToast(
+            msg: response.data["message"].toString(),
+            toastLength: Toast.LENGTH_LONG);
+      } else {
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "Something went Wrong",
+            toastLength: Toast.LENGTH_LONG);
+      }
       return response;
     }
   }
-
   void postImage(var image) async {
     try {
       var response =
@@ -1240,8 +1256,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         backgroundColor: Colors.black87,
         textColor: Colors.white,
         fontSize: 16.0);
-    Navigator.push(context,MaterialPageRoute(builder: (context)=>SucessFullyAddCustomerScreen()));
-        //SwipeLeftAnimationRoute(widget: SucessFullyAddCustomerScreen()));
+    Navigator.push(context,
+        MaterialPageRoute(builder:(context)=> SucessFullyAddCustomerScreen()));
   }
 
   /*void postImage({String customerId}) async{

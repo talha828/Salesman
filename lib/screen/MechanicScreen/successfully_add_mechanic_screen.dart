@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 
 
-class SucessFullyMechanicAddScreen extends StatefulWidget {
+
+
+class SuccessFullyMechanicAddScreen extends StatefulWidget {
+  CustomerModel customer;
+  SuccessFullyMechanicAddScreen({this.customer});
 
   @override
-  _SucessFullyMechanicAddScreenState createState() => _SucessFullyMechanicAddScreenState();
+  _SuccessFullyMechanicAddScreenState createState() => _SuccessFullyMechanicAddScreenState();
 }
 
-class _SucessFullyMechanicAddScreenState extends State<SucessFullyMechanicAddScreen> {
+class _SuccessFullyMechanicAddScreenState extends State<SuccessFullyMechanicAddScreen> {
 
 
   @override
@@ -25,7 +28,7 @@ class _SucessFullyMechanicAddScreenState extends State<SucessFullyMechanicAddScr
     super.dispose();
   }
   Future<bool> _onWillPop(){
-    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+    return   Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.customer,)));
   }
 
   @override
@@ -49,7 +52,7 @@ class _SucessFullyMechanicAddScreenState extends State<SucessFullyMechanicAddScr
                   Spacer(),
                   InkWell(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.customer,)));
 
                     },
                     child: Image.asset(
@@ -109,7 +112,7 @@ class _SucessFullyMechanicAddScreenState extends State<SucessFullyMechanicAddScr
               InkWell(
                 onTap: (){
                   //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.shopDetails,lat: widget.lat,long: widget.long,fromShop: true,)), (route) => route.isCurrent);
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.customer,)));
                 },
                 child: Center(
                   child: Container(

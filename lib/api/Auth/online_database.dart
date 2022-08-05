@@ -403,6 +403,32 @@ class OnlineDatabase{
     var response=await dio.post(url,data: formData);
     return response;
   }
+  // Arsalan post box
+  static Future<dynamic> newpostBoxDeliverDetails({BoxModel boxDetails, int code_id,String customerCode,String amount,String emp_name,String lat, String long,emp_id}) async {
+    Map<String,dynamic> data={
+      "employee_id":emp_id,
+      "emp_name":emp_name,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+      "box_no":boxDetails.trNumber,
+      "amount":amount,
+      "code_id":code_id,
+    };
+    var dio = Dio();
+    print(data);
+    String url="https://erp.suqexpress.com/api/deliverybox";
+    FormData formData = new FormData.fromMap(data);
+    var response=await dio.post(url,data: formData);
+    // final response = await http.post(
+    //   url,
+    // );
+
+    return response;
+  }
+
   static Future<dynamic> editShop({String customerCode,String imageUrl, String lat,String long,String address,String customerName,String customerName2,String customerPhoneNo,String CustomerPhoneNo2, String shopname,String partyCategory,String city,String area ,}){
     String url=directory+'posteditshop?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_shopname=${shopname}&pin_address=$address&pin_partycategory=$partyCategory&'
         'pin_image_url=${imageUrl}&pin_city=${city??''}&pin_mobile=${customerPhoneNo}&pin_phone1=${customerPhoneNo}&pin_phone2=$CustomerPhoneNo2&pin_ntn=1'

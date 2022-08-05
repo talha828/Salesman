@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 
@@ -87,7 +90,7 @@ class _PaymentPinState extends State<PaymentPin> {
   }
   @override
   void initState() {
-    name1=widget.customer.customerContactPersonName.toString().toUpperCase()=="NULL"?"Name not Found":widget.customer.customerContactPersonName;
+    name1=widget.customer.name;
     name2=widget.customer.customerContactPersonName2;
     name3="NULL";
     number1=widget.customer.customerContactNumber;
@@ -104,109 +107,181 @@ class _PaymentPinState extends State<PaymentPin> {
 
   @override
   Widget build(BuildContext context) {
+    var userData=Provider.of<UserModel>(context);
     var media=MediaQuery.of(context).size;
     double height=media.height;
 
     return SafeArea(
         child: Scaffold(
-          body: Stack(
-            alignment: Alignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            VariableText(text:name1,
-                              fontsize: height * 0.020,
-                              textAlign: TextAlign.start,
-                              line_spacing: 1,
-                              fontcolor: textcolorblack,
-                              fontFamily: fontRegular,),
-                            SizedBox(height: height*0.01),
-                            VariableText(text: widget.customer.customerCode,
-                              fontsize: height * 0.020,
-                              textAlign: TextAlign.start,
-                              line_spacing: 1,
-                              fontcolor: textcolorblack,
-                              fontFamily: fontRegular,),
-                            SizedBox(height: height*0.01),
-                          ],),
-                        Container(child: VariableText(text: number1,
-                          fontsize: height * 0.020,
-                          textAlign: TextAlign.start,
-                          line_spacing: 1,
-                          fontcolor: textcolorblack,
-                          fontFamily: fontRegular,),)
-                      ],),
-                    Spacer(),
-                    VariableText(text: "Enter the 4-digit code sent to",
-                      fontsize: height * 0.025,
-                      textAlign: TextAlign.start,
-                      line_spacing: 1,
-                      fontcolor: textcolorblack,
-                      fontFamily: fontRegular,),
-                    SizedBox(height: height*0.01),
-                    // Column(
-                    //   children: List.generate(widget.contactNumbers.length, (index){
-                    //     return VariableText(text: widget.contactNumbers[index],
-                    //       fontsize: height * 0.020,
-                    //       textAlign: TextAlign.start,
-                    //       line_spacing: 1,
-                    //       fontcolor: textcolorblack,
-                    //       fontFamily: fontRegular);
-                    //   }),
-                    // ),
-                    SizedBox(height: height*0.02),
-                    Row(
-                      children: [
-                        createCodeField(txt1,txt2),SizedBox(width: 15),
-                        createCodeField(txt2,txt3),SizedBox(width: 15),
-                        createCodeField(txt3,txt4),SizedBox(width: 15),
-                        createCodeField(txt4,null),
-                      ],
-                    ),
-                    SizedBox(height: height*0.05),
-                    LoginButton(text: "Verify",onTap: (){
-                      print(enteredPin);
-                      print(code);
-                      if(enteredPin.toString() == code.toString()){
-                        //Navigator.of(context).pop();
-                        setLoading(true);
-                        widget.onSuccess();
-                      }else{
-                        Fluttertoast.showToast(
-                            msg: "Incorrect pin",
-                            toastLength: Toast.LENGTH_SHORT);
-                      }
-                    },),
-                    SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
+            body: Stack(
+              alignment: Alignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              VariableText(text: widget.userName,
+                                fontsize: height * 0.020,
+                                textAlign: TextAlign.start,
+                                line_spacing: 1,
+                                fontcolor: textcolorblack,
+                                fontFamily: fontRegular,),
+                              SizedBox(height: height*0.01),
+                              VariableText(text: widget.customer.customerCode,
+                                fontsize: height * 0.020,
+                                textAlign: TextAlign.start,
+                                line_spacing: 1,
+                                fontcolor: textcolorblack,
+                                fontFamily: fontRegular,),
+                              SizedBox(height: height*0.01),
+                            ],),
+                          Container(child: VariableText(text: number1,
+                            fontsize: height * 0.020,
+                            textAlign: TextAlign.start,
+                            line_spacing: 1,
+                            fontcolor: textcolorblack,
+                            fontFamily: fontRegular,),)
+                        ],),
+                      Spacer(),
+                      VariableText(text: "Enter the 4-digit code sent to",
+                        fontsize: height * 0.025,
+                        textAlign: TextAlign.start,
+                        line_spacing: 1,
+                        fontcolor: textcolorblack,
+                        fontFamily: fontRegular,),
+                      SizedBox(height: height*0.01),
+                      // Column(
+                      //   children: List.generate(widget.contactNumbers.length, (index){
+                      //     return VariableText(text: widget.contactNumbers[index],
+                      //       fontsize: height * 0.020,
+                      //       textAlign: TextAlign.start,
+                      //       line_spacing: 1,
+                      //       fontcolor: textcolorblack,
+                      //       fontFamily: fontRegular);
+                      //   }),
+                      // ),
+                      SizedBox(height: height*0.02),
+                      Row(
+                        children: [
+                          createCodeField(txt1,txt2),SizedBox(width: 15),
+                          createCodeField(txt2,txt3),SizedBox(width: 15),
+                          createCodeField(txt3,txt4),SizedBox(width: 15),
+                          createCodeField(txt4,null),
+                        ],
+                      ),
+                      SizedBox(height: height*0.05),
+                      LoginButton(text: "Verify",onTap: ()async{
+                        print(enteredPin);
+                        print(code);
+                        if(enteredPin.toString() == code.toString()){
+                          // Navigator.of(context).pop();
+                          setLoading(true);
+                          await widget.onSuccess();
+
+                        }else{
+                          setLoading(false);
+                          Fluttertoast.showToast(
+                              msg: "Incorrect pin",
+                              toastLength: Toast.LENGTH_SHORT);
+                        }
+                      },),
+                      SizedBox(height: 20,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: ()async{
+                              if(_start==0){
+                                setLoading(true);
+                                // String msgPin = '';
+                                // var rng = Random();
+                                // for (var i = 0; i < 4; i++) {
+                                //   msgPin += rng.nextInt(9).toString();
+                                // }
+                                // print(msgPin);
+                                // String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
+                                // msgData+= ' ID: ${number1} Pass: 555 or Call 03330133520';
+                                // var response = await OnlineDataBase.sendText(number1, msgData);
+                                var dio = new Dio();
+                                String url = "https://erp.suqexpress.com/api/getcode";
+                                Map<String, dynamic> map = {
+                                  "purpose": 1,
+                                  "number": number1.toString(),
+                                  "customer_id":widget.customer.customerCode,
+                                  "emp_name": userData.userName,
+                                };
+                                FormData formData = FormData.fromMap(map);
+                                //TODO sms post
+                                Response smsResponse =
+                                await dio.post(url, data: formData);
+                                if(smsResponse.statusCode == 200){
+                                  _start=60;
+                                  setState(() {
+                                    code=smsResponse.data["code"].toString();
+                                  });
+                                  startTimer();
+                                }
+                                else{
+                                  Fluttertoast.showToast(
+                                      msg: "Code not sent, Try again",
+                                      toastLength: Toast.LENGTH_SHORT);
+                                }
+                              }
+                              setLoading(false);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(2),
+                                color: _start==0?themeColor1:Colors.white,
+                              ),
+                              child: VariableText(text: "Resend: ${_start}",
+                                  fontsize: height * 0.025,
+                                  textAlign: TextAlign.start,
+                                  line_spacing: 1,
+                                  fontcolor: _start==0?Colors.white:textcolorblack,
+                                  fontFamily: fontRegular),
+                            ),
+                          ),
+                          IconButton(onPressed: ()=>getUser(), icon:Icon(Icons.refresh,color: themeColor1,))
+                        ],),
+                      Spacer(),
                       InkWell(
                         onTap: ()async{
-                          if(_start==0){
+                          if(_start==0 && number2!="NULL" && double.parse(number2) > 1){
                             setLoading(true);
-                            String msgPin = '';
-                            var rng = Random();
-                            for (var i = 0; i < 4; i++) {
-                              msgPin += rng.nextInt(9).toString();
-                            }
-                            print(msgPin);
-                            String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
-                            msgData+= ' ID: ${number1} Pass: 555 or Call 03330133520';
-                            var response = await OnlineDatabase.sendText(number1, msgData);
-                            if(response.statusCode == 200){
+                            // String msgPin = '';
+                            // var rng = Random();
+                            // for (var i = 0; i < 4; i++) {
+                            //   msgPin += rng.nextInt(9).toString();
+                            // }
+                            // print(msgPin);
+                            // String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
+                            // msgData+= ' ID: ${number2} Pass: 555 or Call 03330133520';
+                            // var response = await OnlineDataBase.sendText(number2, msgData);
+                            var dio = new Dio();
+                            String url = "https://erp.suqexpress.com/api/getcode";
+                            Map<String, dynamic> map = {
+                              "purpose": 1,
+                              "number": number2.toString(),
+                              "customer_id":widget.customer.customerCode,
+                              "emp_name": userData.userName,
+                            };
+                            FormData formData = FormData.fromMap(map);
+                            //TODO sms post
+                            Response smsResponse =
+                            await dio.post(url, data: formData);
+                            if(smsResponse.statusCode == 200){
                               _start=60;
                               setState(() {
-                                code=msgPin.toString();
+                                code=smsResponse.data["code"].toString();
                               });
                               startTimer();
                             }
@@ -216,190 +291,154 @@ class _PaymentPinState extends State<PaymentPin> {
                                   toastLength: Toast.LENGTH_SHORT);
                             }
                           }
+                          else{
+                            Fluttertoast.showToast(
+                                msg: "Something went wrong",
+                                toastLength: Toast.LENGTH_SHORT);
+                          }
                           setLoading(false);
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
                           decoration: BoxDecoration(
-                            border: Border.all(color: _start==0?themeColor1.withOpacity(0.7):Colors.grey),
+                            color: _start==0?themeColor1:Colors.grey,
                             borderRadius: BorderRadius.circular(2),
-                            color: Colors.white,
                           ),
-                          child: VariableText(text: "Resend: ${_start}",
-                              fontsize: height * 0.025,
-                              textAlign: TextAlign.start,
-                              line_spacing: 1,
-                              fontcolor: _start==0?themeColor1.withOpacity(0.7):Colors.grey,
-                              fontFamily: fontRegular),
+                          height: 50,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Spacer(),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        VariableText(
+                                          text: name2.toString()== "NULL"?"Number not Found":name2.toString(),
+                                          textAlign: TextAlign.center,
+                                          fontsize: 15,
+                                          fontcolor: themeColor2,
+                                          fontFamily: fontMedium,
+                                        ),
+                                        VariableText(
+                                          text: number2.toString()== "NULL" || number2.toString()== 1.toString()?"":number2.toString(),
+                                          textAlign: TextAlign.center,
+                                          fontsize: 15,
+                                          fontcolor: themeColor2,
+                                          fontFamily: fontMedium,
+                                        ),
+                                      ],),
+                                    Spacer(),
+                                    Image.asset(
+                                      'assets/icons/arrow_forward.png',
+                                      scale: 2.5,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                        IconButton(onPressed: ()=>getUser(), icon:Icon(Icons.refresh,color: themeColor1,))
+                      SizedBox(height: 15,),
+                      InkWell(
+                        onTap: ()async{
+                          if(_start==0 && number3!="NULL" && number3 != 1.toString){
+                            setLoading(true);
+                            // String msgPin = '';
+                            // var rng = Random();
+                            // for (var i = 0; i < 4; i++) {
+                            //   msgPin += rng.nextInt(9).toString();
+                            // }
+                            // print(msgPin);
+                            // String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
+                            // msgData+= ' ID: ${number3} Pass: 555 or Call 03330133520';
+                            // var response = await OnlineDataBase.sendText(number3, msgData);
+                            var dio = new Dio();
+                            String url = "https://erp.suqexpress.com/api/getcode";
+                            Map<String, dynamic> map = {
+                              "purpose": 1,
+                              "number": number2.toString(),
+                              "customer_id":widget.customer.customerCode,
+                              "emp_name": userData.userName,
+                            };
+                            FormData formData = FormData.fromMap(map);
+                            //TODO sms post
+                            Response smsResponse =
+                            await dio.post(url, data: formData);
+                            if(smsResponse.statusCode == 200){
+                              _start=60;
+                              setState(() {
+                                code=smsResponse.data["code"].toString();
+                              });
+                              startTimer();
+                            }
+                            else{
+                              Fluttertoast.showToast(
+                                  msg: "Code not sent, Try again",
+                                  toastLength: Toast.LENGTH_SHORT);
+                            }
+                          }
+                          else{
+                            Fluttertoast.showToast(
+                                msg: "Something went wrong",
+                                toastLength: Toast.LENGTH_SHORT);
+                          }
+                          setLoading(false);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _start==0?themeColor1:Colors.grey,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          height: 50,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Spacer(),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        VariableText(
+                                          text: name3.toString()== "NULL"?"Number not Found":name3.toString(),
+                                          textAlign: TextAlign.center,
+                                          fontsize: 15,
+                                          fontcolor: themeColor2,
+                                          fontFamily: fontMedium,
+                                        ),
+                                        VariableText(
+                                          text: number3.toString()== "NULL" ||number3.toString()== 1.toString()?"":number3.toString(),
+                                          textAlign: TextAlign.center,
+                                          fontsize: 15,
+                                          fontcolor: themeColor2,
+                                          fontFamily: fontMedium,
+                                        ),
+                                      ],),
+                                    Spacer(),
+                                    Image.asset(
+                                      'assets/icons/arrow_forward.png',
+                                      scale: 2.5,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],),
-                    Spacer(),
-                    InkWell(
-                      onTap: ()async{
-                        if(_start==0 && number2!="NULL" && double.parse(number2) > 1){
-                          setLoading(true);
-                          String msgPin = '';
-                          var rng = Random();
-                          for (var i = 0; i < 4; i++) {
-                            msgPin += rng.nextInt(9).toString();
-                          }
-                          print(msgPin);
-                          String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
-                          msgData+= ' ID: ${number2} Pass: 555 or Call 03330133520';
-                          var response = await OnlineDatabase.sendText(number2, msgData);
-                          if(response.statusCode == 200){
-                            _start=60;
-                            setState(() {
-                              code=msgPin.toString();
-                            });
-                            startTimer();
-                          }
-                          else{
-                            Fluttertoast.showToast(
-                                msg: "Code not sent, Try again",
-                                toastLength: Toast.LENGTH_SHORT);
-                          }
-                        }
-                        else{
-                          Fluttertoast.showToast(
-                              msg: "Something went wrong",
-                              toastLength: Toast.LENGTH_SHORT);
-                        }
-                        setLoading(false);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: _start==0?themeColor1:Colors.grey),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        height: 50,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Spacer(),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      VariableText(
-                                        text: name2.toString().toUpperCase()== "NULL"?"Number not Found":name2.toString(),
-                                        textAlign: TextAlign.center,
-                                        fontsize: 15,
-                                        fontcolor: _start==0?themeColor1:Colors.grey,
-                                        fontFamily: fontMedium,
-                                      ),
-                                      VariableText(
-                                        text: number2.toString().toUpperCase()== "NULL" || number2.toString()== 1.toString()?"":number2.toString(),
-                                        textAlign: TextAlign.center,
-                                        fontsize: 15,
-                                        fontcolor: _start==0?themeColor1:Colors.grey,
-                                        fontFamily: fontMedium,
-                                      ),
-                                    ],),
-                                  Spacer(),
-                                  Image.asset(
-                                    'assets/icons/arrow_forward.png',
-                                    color: _start==0?themeColor1:Colors.grey,
-                                    scale: 2.5,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15,),
-                    InkWell(
-                      onTap: ()async{
-                        if(_start==0 && number3!="NULL" && number3 != 1.toString){
-                          setLoading(true);
-                          String msgPin = '';
-                          var rng = Random();
-                          for (var i = 0; i < 4; i++) {
-                            msgPin += rng.nextInt(9).toString();
-                          }
-                          print(msgPin);
-                          String msgData='Use $msgPin  to confirm Rs  ${widget.total} to ${widget.userName} %26 Download app https://bit.ly/38uffP8';
-                          msgData+= ' ID: ${number3} Pass: 555 or Call 03330133520';
-                          var response = await OnlineDatabase.sendText(number3, msgData);
-                          if(response.statusCode == 200){
-                            _start=60;
-                            setState(() {
-                              code=msgPin.toString();
-                            });
-                            startTimer();
-                          }
-                          else{
-                            Fluttertoast.showToast(
-                                msg: "Code not sent, Try again",
-                                toastLength: Toast.LENGTH_SHORT);
-                          }
-                        }
-                        else{
-                          Fluttertoast.showToast(
-                              msg: "Something went wrong",
-                              toastLength: Toast.LENGTH_SHORT);
-                        }
-                        setLoading(false);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color:_start==0?themeColor1:Colors.grey),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        height: 50,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Spacer(),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      VariableText(
-                                        text: name3.toString().toUpperCase()== "NULL"?"Number not Found":name3.toString(),
-                                        textAlign: TextAlign.center,
-                                        fontsize: 15,
-                                        fontcolor: _start==0?themeColor1:Colors.grey,
-                                        fontFamily: fontMedium,
-                                      ),
-                                      VariableText(
-                                        text: number3.toString().toUpperCase()== "NULL" ||number3.toString()== 1.toString()?"":number3.toString(),
-                                        textAlign: TextAlign.center,
-                                        fontsize: 15,
-                                        fontcolor: _start==0?themeColor1:Colors.grey,
-                                        fontFamily: fontMedium,
-                                      ),
-                                    ],),
-                                  Spacer(),
-                                  Image.asset(
-                                    'assets/icons/arrow_forward.png',
-                                    scale: 2.5,
-                                    color: _start==0?themeColor1:Colors.grey,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],),
-              ),
-              isLoading ? Positioned.fill(child: ProcessLoading()) : Container(),
-            ],
-          )));
+                ),
+                isLoading ? Positioned.fill(child: ProcessLoading()) : Container(),
+              ],
+            )));
   }
 
   Widget createCodeField(TextEditingController cont,TextEditingController next_cont){

@@ -21,6 +21,7 @@ import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
+import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -46,59 +47,6 @@ class _AllShopScreenState extends State<AllShopScreen> {
   String actualAddress="Searching....";
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
    TextEditingController search=TextEditingController();
-   void PostEmployeeVisit(
-       {String customerCode,
-         String employeeCode,
-         String purpose,
-         String lat,
-         String long,
-         CustomerModel customerData}) async {
-     try {
-       /*   setState(() {
-      widget.isLoading2=true;
-    });*/
-       var response = await OnlineDatabase.postEmployee(emp_id: employeeCode, customerCode: customerCode, purpose: purpose, long: long, lat: lat, );
-       print("Response is" + response.statusCode.toString());
-       if (response.statusCode == 200) {
-         print("data is" + response.data["data"]["distance"].toString());
-         Provider.of<CartModel>(context, listen: false).createCart();
-         loc.Location location = new loc.Location();
-         var _location = await location.getLocation();
-         Fluttertoast.showToast(
-             msg: 'Check In Successfully',
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
-         Provider.of<CustomerList>(context,listen: false).myCustomer(customerData);
-         Navigator.push(
-             context,
-             MaterialPageRoute(
-                 builder: (_) => CheckInScreen(
-                   distance:double.parse(response.data["data"]["distance"].toString()) ,
-                   //locationdata: _locationData,
-                   shopDetails: customerData,)));
-       } else {
-         print("data is" + response.statusCode.toString());
-
-         Fluttertoast.showToast(
-             msg: 'Some thing went wrong',
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
-       }
-     } catch (e, stack) {
-       print('exception is' + e.toString());
-
-       Fluttertoast.showToast(
-           msg: "Error: " + e.toString(),
-           toastLength: Toast.LENGTH_SHORT,
-           backgroundColor: Colors.black87,
-           textColor: Colors.white,
-           fontSize: 16.0);
-     }
-   }
    getAddressFromLatLng() async {
 
      var data =await location.getLocation();
@@ -172,6 +120,33 @@ class _AllShopScreenState extends State<AllShopScreen> {
   //           (1 - c((lon2 - lon1) * p))/2;
   //   return 12742 * asin(sqrt(a));
   // }
+   int index=0;
+   // sortCustomer(List<CustomerModel> dda,BuildContext context,int indexs)async{
+   //  if(dda.length>1){
+   //    index=1+index;
+   //    if(index==1){
+   //    var location=await loc.Location().getLocation();
+   //    List<double> num=[];
+   //    List<double> sortNum=[];
+   //    for (var item in dda) {
+   //      double dist=calculateDistance(double.parse(item.customerLatitude.toString()=="null"?1.toString():item.customerLatitude.toString()), double.parse(item.customerLongitude.toString()=="null"?1.toString():item.customerLongitude.toString()),location.latitude,location.longitude);
+   //      num.add(double.parse(dist.toString()));
+   //      //customer.add(CustomerModel.fromModel(item,distance: dist));
+   //    }
+   //    sortNum.addAll(num);
+   //    sortNum.sort();
+   //    List<CustomerModel> cc=[];
+   //    for(int i=0;i<num.length;i++){
+   //      for(int j=0;j<sortNum.length;j++){
+   //        if(sortNum[i]==num[j]){
+   //          cc.add(dda[j]);
+   //        }
+   //      }
+   //    };
+   //    Provider.of<CustomerList>(context,listen: false).getAllCustomer(cc);
+   //  }
+   //  }
+   // }
    List<CustomerModel> customer=[];
    List<CustomerModel> nearByCustomers=[];
    void getAllCustomerData() async {
@@ -209,7 +184,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
              customer.add(CustomerModel.fromModel(item,distance: dist));
            }
            customer.sort((a,b)=>a.distance.compareTo(b.distance));
-           Provider.of<CustomerList>(context,listen: false).add(customer);
+           Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
            Provider.of<CustomerList>(context,listen: false).getDues(customer);
            Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
            print("done");
@@ -237,12 +212,16 @@ class _AllShopScreenState extends State<AllShopScreen> {
      }
    }
 
-
   void setLoading(bool value){
     setState(() {
       isLoading=value;
     });
   }
+   getLocation()async{
+     var location=await loc.Location().getLocation();
+     userLatLng=Coordinates(location.latitude,location.longitude);
+     Provider.of<CustomerList>(context,listen: false).updateList(userLatLng);
+   }
   @override
   void initState() {
     startLocationService();
@@ -251,10 +230,11 @@ class _AllShopScreenState extends State<AllShopScreen> {
   @override
   Widget build(BuildContext context) {
      CustomerList dd=Provider.of<CustomerList>(context);
+     List<CustomerModel> dda=Provider.of<CustomerList>(context).customerData;
      print(customer.length);
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
-    var userData=Provider.of<UserModel>(context);
+    // dda.length>0?getLocation():false;
     return Scaffold(
       body: Stack(
         children: [
@@ -267,15 +247,6 @@ class _AllShopScreenState extends State<AllShopScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // InkWell(
-                    //   onTap:(){
-                    //     Navigator.push(
-                    //         context,
-                    //         MaterialPageRoute(
-                    //             builder: (_) => SearchScreen(
-                    //               customerModel: dd.customerData,
-                    //             )));
-                    //   },
                     SizedBox(
                       height: height * 0.03,
                     ),
@@ -292,7 +263,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Container(
-                                width:width * 0.75 ,
+                                width:width * 0.6 ,
                                 child: RectangluartextFeild(
                                   bordercolor: Color(0xffEBEAEA),
                                   hinttext: "Search by shop name",
@@ -305,16 +276,6 @@ class _AllShopScreenState extends State<AllShopScreen> {
                                 ),
                               ),
                               SizedBox(width: 5,),
-                              // InkWell(
-                              //   onTap: (){
-                              //     setLoading(true);
-                              //     //onStop();
-                              //   },
-                              //   child: Image.asset(
-                              //     'assets/icons/referesh.png',
-                              //     scale: 1.5,
-                              //   ),
-                              // ),
                             ],
                           ),
                         ),
@@ -327,7 +288,12 @@ class _AllShopScreenState extends State<AllShopScreen> {
                     Spacer(),
                     IconButton(onPressed: (){
                       getAllCustomerData();
-                    }, icon: Icon(Icons.refresh,color: themeColor1))
+                    }, icon: Icon(Icons.refresh,color: themeColor1)),
+                    IconButton(
+                        padding: EdgeInsets.all(0),
+                        onPressed: (){
+                          getLocation();
+                        }, icon: Image.asset("assets/images/update.png",color: themeColor1,width: 25,height: 25,))
                   ],
                 ),
                 Padding(
@@ -336,13 +302,17 @@ class _AllShopScreenState extends State<AllShopScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                     Text("Near by you (${dd.customerData.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
-                    Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
+                    InkWell(
+                        //onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>ViewAllScreen(customer: dda,))),
+
+                        child: Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,))
                   ],),
                 ),
                 Consumer<CustomerList>(
                   builder: (key,customerList,child){
                     return  Container(
-                        child: dd.customerData.length<1?Container(
+                        child: dd.customerData.length<1?
+                        Container(
                           height: 480,
                           child: Shimmer.fromColors(
                             period: Duration(seconds: 1),
@@ -411,6 +381,16 @@ class _AllShopScreenState extends State<AllShopScreen> {
             ),
           ),
         ),
+          dd.customerData.length<1 &&dd.loading != true ?
+          Container(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children:[
+                  Text("No shops are Found",textAlign: TextAlign.center,),
+                ]
+            ),
+          ):Container(),
           isLoading?Positioned.fill(child: ProcessLoading()):Container()
       ],)
     );

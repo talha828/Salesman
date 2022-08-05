@@ -162,7 +162,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
        print("Response is" + response.statusCode.toString());
        if (response.statusCode == 200) {
         print("data is" + response.data["data"]["distance"].toString());
-         Provider.of<CartModel>(context, listen: false).createCart();
+       //  Provider.of<CartModel>(context, listen: false).createCart();
          Location location = new Location();
          var _location = await location.getLocation();
          Fluttertoast.showToast(
@@ -351,14 +351,14 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                       ),
                       InkWell(
                         onTap: () {
-                          // if (widget.customerData.customerinfo.isNotEmpty) {
-                          //   renderDeletePopup(context, widget.height,
-                          //       widget.width, widget.customerData);
-                          // } else {
-                          //   Fluttertoast.showToast(
-                          //       msg: "No Information found..",
-                          //       toastLength: Toast.LENGTH_LONG);
-                          // }
+                          if (widget.customerData.customerinfo.isNotEmpty) {
+                            renderDeletePopup(context, widget.height,
+                                widget.width, widget.customerData);
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: "No Information found..",
+                                toastLength: Toast.LENGTH_LONG);
+                          }
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2026,12 +2026,6 @@ class _SingleProductTileState extends State<SingleProductTile> {
                           child: Image.network(
                             widget.productDetails.imageUrl,
                             fit: BoxFit.scaleDown,
-                            cacheWidth: 100,
-                            cacheHeight: 140,
-                            filterQuality: FilterQuality.low,
-                            errorBuilder: (BuildContext context, Object exception, StackTrace stackTrace) {
-                              return Image.asset("assets/images/gear.png");
-                            },
                             loadingBuilder: (BuildContext context,
                                 Widget child,
                                 ImageChunkEvent loadingProgress) {
@@ -2090,8 +2084,8 @@ class _SingleProductTileState extends State<SingleProductTile> {
                               ),
                             ),
                             Container(
-                              height: ratio * 19,
-                              width: ratio * 13,
+                              height: ratio * 18,
+                              width: ratio * 22,
                               //color: Colors.red,
                               child: TextField(
                                 maxLines: 1,
@@ -2269,7 +2263,8 @@ class _SingleProductTileState extends State<SingleProductTile> {
                               child: ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount:widget.productDetails.productPrice.length,
+                                  itemCount:
+                                  widget.productDetails.productPrice.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return Column(
@@ -2476,6 +2471,7 @@ class _SingleProductTileState extends State<SingleProductTile> {
 
   static double calculatePrice({int quantity, ProductModel productDetils}) {
     double dynamicprice = double.parse(productDetils.productPrice.last.price.toStringAsFixed(2));
+    print("calculating price");
     for (var item in productDetils.productPrice) {
       if (item.min <= quantity && item.max >= quantity) {
         dynamicprice = double.parse(item.price.toStringAsFixed(2));
@@ -3050,7 +3046,8 @@ class MyTextFields extends StatefulWidget {
   String title;
   String hint;
   TextEditingController controller;
-  MyTextFields({this.controller,this.title,this.hint});
+  var onChange;
+  MyTextFields({this.controller,this.title,this.hint,this.onChange});
 
 
   @override
@@ -3083,7 +3080,7 @@ class _MyTextFieldsState extends State<MyTextFields> {
           RectangluartextFeild(
             hinttext: widget.hint,
             cont: widget.controller,
-            //onChanged: enableBtn(email.text),
+            onChanged:widget.onChange,
             keytype: TextInputType.text,
             textlength: 25,
           ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -1111,6 +1112,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                   SizedBox(height: height * 0.015),
                   InkWell(
                     onTap: () async {
+                      var location=await Location().getLocation();
                       if (!isLoading2) {
                         try {
                           setState(() {
@@ -1135,32 +1137,23 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                           // } else {
                           //   //tempContact.add('+923340243440');
                           // }
-                          print(tempContact);
-                          String msgPin = '';
-                          var rng = Random();
-                          for (var i = 0; i < 4; i++) {
-                            msgPin += rng.nextInt(9).toString();
-                          }
-                          print(msgPin);
-                          String msgData = 'Use $msgPin to confirm goods receive of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8';
-                          msgData += ' ID: ${tempContact[0]} Pass: 555';
-                          //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
-                          // String msgData =
-                          //     "آپ نے ہمارے نمائندے ${userData.userName} سے ${boxDetails.totalAmount} روپے کا سامان لیا ہے۔";
-                          // msgData += '\n';
-                          // msgData +=
-                          //     'آگر یہ رقم درست ہے تو کنفرمیش کے لئے $msgPin ہمارے نمائندے کو بتا دیجئے۔';
-                          // msgData += '\n';
-                          // msgData +=
-                          //     'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
-                          // msgData += '\n';
-                          // msgData += 'شکریہ۔';
-                          var response = await OnlineDatabase.sendText(
-                              tempContact[0], msgData);
-                          if (response.statusCode == 200) {
+                          var dio = new Dio();
+                          String url = "https://erp.suqexpress.com/api/getcode";
+                          Map<String, dynamic> map = {
+                            "purpose": 1,
+                            "number": tempContact.first,
+                            "customer_id":widget.shopDetails.customerCode,
+                            "emp_name": userData.userName,
+                          };
+                          FormData formData = FormData.fromMap(map);
+                          //TODO sms post
+                          Response smsResponse =
+                          await dio.post(url, data: formData);
+                          if (smsResponse.statusCode == 200) {
                             setState(() {
                               isLoading2 = false;
                             });
+                            print(smsResponse.data.toString());
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -1168,43 +1161,73 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                     userName:userData.userName ,
                                     customer:widget.shopDetails ,
                                     total:boxDetails.totalAmount,
-                                    pin: msgPin,
+                                    pin: smsResponse.data["code"].toString(),
                                     contactNumbers: tempContact,
                                     onSuccess: () async {
                                       setState(() {
                                         isLoading2 = true;
                                       });
-                                      var location = await Location().getLocation();
+                                      //
+                                      // var response = await OnlineDataBase
+                                      //     .postBoxDeliverDetails(
+                                      //         boxDetails: boxDetails,
+                                      //         lat: widget.lat.toString(),
+                                      //         long: widget.long.toString(),
+                                      //         customerCode: widget
+                                      //             .shopDetails.customerCode);
+
                                       var response = await OnlineDatabase
-                                          .postBoxDeliverDetails(
+                                          .newpostBoxDeliverDetails(
                                           boxDetails: boxDetails,
+                                          emp_id:userData.userID ,
+                                          emp_name: userData.userName,
                                           lat: location.latitude.toString(),
+                                          code_id: smsResponse.data["id"],
                                           long: location.longitude.toString(),
+                                          amount: boxDetails.totalAmount,
                                           customerCode: widget
-                                              .shopDetails.customerCode);
+                                              .shopDetails.customerCode).catchError((e){
+                                        setState(() {
+                                          isLoading2 = false;
+                                        });
+                                        setLoading(false);
+                                        Navigator.pop(context);
+                                        AwesomeDialog(
+                                          context: context,
+                                          dialogType: DialogType.ERROR,
+                                          animType: AnimType.BOTTOMSLIDE,
+                                          title: "Something went wrong",
+                                          desc: "Error: " + e.toString(),
+                                          btnCancelText: "Ok",
+                                          dismissOnTouchOutside: false,
+                                          btnOkOnPress: () {},
+                                        )..show();
+                                      });
                                       print("Post box Response is: " +
                                           response.statusCode.toString());
                                       if (response.statusCode == 200) {
-                                        var data = jsonDecode(
-                                            utf8.decode(response.bodyBytes));
-                                        print("Post box Response is: " +
-                                            data.toString());
-                                        String msgData = "Thankyou, you have receive goods of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8";
-                                        msgData+= " ID: ${tempContact[0]} Pass: 555";
-                                        //     "آپ ${boxDetails.totalAmount} روپے کا سامان لے چکے ہیں۔ شکریہ۔";
+                                        // var data = jsonDecode(
+                                        //     utf8.decode(response.bodyBytes));
+                                        // print("Post box Response is: " +
+                                        //     data.toString());
+                                        // String msgData = "Thankyou, you have receive goods of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8";
+                                        //     msgData+= " ID: ${tempContact[0]} Pass: 555";
+                                        // //     "آپ ${boxDetails.totalAmount} روپے کا سامان لے چکے ہیں۔ شکریہ۔";
+                                        //
+                                        // var responseMsg = await OnlineDataBase
+                                        //     .sendText(
+                                        //         tempContact[0], msgData);
+                                        // if (responseMsg.statusCode == 200) {
+                                        //   print("Message sent!!!!!");
+                                        // }
 
-                                        var responseMsg = await OnlineDatabase
-                                            .sendText(
-                                            tempContact[0], msgData);
-                                        if (responseMsg.statusCode == 200) {
-                                          print("Message sent!!!!!");
-                                        }
-                                        await Navigator.push(
+                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (_) =>
-                                                    SucessFullyDelieveredOrderScreen(
-                                                    )));
+                                                    SucessFullyDelieveredOrderScreen()));
+
+
                                       }
                                       //setLoading(false);
                                     },

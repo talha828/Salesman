@@ -432,7 +432,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                               product[index],
                                               itemCount: 1,
                                               itemPrice:
-                                              product[index].price,
+                                              product[index]
+                                                  .price,
                                               subTotalPrice:
                                               product[index]
                                                   .price,

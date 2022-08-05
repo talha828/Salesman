@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/cupertino.dart';
@@ -7,12 +11,16 @@ import 'package:geocoder/model.dart';
 import 'package:http/http.dart'as http;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/globalvariable.dart';
+import 'package:salesmen_app_new/locationServices/location_callback_handler.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
-import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
+import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
+import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -21,6 +29,8 @@ import 'dart:math' show cos, sqrt, asin;
 
 import 'package:shimmer/shimmer.dart';
 class DuesShopScreen extends StatefulWidget {
+UserModel user;
+DuesShopScreen({this.user});
 
 
 
@@ -81,7 +91,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
             i++;
           }
           customer.sort((a,b)=>a.distance.compareTo(b.distance));
-          Provider.of<CustomerList>(context,listen: false).add(customer);
+          Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
           Provider.of<CustomerList>(context,listen: false).getDues(customer);
           Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
           print("done");
@@ -108,26 +118,11 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
           fontSize: 16.0);
     }
   }
-  // void getCustomerInfo()async{
-  //   setLoading(true);
-  //   loc.Location location = new loc.Location();
-  //   var _location = await location.getLocation();
-  //   userLatLng =Coordinates(_location.latitude, _location.longitude);
-  //   http.Response response=await OnlineDatabase().getCustomer();
-  //   if(response.statusCode==200){
-  //     var list=jsonDecode(response.body);
-  //     int i=0;
-  //     print(list["data"]);
-  //     for (var person in list['data']){
-  //       double dist=calculateDistance(userLatLng.latitude,userLatLng.longitude,double.parse(person['lat'].toString()=="null"?1.toString():person['lat'].toString()), double.parse(person['long'].toString()=="null"?1.toString():person['long'].toString()));
-  //       customer.add(NewCustomerModel.fromJson(person,dist));
-  //       print(customer[i].userData.firstName);
-  //       print(customer[i].custCode);
-  //       i++;
-  //     }
-  //   }
-  //   setLoading(false);
-  // }
+  getLocation()async{
+    var location=await loc.Location().getLocation();
+    userLatLng=Coordinates(location.latitude,location.longitude);
+    Provider.of<CustomerList>(context,listen: false).updateList(userLatLng);
+  }
   changeList(List<CustomerModel> value,String buttonText){
     if(buttonText=="dues"){
       setState(() {
@@ -143,16 +138,52 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
     });
   }
   int index = 0;
+  Future<void> startLocationService() async {
+
+    await BackgroundLocator.initialize();
+    Map<String, dynamic> data = {
+      'countInit': 1,
+      'userNumber': phoneNumber,
+      'userName': widget.user.userName,
+    };
+    print(phoneNumber);
+    print(widget.user.userName);
+    return await BackgroundLocator.registerLocationUpdate(
+        LocationCallbackHandler.callback,
+        initCallback: LocationCallbackHandler.initCallback,
+        initDataCallback: data,
+        disposeCallback: LocationCallbackHandler.disposeCallback,
+        autoStop: false,
+        iosSettings: IOSSettings(
+            accuracy: LocationAccuracy.NAVIGATION, distanceFilter: 0),
+        androidSettings: AndroidSettings(
+            accuracy: LocationAccuracy.NAVIGATION,
+            interval: 120,
+            distanceFilter: 0,
+            androidNotificationSettings: AndroidNotificationSettings(
+                notificationChannelName: 'Location tracking',
+                notificationTitle: 'Start Location Tracking',
+                notificationMsg: 'Track location in background',
+                notificationBigMsg:
+                'Background location is on to keep the app up-tp-date with your location. This is required for main features to work properly when the app is not running.',
+                notificationIcon: '',
+                notificationIconColor: Colors.grey,
+                notificationTapCallback:
+                LocationCallbackHandler.notificationCallback)));
+  }
   @override
   void initState() {
-    //initData();
+    startLocationService();
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     var dd=Provider.of<CustomerList>(context);
+    var ddd=Provider.of<CustomerList>(context).dues;
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
+    var response=Provider.of<CustomerList>(context).response;
+    //ddd.length>0?getLocation():false;
     return Scaffold(
         body: Stack(
           children: [
@@ -161,77 +192,12 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
                 child: Column(
                   children: [
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 15),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       InkWell(
-                    //         onTap: (){
-                    //           setState(() {
-                    //             index=0;
-                    //           });
-                    //         },
-                    //         child: Container(
-                    //           decoration: BoxDecoration(
-                    //               color: (index==0)?themeColor1:Colors.white,
-                    //               border: Border.all(color: themeColor1)
-                    //           ),
-                    //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //           child: Text("Dues Shop",style: TextStyle(color:index==0?Colors.white:themeColor1),),
-                    //         ),
-                    //       ),
-                    //       InkWell(
-                    //         onTap: (){
-                    //           setState(() {
-                    //             index=1;
-                    //           });
-                    //         },
-                    //         child: Container(
-                    //           decoration: BoxDecoration(
-                    //             color: (index==1)?themeColor1:Colors.white,
-                    //             border: Border.all(color:themeColor1),
-                    //           ),
-                    //           padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //           child: Text("Near By",style: TextStyle(color:index==1?Colors.white:themeColor1),),
-                    //         ),
-                    //       ),
-                    //       // InkWell(
-                    //       //   onTap: (){
-                    //       //     setState(() {
-                    //       //       index=2;
-                    //       //     });
-                    //       //     getNearByCustomerData();
-                    //       //     setState(() {
-                    //       //     });
-                    //       //   },
-                    //       //   child: Container(
-                    //       //     decoration: BoxDecoration(
-                    //       //         color: (index==2)?themeColor1:Colors.white,
-                    //       //         border: Border.all(color:themeColor1)
-                    //       //     ),
-                    //       //     padding: EdgeInsets.symmetric(vertical: 10,horizontal: 15),
-                    //       //     child: Text("Dues",style: TextStyle(color:index==2?Colors.white:themeColor1),),
-                    //       //   ),
-                    //       // ),
-                    //     ],
-                    //   ),
-                    // ),
                     SizedBox(
                       height: height * 0.015,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // InkWell(
-                        // onTap:(){
-                        //   Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //           builder: (_) => SearchScreen(
-                        //             customerModel: index==0?dd.dues:dd.assign,
-                        //           )));
-                        // },
                         SizedBox(
                           height: height * 0.03,
                         ),
@@ -248,7 +214,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Container(
-                                    width:width * 0.75 ,
+                                    width:width * 0.6 ,
                                     child: RectangluartextFeild(
                                       bordercolor: Color(0xffEBEAEA),
                                       hinttext: "Search by shop name",
@@ -261,16 +227,6 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                                     ),
                                   ),
                                   SizedBox(width: 5,),
-                                  // InkWell(
-                                  //   onTap: (){
-                                  //     setLoading(true);
-                                  //     //onStop();
-                                  //   },
-                                  //   child: Image.asset(
-                                  //     'assets/icons/referesh.png',
-                                  //     scale: 1.5,
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),
@@ -284,7 +240,16 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                             padding: EdgeInsets.all(0),
                             onPressed: (){
                               getAllCustomerData();
-                            }, icon: Icon(Icons.refresh,color: themeColor1))
+                            }, icon: Icon(Icons.refresh,color: themeColor1)),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
+                        // ),
+                        IconButton(
+                            padding: EdgeInsets.all(0),
+                            onPressed: (){
+                              getLocation();
+                            }, icon: Image.asset("assets/images/update.png",color: themeColor1,width: 25,height: 25,))
                       ],
                     ),
                     Padding(
@@ -292,11 +257,42 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Near by you (${customers.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
-                          Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,)
+                          Text("Near by you (${dd.dues.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
+                          InkWell(
+                              onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>ViewAllScreen(customer: ddd,))),
+
+                              child: Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,))
                         ],),
                     ),
-                    dd.dues.length<1  ?Container()
+                    dd.loading ?Container(
+                      height: 480,
+                      child: Shimmer.fromColors(
+                        period: Duration(seconds: 1),
+                        baseColor: Colors.grey.withOpacity(0.4),
+                        highlightColor: Colors.grey.shade100,
+                        enabled: true,
+                        child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: 4,
+                          itemBuilder:
+                              (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                CustomShopContainerLoading(
+                                  height: height,
+                                  width: width,
+                                ),
+                                SizedBox(
+                                  height: height * 0.025,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    )
                            :  Container(
                         child: SingleChildScrollView(
                           child: Container(
@@ -338,7 +334,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                 ),
               ),
             ),
-            dd.dues.length<1  ?
+            dd.dues.length<1 &&dd.loading != true ?
             Container(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

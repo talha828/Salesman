@@ -28,15 +28,16 @@ import 'package:salesmen_app_new/screen/History_Screen/history_screen.dart';
 import 'package:salesmen_app_new/screen/ReportsScreen/report_screen.dart';
 import 'package:salesmen_app_new/screen/ShowDelivery/show_delivery_screen.dart';
 import 'package:salesmen_app_new/screen/agingScreen/aging_card.dart';
+import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/assignShopScreen/AssignShopScreen.dart';
-import 'package:salesmen_app_new/screen/allShopScreen/customer_screen.dart';
 import 'package:salesmen_app_new/screen/duesShop/duesShopScreen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 class MainScreen extends StatefulWidget {
-
+bool loadCustomer;
+MainScreen({this.loadCustomer});
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -50,8 +51,10 @@ class _MainScreenState extends State<MainScreen> {
     return distance / 1000;
   }
 
-  void getAllCustomerData() async {
+  void getAllCustomerData(bool data) async {
+  if(data){
     try {
+      Provider.of<CustomerList>(context,listen: false).setLoading(true);
       var data =await location.getLocation();
       List<AddressModel>addressList=[];
       userLatLng=Coordinates(data.latitude,data.longitude);
@@ -71,37 +74,41 @@ class _MainScreenState extends State<MainScreen> {
           actualAddress=addressList[3].shortName;
           Provider.of<CustomerList>(context,listen: false).updateAddress(actualAddress);
           print("response ==== $_formattedAddress");
-           _formattedAddress;
+          _formattedAddress;
         }
-      var response = await OnlineDatabase.getAllCustomer();
-      print("Response code is " + response.statusCode.toString());
-      if (response.statusCode == 200) {
-        var data = jsonDecode(utf8.decode(response.bodyBytes));
-        //print("Response is" + data.toString());
+        var response = await OnlineDatabase.getAllCustomer();
+        print("Response code is " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          var data = jsonDecode(utf8.decode(response.bodyBytes));
+          //print("Response is" + data.toString());
 
-        for (var item in data["results"]) {
-          double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-          customer.add(CustomerModel.fromModel(item,distance: dist));
-        }
-        customer.sort((a,b)=>a.distance.compareTo(b.distance));
-        Provider.of<CustomerList>(context,listen: false).clearList();
-        Provider.of<CustomerList>(context,listen: false).add(customer);
-        Provider.of<CustomerList>(context,listen: false).getDues(customer);
-        Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
-        print("done");
-        setState(() {
+          for (var item in data["results"]) {
+            double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+            customer.add(CustomerModel.fromModel(item,distance: dist));
+          }
+          customer.sort((a,b)=>a.distance.compareTo(b.distance));
+          Provider.of<CustomerList>(context,listen: false).clearList();
+          Provider.of<CustomerList>(context,listen: false).storeResponse(data);
+          Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
+          Provider.of<CustomerList>(context,listen: false).getDues(customer);
+          Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
+          print("done");
+          setState(() {
 
-        });
-        //print("length is"+limitedcustomer.length.toString());
-      } else if (response.statusCode == 400) {
-        var data = jsonDecode(utf8.decode(response.bodyBytes));
-        Fluttertoast.showToast(
-            msg: "${data['results'].toString()}",
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.black87,
-            textColor: Colors.white,
-            fontSize: 16.0);
-      }}
+          });
+          //print("length is"+limitedcustomer.length.toString());
+          Provider.of<CustomerList>(context,listen: false).setLoading(false);
+
+        } else if (response.statusCode == 400) {
+          var data = jsonDecode(utf8.decode(response.bodyBytes));
+          Fluttertoast.showToast(
+              msg: "${data['results'].toString()}",
+              toastLength: Toast.LENGTH_SHORT,
+              backgroundColor: Colors.black87,
+              textColor: Colors.white,
+              fontSize: 16.0);
+          Provider.of<CustomerList>(context,listen: false).setLoading(false);
+        }}
     } catch (e, stack) {
       print('exception is' + e.toString());
       Fluttertoast.showToast(
@@ -110,7 +117,9 @@ class _MainScreenState extends State<MainScreen> {
           backgroundColor: Colors.black87,
           textColor: Colors.white,
           fontSize: 16.0);
+      Provider.of<CustomerList>(context,listen: false).setLoading(false);
     }
+  }
   }
   Coordinates userLatLng;
 
@@ -138,8 +147,8 @@ class _MainScreenState extends State<MainScreen> {
   
   @override
   void initState() {
-   getAllCustomerData();
-
+    bool test=widget.loadCustomer;
+   getAllCustomerData(test);
     super.initState();
   }
   Future<bool> _onWillPop() async {
@@ -318,10 +327,12 @@ class _MainScreenState extends State<MainScreen> {
                     text: 'Add Customer',
                     imageSource: "assets/icons/addcustomer.png",
                     selected: false,
-                    onTap: () {
+                    onTap: () async{
+                      var location =await loc.Location().getLocation();
+                      var currentLocation =Coordinates(location.latitude, location.longitude);
                       Navigator.of(context).pop();
                       Navigator.push(
-                          context,MaterialPageRoute(builder: (context)=>AddCustomerScreen()));
+                          context,MaterialPageRoute(builder: (context)=>AddCustomerScreen(locationdata: currentLocation,)));
                     },
                   ),
                   DrawerList(
@@ -409,7 +420,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           body: TabBarView(
             children: [
-              DuesShopScreen(),
+              DuesShopScreen(user: userData,),
               AssignShopScreen(),
               AllShopScreen(user:userData),
             ],

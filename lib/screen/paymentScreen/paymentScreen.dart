@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -243,14 +244,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     // }else{
                                     //   //tempContact.add('+923340243440');
                                     // }
-                                    String msgPin = '';
-                                    var rng = Random();
-                                    for (var i = 0; i < 4; i++) {
-                                      msgPin += rng.nextInt(9).toString();
-                                    }
-                                    print(msgPin);
-                                    String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.userName} %26 Download app https://bit.ly/38uffP8';
-                                    msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
+                                    // String msgPin = '';
+                                    // var rng = Random();
+                                    // for (var i = 0; i < 4; i++) {
+                                    //   msgPin += rng.nextInt(9).toString();
+                                    // }
+                                    // print(msgPin);
+                                    // String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.userName} %26 Download app https://bit.ly/38uffP8';
+                                    // msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
                                     // msgData += '\n';
                                     // msgData +=' ';
                                     // username = userData.userName;
@@ -262,18 +263,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     // msgData += 'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
                                     // msgData += '\n';
                                     // msgData += 'شکریہ۔';
-
-                                    var response = await OnlineDatabase.sendText(tempContact[0], msgData);
-                                    if(response.statusCode == 200){
+                                   // var response = await OnlineDatabase.sendText(tempContact[0], msgData);
+                                    var dio = new Dio();
+                                    String url = "https://erp.suqexpress.com/api/getcode";
+                                    Map<String, dynamic> map = {
+                                      "purpose": 2,
+                                      "number": tempContact.first,
+                                      "amount": totalAmount,
+                                      "customer_id":customerData.customerCode,
+                                      "emp_name": userData.userName,
+                                    };
+                                    FormData formData = FormData.fromMap(map);
+                                    //TODO sms post
+                                    Response smsResponse =
+                                    await dio.post(url, data: formData);
+                                    print(smsResponse.data.toString());
+                                    if(smsResponse.statusCode == 200){
                                       setLoading(false);
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) => PaymentPin(
+                                              builder: (context) => PaymentPin(
                                                 userName:userData.userName,
                                                 total: totalAmount,
                                                 customer:customerData,
-                                                pin: msgPin,
+                                                pin: smsResponse.data["code"].toString(),
                                                 contactNumbers: tempContact,
                                                 onSuccess: (){
                                                   print("@@@@@@@@@@@@@");
@@ -294,7 +308,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   : Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => PaymentUsingCheck(
+                                      builder: (context) => PaymentUsingCheck(
                                         customerData: customerData,
                                         paymentTypedetails:
                                         paymentType['payment']
@@ -420,14 +434,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
         //   //tempContact.add('+923340243440');
         // }
         // final userData = Provider.of<UserModel>(context, listen: false);
-        String msgData ="Thankyou for your payment of Rs $totalAmount to  ${user.userName}";
-        msgData+= " %26 Download app https://bit.ly/38uffP8 ID: ${tempContact[0]} Pass: 555 or Call 03330133520";
-        // String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
-
-        var responseMsg = await OnlineDatabase.sendText(tempContact[0], msgData);
-        if(responseMsg.statusCode == 200){
-          print("Message sent!!!!!");
-        }
+        // String msgData ="Thankyou for your payment of Rs $totalAmount to  ${user.userName}";
+        // msgData+= " %26 Download app https://bit.ly/38uffP8 ID: ${tempContact[0]} Pass: 555 or Call 03330133520";
+        // // String msgData = "آپ نے $totalAmount روپے ادا کر دئے ہیں۔ شکریہ۔";
+        //
+        // var responseMsg = await OnlineDatabase.sendText(tempContact[0], msgData);
+        // if(responseMsg.statusCode == 200){
+        //   print("Message sent!!!!!");
+        // }
 
         setLoading(false);
         Fluttertoast.showToast(
