@@ -10,6 +10,7 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/box_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
@@ -199,7 +200,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
       print('exception is' + e.toString() + stack.toString());
       setLoading(false);
       Fluttertoast.showToast(
-          msg: "Something went wrong try again letter",
+          msg: "Error: "+e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
@@ -245,7 +246,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
           stack.toString());
       setLoading(false);
       Fluttertoast.showToast(
-          msg: "Something went wrong try again later",
+          msg: "Error: "+e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
@@ -305,6 +306,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
+    var customer=Provider.of<CustomerList>(context).singleCustomer;
     return Scaffold(
       appBar:MyAppBar(
         title: 'Check-In',
@@ -445,7 +447,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                   );
                 }),
           )
-              : orderDetailsBlock(height, width),
+              : orderDetailsBlock(height, width,customer),
         ]),
       ),
 /*      bottomNavigationBar: BottomAppBar(
@@ -531,7 +533,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
     );
   }
 
-  Widget orderDetailsBlock(double height, double width) {
+  Widget orderDetailsBlock(double height, double width,CustomerModel customer) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -609,7 +611,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                 child: InkWell(
                                   onTap: () {
                                     showBoxDialog(
-                                        boxDetails: boxDelivery[index]);
+                                        boxDetails: boxDelivery[index],customer: customer);
                                    // getFullDeliveryDetails(orderId: delivery[index].orderNumber);
                                   },
                                   child: Container(
@@ -816,7 +818,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
 
 
 
-  void showBoxDialog({BoxModel boxDetails}) {
+  void showBoxDialog({BoxModel boxDetails ,CustomerModel customer}) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     AwesomeDialog(
@@ -1112,12 +1114,12 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                   SizedBox(height: height * 0.015),
                   InkWell(
                     onTap: () async {
-                      var location=await Location().getLocation();
                       if (!isLoading2) {
                         try {
                           setState(() {
                             isLoading2 = true;
                           });
+                      var location=await Location().getLocation();
                           List<String> tempContact = [];
                           final userData =
                           Provider.of<UserModel>(context, listen: false);
@@ -1142,6 +1144,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                           Map<String, dynamic> map = {
                             "purpose": 1,
                             "number": tempContact.first,
+                            "amount":boxDetails.totalAmount,
                             "customer_id":widget.shopDetails.customerCode,
                             "emp_name": userData.userName,
                           };
@@ -1196,8 +1199,8 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                           context: context,
                                           dialogType: DialogType.ERROR,
                                           animType: AnimType.BOTTOMSLIDE,
-                                          title: "Something went wrong",
-                                          desc: "Error: " + e.toString(),
+                                          title: "Error",
+                                          desc: "Error: " + e.response.toString(),
                                           btnCancelText: "Ok",
                                           dismissOnTouchOutside: false,
                                           btnOkOnPress: () {},
@@ -1206,6 +1209,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                       print("Post box Response is: " +
                                           response.statusCode.toString());
                                       if (response.statusCode == 200) {
+
                                         // var data = jsonDecode(
                                         //     utf8.decode(response.bodyBytes));
                                         // print("Post box Response is: " +
@@ -1225,7 +1229,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (_) =>
-                                                    SucessFullyDelieveredOrderScreen()));
+                                                    SucessFullyDelieveredOrderScreen(customer:customer,)));
 
 
                                       }
@@ -1247,7 +1251,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                           });
                           print('exception is: ' + e.toString());
                           Fluttertoast.showToast(
-                              msg: "Something went wrong, Try again later",
+                              msg: "Error: "+e.toString(),
                               toastLength: Toast.LENGTH_SHORT,
                               backgroundColor: Colors.black87,
                               textColor: Colors.white,
@@ -1749,7 +1753,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
       // setLoading2(false);
       print('exception is' + e.toString());
       Fluttertoast.showToast(
-          msg: "Something went wrong try again letter",
+          msg:'Error' + e.response.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -388,14 +389,14 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                             long: data.longitude.toString(),
                                             customerCode: customer.customerCode)
                                             .catchError(
-                                              (e) => AwesomeDialog(
+                                              (DioError e) => AwesomeDialog(
                                             context: context,
                                             dialogType: DialogType.INFO,
                                             useRootNavigator: false,
                                             animType: AnimType.BOTTOMSLIDE,
-                                            title: "Something went wrong",
+                                            title: e.response.data["message"],
                                             desc:
-                                            "Please check your available balances",
+                                            e.response.data["data"],
                                             btnCancelText: "Cart Page",
                                             dismissOnTouchOutside: false,
                                             btnOkOnPress: () {},
@@ -443,6 +444,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         SucessFullyGeneratedOrderScreen(
+                                                          customer: customer,
                                                           orderID: orderID,
                                                         )));
                                           }

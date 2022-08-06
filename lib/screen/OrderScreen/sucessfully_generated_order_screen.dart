@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
@@ -9,7 +10,8 @@ import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 
 class SucessFullyGeneratedOrderScreen extends StatefulWidget {
   String orderID;
-  SucessFullyGeneratedOrderScreen({this.orderID});
+  CustomerModel customer;
+  SucessFullyGeneratedOrderScreen({this.orderID,this.customer});
   @override
   _SucessFullyGeneratedOrderScreenState createState() => _SucessFullyGeneratedOrderScreenState();
 }
@@ -30,7 +32,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
   }
   Future<bool> _onWillPop(){
     clearCart();
-    return Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+    return Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen(shopDetails: widget.customer,)));
   }
 
   @override
@@ -57,7 +59,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
                   InkWell(
                     onTap: (){
                       //Provider.of<CartModel>(context, listen: false).createCart();
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen(shopDetails: widget.customer,)));
 
                     },
                     child: Image.asset(
@@ -118,7 +120,7 @@ class _SucessFullyGeneratedOrderScreenState extends State<SucessFullyGeneratedOr
                 onTap: (){
                   //Provider.of<CartModel>(context, listen: false).createCart();
 
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen(shopDetails: widget.customer,)));
 
                 },
                 child: Center(

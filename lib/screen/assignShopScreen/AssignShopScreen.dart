@@ -207,7 +207,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => SearchScreen(customerModel: dd.dues,)));
+                                        builder: (_) => SearchScreen(customerModel: dd.assign,)));
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

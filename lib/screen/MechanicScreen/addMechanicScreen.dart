@@ -44,7 +44,6 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
     });
   }
 
-
   _uploadImg(bool fromCamera) async {
     if (fromCamera) {
       XFile image = await ImagePicker().pickImage(
@@ -417,8 +416,8 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                     height: height * 0.03,
                   ),
                   MyButton(onTap: () async {
-                    var location =await Location().getLocation();
                     setLoading(true);
+                    var location =await Location().getLocation();
                     if (name.text != null &&
                         phoneNo.text != null &&
                         idCard.text != null &&
@@ -500,9 +499,9 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                                                       fontSize: 16.0));
                                               Map<String, dynamic> map = {
                                                 "picture":
-                                                'https://suqexpress.com/assets/images/customer/${tempImage.filename}',
-                                                // "image2":
-                                                // 'https://suqexpress.com/assets/images/customer/${tempImage2.filename}',
+                                                'https://suqexpress.com/assets/images/mechanics/${tempImage.filename}',
+                                                "cnic_picture":
+                                                'https://suqexpress.com/assets/images/mechanicscnic/${tempImage2.filename}',
                                                 "name": name.text,
                                                 "code_id":value.data["id"],
                                                 "phone": phoneNo.text,
@@ -524,7 +523,7 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                                                   dialogType: DialogType.ERROR,
                                                   animType: AnimType.BOTTOMSLIDE,
                                                   title: "Something went wrong",
-                                                  desc: "Error: " + e.toString(),
+                                                  desc: "Error: " + e.response.data["data"].toString(),
                                                   btnCancelText: "Ok",
                                                   dismissOnTouchOutside: false,
                                                   btnOkOnPress: () {},
@@ -566,12 +565,13 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                               })
                                   // TODO// when status code in not equal to 200;
                                       .catchError((e){
+                                        setLoading(false);
                                 AwesomeDialog(
                                   context: context,
                                   dialogType: DialogType.ERROR,
                                   animType: AnimType.BOTTOMSLIDE,
                                   title: "Code Not Sent",
-                                  desc: "Error: " + e.toString(),
+                                  desc: "Error: " + e.response.data["message"].toString(),
                                   btnCancelText: "Ok",
                                   dismissOnTouchOutside: false,
                                   btnOkOnPress: () {},

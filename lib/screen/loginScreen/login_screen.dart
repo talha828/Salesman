@@ -154,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
             )
           ],
         ).show();
+        setLoading(false);
       }
     },onError: (e){
       setLoading(false);

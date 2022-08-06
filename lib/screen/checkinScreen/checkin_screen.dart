@@ -343,18 +343,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
       child: Stack(
         children: [
           Scaffold(
-            // floatingActionButton: FloatingActionButton.extended(
-            //   tooltip: "Mechanic",
-            //   autofocus: true,
-            //   backgroundColor: themeColor1,
-            //   label:Row(
-            //     children: [
-            //       Text("Mechanic",style: TextStyle(color: Colors.white),),
-            //       SizedBox(width: 15,),
-            //       Icon(Icons.arrow_forward,color: Colors.white,),
-            //     ],
-            //   ) ,
-            //   onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen())),),
+            floatingActionButton: FloatingActionButton.extended(
+              tooltip: "Mechanic",
+              autofocus: true,
+              backgroundColor: themeColor1,
+              label:Row(
+                children: [
+                  Text("Mechanic",style: TextStyle(color: Colors.white),),
+                  SizedBox(width: 15,),
+                  Icon(Icons.arrow_forward,color: Colors.white,),
+                ],
+              ) ,
+              onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen(customerModel:myCustomer ,))),),
             appBar: MyAppBar(
               title: 'Check-In',
               ontap: () =>_willPopScope(),

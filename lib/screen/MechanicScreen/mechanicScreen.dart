@@ -19,12 +19,12 @@ class _MechanicScreenState extends State<MechanicScreen> {
   getMechanic()async{
     var dio=new Dio();
     var response=await dio.get("https://erp.suqexpress.com/api/mechanics/cust/${widget.customerModel.customerCode}");
+    print("get mechanic url: https://erp.suqexpress.com/api/mechanics/cust/${widget.customerModel.customerCode}");
     for(var i in response.data["data"]){
       mechanic.add(MechanicModel.fromJson(i));
       print(mechanic.last.picture);
     }
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -64,13 +64,14 @@ class _MechanicScreenState extends State<MechanicScreen> {
                     contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
                     leading:  ClipRRect(
                     borderRadius: BorderRadius.circular(50),
-                    child: Image.network(mechanic[1].picture.toString(),cacheWidth: 100,cacheHeight: 100,
+                    child: Image.network(mechanic[index].picture.toString(),cacheWidth: 100,cacheHeight: 100,
+                    filterQuality: FilterQuality.low,
                     errorBuilder: (context,object,StackTrace){
                       return Image.asset('assets/images/splashlogo.png',scale: 8.5,);
                     },
                     ),
                     ),
-                    title: Text(mechanic[index].name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+                    title: Text(mechanic[index].name.toUpperCase(),style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
                     subtitle: Text(mechanic[index].phone.toString()),
                     trailing: Container(
                       decoration: BoxDecoration(
