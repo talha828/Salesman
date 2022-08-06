@@ -112,7 +112,7 @@ class _SucessFullyAddCustomerScreenState extends State<SucessFullyAddCustomerScr
         ),
       ),
       floatingActionButton:new FloatingActionButton(onPressed: (){
-        Navigator.push(context,MaterialPageRoute(builder: (context)=>MainScreen(loadCustomer: false,)));
+        Navigator.push(context,MaterialPageRoute(builder: (context)=>MainScreen()));
 
       },
         backgroundColor: themeColor1,

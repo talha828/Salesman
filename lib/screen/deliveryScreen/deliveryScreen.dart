@@ -765,8 +765,8 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                 flex: 7,
                                 child: InkWell(
                                   onTap: () {
-                                    // getFullDeliveryDetails(
-                                    //     orderId: delivery[index].orderNumber);
+                                    getFullDeliveryDetails(
+                                        orderId: delivery[index].orderNumber);
                                   },
                                   child: Container(
                                     height: height * 0.04,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart'as http;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -91,11 +92,12 @@ class _SplashScreenState extends State<SplashScreen> {
               ).show();
             }
             else {
+              var data = jsonDecode(utf8.decode(response.bodyBytes));
               Alert(
                 context: context,
                 type: AlertType.error,
                 title: "Somethings wants wrongs",
-                desc: "please try again after few Mints",
+                desc: data["results"][0]["A"].toString(),
                 buttons: [
                   DialogButton(
                     color: themeColor1,

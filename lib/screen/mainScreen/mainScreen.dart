@@ -36,8 +36,7 @@ import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 class MainScreen extends StatefulWidget {
-bool loadCustomer;
-MainScreen({this.loadCustomer});
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -52,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void getAllCustomerData(bool data) async {
-  if(data){
+  if(true){
     try {
       Provider.of<CustomerList>(context,listen: false).setLoading(true);
       var data =await location.getLocation();
@@ -86,7 +85,16 @@ class _MainScreenState extends State<MainScreen> {
             double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
             customer.add(CustomerModel.fromModel(item,distance: dist));
           }
-          customer.sort((a,b)=>a.distance.compareTo(b.distance));
+
+          for(int i=0; i < customer.length-1; i++){
+            for(int j=0; j < customer.length-i-1; j++){
+              if(customer[j].distance > customer[j+1].distance){
+                CustomerModel temp = customer[j];
+                customer[j] = customer[j+1];
+                customer[j+1] = temp;
+              }
+            }
+          }
           Provider.of<CustomerList>(context,listen: false).clearList();
           Provider.of<CustomerList>(context,listen: false).storeResponse(data);
           Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
@@ -126,7 +134,18 @@ class _MainScreenState extends State<MainScreen> {
   var actualAddress = "Searching....";
 
    List<CustomerModel> customer=[];
-
+  getWalletStatus() async {
+    var response2 = await OnlineDatabase.getWalletStatus().catchError((error){Fluttertoast.showToast(
+        msg: "Error: "+error.toString(), toastLength: Toast.LENGTH_LONG);});
+    if (response2.statusCode == 200) {
+      var data2 = jsonDecode(utf8.decode(response2.bodyBytes));
+      print("get wallet data is: " + data2.toString());
+      Provider.of<UserModel>(context, listen: false).getWalletStatus(data2);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Something Went Wrong", toastLength: Toast.LENGTH_LONG);
+    }
+  }
 
   // void onStart()async{
   //
@@ -147,8 +166,8 @@ class _MainScreenState extends State<MainScreen> {
   
   @override
   void initState() {
-    bool test=widget.loadCustomer;
-   getAllCustomerData(test);
+    getWalletStatus();
+   getAllCustomerData(true);
     super.initState();
   }
   Future<bool> _onWillPop() async {
@@ -305,8 +324,9 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                             VariableText(
                               text: "Limit: " +
-                                  "1000" + ' / ' +
-                                  "2000",
+                                  userData.usercashReceive.toString() +
+                                  ' / ' +
+                                  userData.usercashLimit.toString(),
                               fontsize: 12,
                               fontcolor: textcolorgrey,
                               fontFamily: fontRegular,

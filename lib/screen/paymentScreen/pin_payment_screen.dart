@@ -70,7 +70,7 @@ class _PaymentPinState extends State<PaymentPin> {
       var data = jsonDecode(utf8.decode(response.bodyBytes));
       print(data.toString());
       userDetails = CustomerModel.fromModel(data['results'][0]);
-      name1=userDetails.customerName;
+      name1=userDetails.customerContactPersonName;
       name2=userDetails.customerContactPersonName2;
       name3="NULL";
       number1=userDetails.customerContactNumber;
@@ -90,7 +90,7 @@ class _PaymentPinState extends State<PaymentPin> {
   }
   @override
   void initState() {
-    name1=widget.customer.name;
+    name1=widget.customer.customerContactPersonName;
     name2=widget.customer.customerContactPersonName2;
     name3="NULL";
     number1=widget.customer.customerContactNumber;
@@ -110,7 +110,9 @@ class _PaymentPinState extends State<PaymentPin> {
     var userData=Provider.of<UserModel>(context);
     var media=MediaQuery.of(context).size;
     double height=media.height;
+    setState(() {
 
+    });
     return SafeArea(
         child: Scaffold(
             body: Stack(
@@ -127,7 +129,7 @@ class _PaymentPinState extends State<PaymentPin> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              VariableText(text: widget.userName,
+                              VariableText(text: name1,
                                 fontsize: height * 0.020,
                                 textAlign: TextAlign.start,
                                 line_spacing: 1,

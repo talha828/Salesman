@@ -1266,7 +1266,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
         backgroundColor: Colors.black87,
         textColor: Colors.white,
         fontSize: 16.0);
-   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen(loadCustomer: false,)));
+   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
   }
 
   bool setLoading(bool loading) {

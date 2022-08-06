@@ -119,7 +119,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
             fontSize: 16.0);
       } else {
         Fluttertoast.showToast(
-            msg: "Something went wrong try again later",
+            msg: "Product not found",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.black87,
             textColor: Colors.white,
@@ -129,7 +129,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
       print('exception is' + e.toString() + stack.toString());
       setLoading(false);
       Fluttertoast.showToast(
-          msg: "Something went wrong try again later",
+          msg: "Error: "+e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
@@ -159,7 +159,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
         setLoading(false);
       } else {
         Fluttertoast.showToast(
-            msg: "Something went wrong try again later",
+            msg: "unable to get cash limit",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.black87,
             textColor: Colors.white,
@@ -170,7 +170,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     } catch (e, stack) {
       print('exception is' + e.toString());
       Fluttertoast.showToast(
-          msg: "Something went wrong try again later",
+          msg: "Error: "+e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
@@ -241,7 +241,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
             fontSize: 16.0);
       } else {
         Fluttertoast.showToast(
-            msg: "Something went wrong try again later",
+            msg: "Unable to get product category",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.black87,
             textColor: Colors.white,
@@ -250,7 +250,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     } catch (e, stack) {
       print('exception is' + e.toString() + stack.toString());
       Fluttertoast.showToast(
-          msg: "Something went wrong try again later",
+          msg: "Error: "+e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
@@ -268,64 +268,66 @@ class _CheckInScreenState extends State<CheckInScreen> {
     return distance;
   }
   void showDistance()async{
-
-    if(widget.distance > 100){
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.INFO,
-        animType: AnimType.BOTTOMSLIDE,
-        title: widget.distance.toStringAsFixed(0)+" m",
-        desc: "Dukan ki location update karo warna fuel expense nahi milega.",
-        btnOkText: "Update",
-        btnCancelText: "Ok",
-        dismissOnTouchOutside: false,
-        btnCancelOnPress: () {
-        },
-        btnOkOnPress: () async{
-          var response = await OnlineDatabase.getSingleCustomer(widget.shopDetails.customerCode);
-          print("Response is" + response.statusCode.toString());
-          if (response.statusCode == 200) {
-            var data = jsonDecode(utf8.decode(response.bodyBytes));
-            // print("Response is" + data.toString());
-            var userDetail =  CustomerModel.fromModel(data['results'][0]);
-            print(userDetail.editable);
-            if("Y" == 'Y'){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => EditShopScreen(
-                        shopData: widget.shopDetails,
-                      )));
-            }else{
+      if (widget.distance > 100) {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.INFO,
+          animType: AnimType.BOTTOMSLIDE,
+          title: widget.distance.toStringAsFixed(0) + " m",
+          desc: "Dukan ki location update karo warna fuel expense nahi milega.",
+          btnOkText: "Update",
+          btnCancelText: "Ok",
+          dismissOnTouchOutside: false,
+          btnCancelOnPress: () {},
+          btnOkOnPress: () async {
+            var response = await OnlineDatabase.getSingleCustomer(
+                widget.shopDetails.customerCode);
+            print("Response is" + response.statusCode.toString());
+            if (response.statusCode == 200) {
+              var data = jsonDecode(utf8.decode(response.bodyBytes));
+              // print("Response is" + data.toString());
+              var userDetail = CustomerModel.fromModel(data['results'][0]);
+              print(userDetail.editable);
+              if ("Y" == 'Y') {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            EditShopScreen(
+                              shopData: widget.shopDetails,
+                            )));
+              } else {
+                Fluttertoast.showToast(
+                    msg: "Edit not allowed. Call to open edit shop",
+                    toastLength: Toast.LENGTH_SHORT,
+                    backgroundColor: Colors.black87,
+                    textColor: Colors.white,
+                    fontSize: 16.0);
+                showDistance();
+              }
+            }
+            else if (response.statusCode != 200) {
+              var data = jsonDecode(utf8.decode(response.bodyBytes));
+              setLoading(false);
               Fluttertoast.showToast(
-                  msg: "Edit not allowed. Call to open edit shop",
+                  msg: "Internet Issue",
                   toastLength: Toast.LENGTH_SHORT,
                   backgroundColor: Colors.black87,
                   textColor: Colors.white,
                   fontSize: 16.0);
-              showDistance();
             }
-          }
-          else if (response.statusCode != 200) {
-            var data = jsonDecode(utf8.decode(response.bodyBytes));
-            setLoading(false);
-            Fluttertoast.showToast(
-                msg: "Internet Issue",
-                toastLength: Toast.LENGTH_SHORT,
-                backgroundColor: Colors.black87,
-                textColor: Colors.white,
-                fontSize: 16.0);
-          }
-        },
-      )..show();
-    }
+          },
+        )
+          ..show();
+      }
+
   }
 
   // Delivery Api`s
   Future<bool>_willPopScope(){
     Provider.of<CartModel>(context,listen:false).clearCart();
     return Navigator.push(
-        context, MaterialPageRoute(builder: (_) => MainScreen(loadCustomer: false,)));
+        context, MaterialPageRoute(builder: (_) => MainScreen()));
   }
 
 

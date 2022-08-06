@@ -369,9 +369,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                     total: total[index],
                                     onTap: () async {
                                       if (paymentType != 0) {
+                                        setLoading(true);
                                         Location _location=new Location();
                                         var data =await _location.getLocation();
-                                        setLoading(true);
                                         var response = await OnlineDatabase
                                             .newpostSalesOrder(
                                             brand: cartList[index]

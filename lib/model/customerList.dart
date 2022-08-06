@@ -48,6 +48,15 @@ class CustomerList extends ChangeNotifier{
         }
       }
     }
+    for(int i=0; i < dues.length-1; i++){
+      for(int j=0; j < dues.length-i-1; j++){
+        if(double.parse(dues[j].dues) > double.parse(dues[j+1].dues)){
+          CustomerModel temp = dues[j];
+          dues[j] = dues[j+1];
+          dues[j+1] = temp;
+        }
+      }
+    }
     notifyListeners();
   }
   void sliderPicture(List<Widget> value){

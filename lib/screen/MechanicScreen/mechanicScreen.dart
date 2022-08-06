@@ -18,7 +18,7 @@ class _MechanicScreenState extends State<MechanicScreen> {
   List<MechanicModel>mechanic=[];
   getMechanic()async{
     var dio=new Dio();
-    var response=await dio.get("https://erp.suqexpress.com/api/mechanics");
+    var response=await dio.get("https://erp.suqexpress.com/api/mechanics/cust/${widget.customerModel.customerCode}");
     for(var i in response.data["data"]){
       mechanic.add(MechanicModel.fromJson(i));
       print(mechanic.last.picture);

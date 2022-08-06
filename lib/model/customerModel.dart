@@ -106,8 +106,8 @@ class CustomerModel extends ChangeNotifier {
       customerMarketCode = json["MARKET_CODE"];
       customerMarketName = json["MARKET_NAME"];
       name=json["CONTACT_PERSON"];
-      customerContactPersonName2 = json['CONTACT_PERSON2'];
-      customerContactNumber2 = json['PHONE2'];
+      customerContactPersonName2 = json['CONTACT2'].toString();
+      customerContactNumber2 = json['PHONE2'].toString();
       customerEmail = json['EMAIL'];
       customerCnic = json['CNIC'].toString();
       customerCnicExpiry = json['CNIC_EXPIRY'];

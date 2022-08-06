@@ -107,7 +107,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             SizedBox(height: height*0.05),
             LoginButton(text: "Done",onTap: (){
               if(dateCheck == code){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(loadCustomer: true,)));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
               }else{
                 Fluttertoast.showToast(msg: "Incorrect password",toastLength: Toast.LENGTH_SHORT);
               }

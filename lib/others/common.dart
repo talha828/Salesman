@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math'as math;
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -646,28 +647,28 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                       widget.showLoading(false);
                                       //checkAndGetLocation();
                                     } else {
-                                      if(widget.customerData.shopAssigned.toString()=="Yes"){
-                                        Location location = new Location();
-                                        var _location = await location.getLocation();
-                                       await PostEmployeeVisit(
-                                            employeeCode: userData.userEmpolyeeNumber,
-                                            customerCode: widget.customerData.customerCode,
-                                            purpose: 'Check In',
-                                            lat: _location.latitude.toString(),
-                                            long: _location.longitude.toString(),
-                                            customerData: widget.customerData);
-                                      }
-                                      widget.showLoading(false);
+                                      // if(widget.customerData.shopAssigned.toString()=="Yes"){
+                                      //   Location location = new Location();
+                                      //   var _location = await location.getLocation();
+                                      //  await PostEmployeeVisit(
+                                      //       employeeCode: userData.userEmpolyeeNumber,
+                                      //       customerCode: widget.customerData.customerCode,
+                                      //       purpose: 'Check In',
+                                      //       lat: _location.latitude.toString(),
+                                      //       long: _location.longitude.toString(),
+                                      //       customerData: widget.customerData);
+                                      // }
+                                      // widget.showLoading(false);
 
-                                      // if(widget.customerData.shopAssigned == 'Yes'){
-                                      //   if (double.parse(userData.usercashReceive) >=
-                                      //       double.parse(userData.usercashLimit)
-                                      //   // || double.parse(userData.usercashReceive) < 0
-                                      //   ) {
-                                      //     limitReachedPopup(
-                                      //         context: context,
-                                      //         height: widget.height,
-                                      //         width: widget.width);
+                                      if(widget.customerData.shopAssigned == 'Yes'){
+                                        if (double.parse(userData.usercashReceive) >=
+                                            double.parse(userData.usercashLimit)
+                                        // || double.parse(userData.usercashReceive) < 0
+                                        ) {
+                                          limitReachedPopup(
+                                              context: context,
+                                              height: widget.height,
+                                              width: widget.width);
 
                                           ///for testing
                                           /*widget.showLoading(true);
@@ -679,20 +680,24 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                         long: templong.toString(),
                                         customerData: widget.customerData);
                                     widget.showLoading(false);*/
-                                        // } else {
+                                          widget.showLoading(false);
 
-                                        //   //TODO:// set check-in api
-                                        //   // widget.showLoading(true);
-                                        //   // await PostEmployeeVisit(
-                                        //   //     customerCode:
-                                        //   //     widget.customerData.customerCode,
-                                        //   //     purpose: 'Check In',
-                                        //   //     lat: templat.toString(),
-                                        //   //     long: templong.toString(),
-                                        //   //     customerData: widget.customerData);
-                                        //   // widget.showLoading(false);
-                                        // }
-                                      // }
+                                        } else {
+
+                                          TODO:// set check-in api
+                                          widget.showLoading(true);
+                                          Location location = new Location();
+                                          var _location = await location.getLocation();
+                                          await PostEmployeeVisit(
+                                                  employeeCode: userData.userEmpolyeeNumber,
+                                                  customerCode: widget.customerData.customerCode,
+                                                  purpose: 'Check In',
+                                                  lat: _location.latitude.toString(),
+                                                  long: _location.longitude.toString(),
+                                                  customerData: widget.customerData);
+                                            }
+                                          widget.showLoading(false);
+                                        }
                                     }
                                   } else if (index == 0) {
                                     ///Launch Map
@@ -1072,43 +1077,43 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
     );*/
   }
 
-  // limitReachedPopup({BuildContext context, double height, double width}) {
-  //   AwesomeDialog(
-  //       context: context,
-  //       //dismissOnTouchOutside: false,
-  //       animType: AnimType.SCALE,
-  //       dialogType: DialogType.WARNING,
-  //       btnOkColor: themeColor1,
-  //       showCloseIcon: true,
-  //       btnOkText: "OK",
-  //       closeIcon: Icon(Icons.close),
-  //       btnOkOnPress: () {
-  //         print("ok tap");
-  //         // Navigator.pop(context);
-  //       },
-  //       body: StatefulBuilder(builder: (context, setState) {
-  //         return Container(
-  //           width: width,
-  //           decoration: BoxDecoration(
-  //             color: Colors.white,
-  //             borderRadius: BorderRadius.circular(8),
-  //           ),
-  //           child: Column(
-  //             children: [
-  //               VariableText(
-  //                 text: "Your Limit is Reached",
-  //                 fontsize: 14,
-  //                 fontcolor: textcolorblack,
-  //                 weight: FontWeight.w500,
-  //                 fontFamily: fontMedium,
-  //               ),
-  //               // SizedBox(height: height*0.02,),
-  //             ],
-  //           ),
-  //         );
-  //       }))
-  //     ..show();
-  // }
+  limitReachedPopup({BuildContext context, double height, double width}) {
+    AwesomeDialog(
+        context: context,
+        //dismissOnTouchOutside: false,
+        animType: AnimType.SCALE,
+        dialogType: DialogType.WARNING,
+        btnOkColor: themeColor1,
+        showCloseIcon: true,
+        btnOkText: "OK",
+        closeIcon: Icon(Icons.close),
+        btnOkOnPress: () {
+          print("ok tap");
+          // Navigator.pop(context);
+        },
+        body: StatefulBuilder(builder: (context, setState) {
+          return Container(
+            width: width,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                VariableText(
+                  text: "Your Limit is Reached",
+                  fontsize: 14,
+                  fontcolor: textcolorblack,
+                  weight: FontWeight.w500,
+                  fontFamily: fontMedium,
+                ),
+                // SizedBox(height: height*0.02,),
+              ],
+            ),
+          );
+        }))
+      ..show();
+  }
   //
   // void PostEmployeeVisit(
   //     {String customerCode,

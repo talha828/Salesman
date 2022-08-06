@@ -111,7 +111,7 @@ class _SucessFullyVerifiedScreenState extends State<SucessFullyVerifiedScreen> {
               context,
               MaterialPageRoute(
                   builder: (context) => MainScreen(
-                        loadCustomer: false,
+
                       )));
           // var  userName = Provider.of<UserModel>(context, listen: false).userName;
           //

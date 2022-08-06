@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
@@ -71,6 +72,7 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
   @override
   Widget build(BuildContext context) {
     var userData = Provider.of<UserModel>(context);
+    var cus=Provider.of<CustomerList>(context).singleCustomer;
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
@@ -505,7 +507,7 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                                                 "code_id":value.data["id"],
                                                 "phone": phoneNo.text,
                                                 "cnic": idCard.text,
-                                                "customer_id":widget.customer.customerCode,
+                                                "customer_id":cus.customerCode,
                                                 "emp_id":userData.userID,
                                                 "lat":location.latitude,
                                                 "long":location.longitude

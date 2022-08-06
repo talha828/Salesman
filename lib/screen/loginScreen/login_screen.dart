@@ -135,19 +135,19 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ).show();
       }
-      else{
-        setLoading(false);
+      else {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
         Alert(
           context: context,
           type: AlertType.error,
           title: "Somethings wants wrongs",
-          desc: "please try again after few Mints",
+          desc: data["results"][0]["A"].toString(),
           buttons: [
             DialogButton(
-              color:themeColor1 ,
+              color: themeColor1,
               child: Text(
                 "CANCEL",
-                style: TextStyle(color:Colors.white , fontSize: 20),
+                style: TextStyle(color: Colors.white, fontSize: 20),
               ),
               onPressed: () => Navigator.pop(context),
               width: 120,
@@ -174,7 +174,26 @@ class _LoginScreenState extends State<LoginScreen> {
           )
         ],
       ).show();
-      print("Login Error: $e");});
+      print("Login Error: $e");}).catchError((e){
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Something want wrong",
+        desc: e.response.data["results"][0],
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            width: 120,
+          )
+        ],
+      ).show();
+    });
   }
   @override
   Widget build(BuildContext context) {

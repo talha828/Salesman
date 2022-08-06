@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -25,7 +27,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
     super.dispose();
   }
   Future<bool> _onWillPop(){
-    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+    return   Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
   }
 
   @override
@@ -49,7 +51,7 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                   Spacer(),
                   InkWell(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
 
                     },
                     child: Image.asset(
@@ -108,8 +110,9 @@ class _SucessFullyRecivePaymentScreenState extends State<SucessFullyRecivePaymen
                 height: height * 0.02,),
               InkWell(
                 onTap: (){
+                  //var customer=Provider.of<CustomerList>(context).singleCustomer;
                   //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>CheckInScreen(shopDetails: widget.shopDetails,lat: widget.lat,long: widget.long,fromShop: true,)), (route) => route.isCurrent);
-                  Navigator.push(context, MaterialPageRoute(builder: (_)=>CheckInScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_)=>MainScreen()));
                 },
                 child: Center(
                   child: Container(

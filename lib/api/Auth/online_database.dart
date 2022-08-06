@@ -521,7 +521,12 @@ class OnlineDatabase{
     );
     return response;
   }
-
+  static Future<dynamic> getWalletStatus() async {
+    var url=Uri.parse(directory+'getwalletstatus?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password');
+    print("url is: "+url.toString());
+    final response=await http.get(url);
+    return response;
+  }
   static Future<dynamic> getAllCategories() async {
     //var url=Uri.parse(getProductListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=+923002233297&pin_password=654321&pin_itemtype=');
     var url=Uri.parse(directory+'getmainitemtypes?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_itemtype=&pin_app_for=');
