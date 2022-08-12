@@ -536,7 +536,7 @@ class OnlineDatabase{
   }
   static Future<dynamic> getSingleCustomer(String custCode) async {
     String url=directory+
-        'getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=&pin_cust_code=$custCode';
+        'getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=INFO&pin_cust_code=$custCode';
     print("url is: "+url);
     final response = await http.get(
         Uri.parse(url));

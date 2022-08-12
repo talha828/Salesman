@@ -216,13 +216,19 @@ class _PaymentPinState extends State<PaymentPin> {
                                 Map<String, dynamic> map = {
                                   "purpose": 1,
                                   "number": number1.toString(),
+                                  "amount":widget.total,
                                   "customer_id":widget.customer.customerCode,
                                   "emp_name": userData.userName,
                                 };
                                 FormData formData = FormData.fromMap(map);
                                 //TODO sms post
                                 Response smsResponse =
-                                await dio.post(url, data: formData);
+                                await dio.post(url, data: formData).catchError((e){
+                                  setLoading(false);
+                                  Fluttertoast.showToast(
+                                      msg: e.response.data["message"].toString(),
+                                      toastLength: Toast.LENGTH_SHORT);
+                                });
                                 if(smsResponse.statusCode == 200){
                                   _start=60;
                                   setState(() {
@@ -273,13 +279,19 @@ class _PaymentPinState extends State<PaymentPin> {
                             Map<String, dynamic> map = {
                               "purpose": 1,
                               "number": number2.toString(),
+                              "amount":widget.total,
                               "customer_id":widget.customer.customerCode,
                               "emp_name": userData.userName,
                             };
                             FormData formData = FormData.fromMap(map);
                             //TODO sms post
                             Response smsResponse =
-                            await dio.post(url, data: formData);
+                            await dio.post(url, data: formData).catchError((e){
+                              setLoading(false);
+                              Fluttertoast.showToast(
+                                  msg: e.response.data["message"].toString(),
+                                  toastLength: Toast.LENGTH_SHORT);
+                            });
                             if(smsResponse.statusCode == 200){
                               _start=60;
                               setState(() {

@@ -245,14 +245,49 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                       name = TextEditingController(text: value);
                     },
                   ),
-                  MyTextFields(
-                    title: "Mechanic Phone  Number",
-                    controller: phoneNo,
-                    hint: "+923012071090",
-                    onChange: (value) {
-                      phoneNo = TextEditingController(text: value);
-                    },
+                  SizedBox(
+                    height: height * 0.03,
                   ),
+                  VariableText(
+                    text: "Mechanic Phone Number",
+                    fontsize: 12,
+                    fontFamily: fontMedium,
+                    weight: FontWeight.w500,
+                    fontcolor: textcolorblack,
+                  ),
+                  SizedBox(
+                    height: height * 0.01,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        child: Text("+92"),
+                      ),
+                      Container(
+                        width: width * 0.8,
+                        child: RectangluartextFeild(
+                          hinttext:"3012070920",
+                          cont: phoneNo,
+                          onChanged:(value){phoneNo = TextEditingController(text:value);
+                            print(phoneNo.text);
+                            },
+                          keytype: TextInputType.text,
+                          textlength: 25,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Container(
+                  //   child: MyTextFields(
+                  //     title: "Mechanic Phone  Number",
+                  //     controller: phoneNo,
+                  //     hint: "+923012071090",
+                  //     onChange: (value) {
+                  //       phoneNo = TextEditingController(text: value);
+                  //     },
+                  //   ),
+                  // ),
                   MyTextFields(
                     title: "Mechanic ID Card No",
                     controller: idCard,
@@ -424,14 +459,14 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                         personImage != null &&
                         idImage != null
                     ) {
-                      if (phoneNo.text.length > 11) {
+                      if (phoneNo.text.length > 9) {
                         if (idCard.text.length > 13) {
                           //TODO:// Arsalan Api http 500 not working properly
                           var dio = new Dio();
                           String url = "https://erp.suqexpress.com/api/getcode";
                           Map<String, dynamic> map = {
                             "purpose": 3,
-                            "number": phoneNo.text,
+                            "number": "+92"+ phoneNo.text,
                             "emp_name": userData.userName,
                           };
                           FormData formData = FormData.fromMap(map);
@@ -564,18 +599,11 @@ class _AddMechanicScreenState extends State<AddMechanicScreen> {
                                 }
                               })
                                   // TODO// when status code in not equal to 200;
-                                      .catchError((e){
-                                        setLoading(false);
-                                AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.ERROR,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: "Code Not Sent",
-                                  desc: "Error: " + e.response.data["message"].toString(),
-                                  btnCancelText: "Ok",
-                                  dismissOnTouchOutside: false,
-                                  btnOkOnPress: () {},
-                                )..show();
+                                  .catchError((e){
+                                setLoading(false);
+                                Fluttertoast.showToast(
+                                    msg: e.response.data["message"].toString(),
+                                    toastLength: Toast.LENGTH_SHORT);
                               });
                           //TODO when status code == 200
                         } else {

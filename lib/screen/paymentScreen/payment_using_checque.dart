@@ -659,7 +659,7 @@ class _PaymentUsingCheckState extends State<PaymentUsingCheck> {
             backgroundColor: Colors.black87,
             textColor: Colors.white,
             fontSize: 16.0);
-        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen()));
+        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen(customer: widget.customerData,)));
       } else {
         setLoading(false);
         Fluttertoast.showToast(

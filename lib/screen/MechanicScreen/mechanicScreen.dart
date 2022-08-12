@@ -24,7 +24,7 @@ class _MechanicScreenState extends State<MechanicScreen> {
       mechanic.add(MechanicModel.fromJson(i));
       print(mechanic.last.picture);
     }
-    setState(() {});
+    setState((){});
   }
 
   @override

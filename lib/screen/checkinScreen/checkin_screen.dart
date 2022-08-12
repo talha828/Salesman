@@ -44,6 +44,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
   @override
   void initState() {
     super.initState();
+    getCustomer();
     getCustomerTransactionData();
     getSliderImage();
     Future.delayed(Duration.zero, () {
@@ -287,7 +288,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
               var data = jsonDecode(utf8.decode(response.bodyBytes));
               // print("Response is" + data.toString());
               var userDetail = CustomerModel.fromModel(data['results'][0]);
+              Provider.of<CustomerList>(context,listen: false).myCustomer(userDetail);
+
               print(userDetail.editable);
+
               if ("Y" == 'Y') {
                 Navigator.push(
                     context,
@@ -321,6 +325,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
           ..show();
       }
 
+  }
+  void getCustomer()async {
+    var response = await OnlineDatabase.getSingleCustomer(
+        widget.shopDetails.customerCode);
+    print("Response is" + response.statusCode.toString());
+    if (response.statusCode == 200) {
+      var data = jsonDecode(utf8.decode(response.bodyBytes));
+      // print("Response is" + data.toString());
+      var userDetail = CustomerModel.fromModel(data['results'][0]);
+      var cc= Provider.of<CustomerList>(context, listen: false).myCustomer(userDetail);
+      print(userDetail);
+    }
   }
 
   // Delivery Api`s
@@ -554,6 +570,99 @@ class _CheckInScreenState extends State<CheckInScreen> {
                               ),
                               SizedBox(
                                 height: height * 0.01,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: height * 0.01,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenpadding),
+                  child: Container(
+                    // height: height*0.15,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: themeColor2,
+                        boxShadow: [
+                          BoxShadow(color: Color(0xff000000).withOpacity(0.25))
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Color.fromARGB(
+                              5,
+                              246,
+                              130,
+                              31,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.red.withOpacity(0.25))
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: height * 0.01,
+                              ),
+                              Row(
+                                children: [
+                                  VariableText(
+                                    text: 'Dues: ',
+                                    fontsize: 14,
+                                    fontcolor: textcolorblack,
+                                    weight: FontWeight.w100,
+                                    fontFamily: fontRegular,
+                                  ),
+                                  Spacer(),
+                                  VariableText(
+                                    text:myCustomer.dues.toString()=="null"?"- -": "Rs. " +
+                                        f.format(double.parse(myCustomer.dues.toString().length<5?myCustomer.dues.toString(): double.parse(myCustomer.dues).toStringAsFixed(2),)),
+
+                                    fontsize: 14,
+                                    fontcolor: Colors.red,
+                                    weight: FontWeight.w500,
+                                    fontFamily: fontMedium,
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Container(
+                                  height: 1,
+                                  color: themeColor1,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  VariableText(
+                                    text: 'Outstanding: ',
+                                    fontsize: 14,
+                                    fontcolor: textcolorblack,
+                                    weight: FontWeight.w500,
+                                    fontFamily: fontRegular,
+                                  ),
+                                  Spacer(),
+                                  VariableText(
+                                    text: myCustomer.outStanding.toString()=="null"?"- -":
+                                    "Rs " + f.format(double.parse(myCustomer.outStanding.toString().length<5? myCustomer.outStanding.toString(): double.parse(myCustomer.outStanding).toStringAsFixed(2),)),
+
+                                    fontsize: 14,
+                                    fontcolor: textcolorblack,
+                                    weight: FontWeight.w500,
+                                    fontFamily: fontRegular,
+                                  ),
+                                ],
                               ),
                             ],
                           ),

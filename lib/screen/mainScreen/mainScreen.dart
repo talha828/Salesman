@@ -303,7 +303,7 @@ class _MainScreenState extends State<MainScreen> {
                               height: height * 0.01,
                             ),
                             VariableText(
-                              text: userData.userName,
+                              text: userData.userName+" ("+userData.userEmpolyeeNumber+")",
                               fontsize: 16,
                               fontcolor: textcolorblack,
                               fontFamily: fontMedium,

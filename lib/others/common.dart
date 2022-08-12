@@ -194,7 +194,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
        print('exception is' + e.toString());
 
        Fluttertoast.showToast(
-           msg: "Error: " + e.toString(),
+           msg: "Error: " + e.response.data["message"].toString(),
            toastLength: Toast.LENGTH_SHORT,
            backgroundColor: Colors.black87,
            textColor: Colors.white,
@@ -647,19 +647,6 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                       widget.showLoading(false);
                                       //checkAndGetLocation();
                                     } else {
-                                      // if(widget.customerData.shopAssigned.toString()=="Yes"){
-                                      //   Location location = new Location();
-                                      //   var _location = await location.getLocation();
-                                      //  await PostEmployeeVisit(
-                                      //       employeeCode: userData.userEmpolyeeNumber,
-                                      //       customerCode: widget.customerData.customerCode,
-                                      //       purpose: 'Check In',
-                                      //       lat: _location.latitude.toString(),
-                                      //       long: _location.longitude.toString(),
-                                      //       customerData: widget.customerData);
-                                      // }
-                                      // widget.showLoading(false);
-
                                       if(widget.customerData.shopAssigned == 'Yes'){
                                         if (double.parse(userData.usercashReceive) >=
                                             double.parse(userData.usercashLimit)
@@ -669,17 +656,6 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                               context: context,
                                               height: widget.height,
                                               width: widget.width);
-
-                                          ///for testing
-                                          /*widget.showLoading(true);
-                                    await PostEmployeeVisit(
-                                        customerCode:
-                                            widget.customerData.customerCode,
-                                        purpose: 'Check In',
-                                        lat: templat.toString(),
-                                        long: templong.toString(),
-                                        customerData: widget.customerData);
-                                    widget.showLoading(false);*/
                                           widget.showLoading(false);
 
                                         } else {
@@ -697,7 +673,17 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                                   customerData: widget.customerData);
                                             }
                                           widget.showLoading(false);
-                                        }
+                                        }else{
+                                        widget.showLoading(false);
+                                        Fluttertoast.showToast(
+                                            msg: "Shop not assigned",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 3,
+                                            backgroundColor: Colors.black87,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0);
+                                      }
                                     }
                                   } else if (index == 0) {
                                     ///Launch Map

@@ -116,96 +116,52 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+    double height = media.height;
+    double width = media.width;
+    bool item = false;
+    double subtotal = 0;
     var cartData = Provider.of<CartModel>(context, listen: true);
     var userDetails = Provider.of<UserModel>(context, listen: true);
     CustomerModel customer=Provider.of<CustomerList>(context).singleCustomer;
     WalletCapacity wallet=Provider.of<WalletCapacity>(context);
-    // var emp_id =
-    //     Provider.of<UserModel>(context, listen: true).userEmpolyeeNumber;
-    // var availableBalance =
-    //     Provider.of<WalletCapacity>(context, listen: true).availableBalance;
-    for (var i in cartData.cartItemName) {
-      brandName.add(i.productName.brand);
-      print(i.productName.brand);
-    }
-    cartList.clear();
-    total.clear();
-    for (var j in brandName.toSet()) {
-      CartModel cart = sperateCart(cartData, j.toString().substring(0, 3));
-      getTotal(cart, j.toString().substring(0, 3));
-    }
-    double subtotal = 0;
-    for (var i in total) {
-      subtotal = subtotal + i;
-    }
-    print(brandName.toSet().length);
-    int nn = brandName.toSet().length;
-    var media = MediaQuery.of(context).size;
-    double height = media.height;
-    double width = media.width;
-    dynamic check = cartData.cartItemName.where((element) =>
-        element.productName.brand.toString().substring(0, 3).contains("SKR"));
-    bool item = false;
-    if (check.length >= 1) {
-      item = true;
-    } else {
-      item = false;
-    }
-    total.clear();
-    if (item) {
-      var first = cartList
-          .where((element) =>
-      element.cartItemName[0].productName.brand
-          .toString()
-          .substring(0, 3) ==
-          "SKR")
-          .first;
-      double temp = 0;
-      int index = 0;
-      for (var item in first.cartItemName) {
-        temp = temp +
-            double.parse((item.itemCount *
-                calculatePrice(
-                    quantity: item.itemCount,
-                    productDetils: item.productName))
-                .toString());
+    double temp = 0;
+    int index = 0;
+    if(cartData.cartItemName.length>0){
+      for (var i in cartData.cartItemName) {
+        brandName.add(i.productName.brand);
+        print(i.productName.brand);
       }
-      total.add(temp);
-      var second = cartList
-          .where((element) =>
-      element.cartItemName[0].productName.brand
-          .toString()
-          .substring(0, 3) !=
-          "SKR")
-          .toList();
-      for (var j in second) {
-        double temp = 0;
-        for (var item in j.cartItemName) {
-          temp = temp +
-              double.parse((item.itemCount *
-                  calculatePrice(
-                      quantity: item.itemCount,
-                      productDetils: item.productName))
-                  .toString());
-        }
-        total.add(temp);
-      }
-      cartList.clear();
-      cartList.add(first);
-      cartList.addAll(second);
-    } else {
-      var second = cartList
-          .where((element) =>
-      element.cartItemName[0].productName.brand
-          .toString()
-          .substring(0, 3) !=
-          "SKR")
-          .toList();
       cartList.clear();
       total.clear();
-      for (var j in second) {
-        double temp = 0;
-        for (var item in j.cartItemName) {
+      for (var j in brandName.toSet()) {
+        CartModel cart = sperateCart(cartData, j.toString().substring(0, 3));
+        getTotal(cart, j.toString().substring(0, 3));
+      }
+
+      for (var i in total) {
+        subtotal = subtotal + i;
+      }
+      print(brandName.toSet().length);
+      int nn = brandName.toSet().length;
+      dynamic check = cartData.cartItemName.where((element) =>
+          element.productName.brand.toString().substring(0, 3).contains("SKR"));
+      if (check.length >= 1) {
+        item = true;
+      } else {
+        item = false;
+      }
+      total.clear();
+      if (item) {
+        var first = cartList
+            .where((element) =>
+        element.cartItemName[0].productName.brand
+            .toString()
+            .substring(0, 3) ==
+            "SKR")
+            .first;
+
+        for (var item in first.cartItemName) {
           temp = temp +
               double.parse((item.itemCount *
                   calculatePrice(
@@ -214,8 +170,52 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   .toString());
         }
         total.add(temp);
+        var second = cartList
+            .where((element) =>
+        element.cartItemName[0].productName.brand
+            .toString()
+            .substring(0, 3) !=
+            "SKR")
+            .toList();
+        for (var j in second) {
+          double temp = 0;
+          for (var item in j.cartItemName) {
+            temp = temp +
+                double.parse((item.itemCount *
+                    calculatePrice(
+                        quantity: item.itemCount,
+                        productDetils: item.productName))
+                    .toString());
+          }
+          total.add(temp);
+        }
+        cartList.clear();
+        cartList.add(first);
+        cartList.addAll(second);
+      } else {
+        var second = cartList
+            .where((element) =>
+        element.cartItemName[0].productName.brand
+            .toString()
+            .substring(0, 3) !=
+            "SKR")
+            .toList();
+        cartList.clear();
+        total.clear();
+        for (var j in second) {
+          double temp = 0;
+          for (var item in j.cartItemName) {
+            temp = temp +
+                double.parse((item.itemCount *
+                    calculatePrice(
+                        quantity: item.itemCount,
+                        productDetils: item.productName))
+                    .toString());
+          }
+          total.add(temp);
+        }
+        cartList.addAll(second);
       }
-      cartList.addAll(second);
     }
     var f = NumberFormat("###,###.0#", "en_US");
 
@@ -389,19 +389,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                             long: data.longitude.toString(),
                                             customerCode: customer.customerCode)
                                             .catchError(
-                                              (DioError e) => AwesomeDialog(
-                                            context: context,
-                                            dialogType: DialogType.INFO,
-                                            useRootNavigator: false,
-                                            animType: AnimType.BOTTOMSLIDE,
-                                            title: e.response.data["message"],
-                                            desc:
-                                            e.response.data["data"],
-                                            btnCancelText: "Cart Page",
-                                            dismissOnTouchOutside: false,
-                                            btnOkOnPress: () {},
-                                          )..show().then(
-                                                  (value) => setLoading(false)),
+                                              (e) {
+                                                setLoading(false);
+                                                Fluttertoast.showToast(
+                                                  msg: "Error: "+e.response.data["message"],
+                                                  toastLength: Toast.LENGTH_LONG,
+                                                  backgroundColor: Colors.black87,
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0,
+                                                );
+                                              }
+                                                  // .then(
+                                                  // (value) => setLoading(false)),
                                         );
                                         if (response.statusCode == 200) {
                                           cartData.cartItemName.removeWhere(
@@ -438,7 +437,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                               backgroundColor: Colors.black87,
                                               textColor: Colors.white,
                                               fontSize: 16.0);
-                                          if (cartList.length < 1) {
+                                          if (cartList.length < 1){
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(

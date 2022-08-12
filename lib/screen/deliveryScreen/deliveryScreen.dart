@@ -1151,7 +1151,12 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                           FormData formData = FormData.fromMap(map);
                           //TODO sms post
                           Response smsResponse =
-                          await dio.post(url, data: formData);
+                          await dio.post(url, data: formData).catchError((e){
+                            setLoading(false);
+                            Fluttertoast.showToast(
+                                msg: e.response.data["message"].toString(),
+                                toastLength: Toast.LENGTH_SHORT);
+                          });
                           if (smsResponse.statusCode == 200) {
                             setState(() {
                               isLoading2 = false;
@@ -1181,7 +1186,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
 
                                       var response = await OnlineDatabase
                                           .newpostBoxDeliverDetails(
-                                          boxDetails: boxDetails,
+                                          boxDetails:boxDetails,
                                           emp_id:userData.userID ,
                                           emp_name: userData.userName,
                                           lat: location.latitude.toString(),
@@ -1200,7 +1205,7 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                           dialogType: DialogType.ERROR,
                                           animType: AnimType.BOTTOMSLIDE,
                                           title: "Error",
-                                          desc: "Error: " + e.response.toString(),
+                                          desc: "Error: " + e.response.data["message"],
                                           btnCancelText: "Ok",
                                           dismissOnTouchOutside: false,
                                           btnOkOnPress: () {},
@@ -1249,10 +1254,10 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                           setState(() {
                             isLoading2 = false;
                           });
-                          print('exception is: ' + e.toString());
+                          print('exception is: ' + e.response.toString());
                           Fluttertoast.showToast(
-                              msg: "Error: "+e.toString(),
-                              toastLength: Toast.LENGTH_SHORT,
+                              msg: e.response.data["message"].toString(),
+                              toastLength: Toast.LENGTH_LONG,
                               backgroundColor: Colors.black87,
                               textColor: Colors.white,
                               fontSize: 16.0);

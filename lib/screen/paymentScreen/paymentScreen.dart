@@ -276,7 +276,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     FormData formData = FormData.fromMap(map);
                                     //TODO sms post
                                     Response smsResponse =
-                                    await dio.post(url, data: formData);
+                                    await dio.post(url, data: formData).catchError((e){
+                                      setLoading(false);
+                                      Fluttertoast.showToast(
+                                          msg: e.response.data["message"].toString(),
+                                          toastLength: Toast.LENGTH_SHORT);
+                                    });
                                     print(smsResponse.data.toString());
                                     if(smsResponse.statusCode == 200){
                                       setLoading(false);
@@ -450,7 +455,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             backgroundColor: Colors.black87,
             textColor: Colors.white,
             fontSize: 16.0);
-        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen()));
+        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen(customer: customer,)));
       } else {
         setLoading(false);
         Fluttertoast.showToast(
@@ -464,8 +469,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     } catch (e,stack) {
       setLoading(false);
       Fluttertoast.showToast(
-        msg: "Error: "+e.toString(),
-        toastLength: Toast.LENGTH_SHORT,
+        msg: e.response.data["message"].toString(),
+        toastLength: Toast.LENGTH_LONG,
         backgroundColor: Colors.black87,
         textColor: Colors.white,
         fontSize: 16.0,

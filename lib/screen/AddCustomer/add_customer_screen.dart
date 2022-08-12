@@ -944,12 +944,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                             ).catchError((ex, stack) {
                               setLoading(false);
                               print("exception is" +
-                                  ex.toString() +
+                                  ex.response.data["data"].toString() +
                                   stack.toString());
                               Fluttertoast.showToast(
                                   msg: ex.toString(),
                                   toastLength: Toast.LENGTH_SHORT);
-                            }).timeout(Duration(seconds: _secs), onTimeout: () {
+                            }).timeout(Duration(seconds: _secs), onTimeout: (){
                               setLoading(false);
                               Fluttertoast.showToast(
                                   msg: _timeoutString,
