@@ -993,45 +993,50 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   bool validateFields() {
     bool ok = false;
-    if (name.text.isNotEmpty) {
-      if (phoneno.text.isNotEmpty) {
-        if (sel_cities != null) {
-          if (sel_areas != null) {
-            if (sel_party_categories != null) {
-              if (currentlocation.text.isEmpty) {
-                if (shopname.text.isNotEmpty) {
-                  ok = true;
-                } else {
-                  Fluttertoast.showToast(
-                      msg: "Please Enter Shop Name",
-                      toastLength: Toast.LENGTH_SHORT);
-                }
-              } else {
-                Fluttertoast.showToast(
-                    msg: "Please Enable Location",
-                    toastLength: Toast.LENGTH_SHORT);
-              }
-            } else {
-              Fluttertoast.showToast(
-                  msg: "Please Select Party Categories",
-                  toastLength: Toast.LENGTH_SHORT);
-            }
-          } else {
-            Fluttertoast.showToast(
-                msg: "Please Select Area", toastLength: Toast.LENGTH_SHORT);
-          }
-        } else {
-          Fluttertoast.showToast(
-              msg: "Please Select City", toastLength: Toast.LENGTH_SHORT);
-        }
-      } else {
-        Fluttertoast.showToast(
-            msg: "Please Enter Phone", toastLength: Toast.LENGTH_SHORT);
-      }
-    } else {
-      Fluttertoast.showToast(
-          msg: "Please Enter Name", toastLength: Toast.LENGTH_SHORT);
-    }
+   if(actualaddress != null){
+     if (name.text.isNotEmpty) {
+       if (phoneno.text.isNotEmpty) {
+         if (sel_cities != null) {
+           if (sel_areas != null) {
+             if (sel_party_categories != null) {
+               if (currentlocation.text.isEmpty) {
+                 if (shopname.text.isNotEmpty) {
+                   ok = true;
+                 } else {
+                   Fluttertoast.showToast(
+                       msg: "Please Enter Shop Name",
+                       toastLength: Toast.LENGTH_SHORT);
+                 }
+               } else {
+                 Fluttertoast.showToast(
+                     msg: "Please Enable Location",
+                     toastLength: Toast.LENGTH_SHORT);
+               }
+             } else {
+               Fluttertoast.showToast(
+                   msg: "Please Select Party Categories",
+                   toastLength: Toast.LENGTH_SHORT);
+             }
+           } else {
+             Fluttertoast.showToast(
+                 msg: "Please Select Area", toastLength: Toast.LENGTH_SHORT);
+           }
+         } else {
+           Fluttertoast.showToast(
+               msg: "Please Select City", toastLength: Toast.LENGTH_SHORT);
+         }
+       } else {
+         Fluttertoast.showToast(
+             msg: "Please Enter Phone", toastLength: Toast.LENGTH_SHORT);
+       }
+     } else {
+       Fluttertoast.showToast(
+           msg: "Please Enter Name", toastLength: Toast.LENGTH_SHORT);
+     }
+   }else{
+     Fluttertoast.showToast(
+         msg: "Your Location is empty", toastLength: Toast.LENGTH_SHORT);
+   }
     return ok;
   }
 

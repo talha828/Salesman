@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -624,5 +625,14 @@ class OnlineDatabase{
     print(response.statusCode.toString());
     print("login data is: "+response.body.toString());
     return response;
+  }
+  static Future<dynamic> getSms(String number,String amount,String emp_name,String smsPin){
+     var dio=Dio();
+     var data=jsonEncode({'code':'$smsPin','amount':'$amount','emp':'$emp_name','number':'$number'});
+     print("http://lifetimesms.com/otp?api_token=573faa073b82e10a0d9c18b6e5215aa87f2f717165&api_secret=SUQ&to=$number&from=8584&event_id=57&data={'code':'$smsPin','amount':'$amount','emp':'$emp_name','number':'$number'}");
+     print("ff");
+   // var url=Uri.parse("http://lifetimesms.com/otp?api_token=573faa073b82e10a0d9c18b6e5215aa87f2f717165&api_secret=SUQ&to=$number&from=8584&event_id=57&data={code:$msgPin,amount:$amount,emp:$emp_name,number:$number}");
+    var response=dio.get("http://lifetimesms.com/otp?api_token=573faa073b82e10a0d9c18b6e5215aa87f2f717165&api_secret=SUQ&to=$number&from=8584&event_id=57&data=$data");
+  return response;
   }
 }

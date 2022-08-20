@@ -664,7 +664,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                           widget.showLoading(true);
                                           Location location = new Location();
                                           var _location = await location.getLocation();
-                                          await PostEmployeeVisit(
+                                           PostEmployeeVisit(
                                                   employeeCode: userData.userEmpolyeeNumber,
                                                   customerCode: widget.customerData.customerCode,
                                                   purpose: 'Check In',
