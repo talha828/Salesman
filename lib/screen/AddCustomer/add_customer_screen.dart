@@ -1206,7 +1206,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
 
   Future<dynamic> registerCustomer(String imageUrl) async {
     String URL = directory +
-        'postcreateshop?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&'
+        'postcreateshop?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&'
             'pin_userid=$phoneNumber&pin_password=$password&pin_shopname=${shopname.text}&pin_address=${actualaddress.toString()}&pin_partycategory=$sel_party_categories&'
             'pin_city=${sel_cities.cityCode ?? ''}&pin_image_url=${imageUrl}&pin_area=${sel_areas.areaCode == 'null' ? '' : sel_areas.areaCode}&pin_mobile=${'+92' + phoneno.text}&pin_phone1=${'+92' + phoneno.text}&pin_phone2= ${'+92' + secondphoneno.text}&pin_ntn=1'
             '&pin_person1=${name.text}&pin_person2=${secondname.text}&pin_longitude=${widget.locationdata.longitude.toString()}&pin_latitude=${widget.locationdata.latitude.toString()}&po_cust_code';

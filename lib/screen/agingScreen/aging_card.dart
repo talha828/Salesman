@@ -21,7 +21,7 @@ class _AgingScreenState extends State<AgingScreen> {
  List tomorrow=[];
  Future get_data() async {
     var url = Uri.parse(directory +
-        'gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=X09&pin_keyword2=912&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=AGING');
+        'gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=AGING');
     // var url  = await http.get(Uri.parse(url));
     // print(url.toString());
     await http.get(url).then((response) {
