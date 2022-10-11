@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     var response = await http.get(url);
     var data = jsonDecode(response.body);
     if (data['data'] == "0") {
-      getLogin();
+      openLocationFirst();
     } else {
       AwesomeDialog(
           context: context,
@@ -135,6 +135,47 @@ class _SplashScreenState extends State<SplashScreen> {
     }
     else{
       Navigator.push(context, MaterialPageRoute(builder: (context)=>GetStartedScreen()));
+    }
+  }
+  openLocationFirst()async{
+    Location location = new Location();
+    bool  _serviceEnabled = await location.serviceEnabled();
+    if(!_serviceEnabled){
+      Alert(
+        context: context,
+        type: AlertType.info,
+        title: "Please Enable your Location",
+        desc: "Your Location is not available",
+        style: AlertStyle(
+            descStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.normal)
+        ),
+        buttons: [
+          DialogButton(
+            color: themeColor1,
+            child: Text(
+              "Enable Now",
+              style: TextStyle(color: Colors.white, fontSize:15,fontWeight: FontWeight.bold),
+            ),
+            onPressed: ()async{
+              _serviceEnabled = await location.requestService();
+              var _permissionGranted = await location.hasPermission();
+              if (_permissionGranted == PermissionStatus.denied) {
+                _permissionGranted = await location.requestPermission();
+                if (_permissionGranted != PermissionStatus.granted) {
+                  getLogin();
+                }
+              }
+              else if(_permissionGranted == PermissionStatus.granted){
+                getLogin();
+              }
+            },
+            width: 120,
+          )
+        ],
+      ).show();
+    }
+    else{
+      getLogin();
     }
   }
   @override

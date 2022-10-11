@@ -293,15 +293,15 @@ class _CartScreenState extends State<CartScreen> {
                                             InkWell(
                                               onTap:(){
                                                 //
-                                                // if( cartData[index].itemCount>1){
-                                                //   setState(() {
-                                                //     cartData[index].itemCount--;
-                                                //     itemCountController.text=cartData[index].itemCount.toString();
-                                                //     Provider.of<CartModel>(context, listen: false).updateSubTotal();
-                                                //     //cartData[index].itemPrice = calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].productName)??0;
-                                                //    //cartData[index].itemTotal = cartData[index].itemPrice*cartData[index].itemCount;
-                                                //   });
-                                                // }
+                                                if( cartData[index].itemCount>1){
+                                                  setState(() {
+                                                    cartData[index].itemCount--;
+                                                    itemCountController.text=cartData[index].itemCount.toString();
+                                                    Provider.of<CartModel>(context, listen: false).updateSubTotal();
+                                                    //cartData[index].itemPrice = calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].productName)??0;
+                                                   //cartData[index].itemTotal = cartData[index].itemPrice*cartData[index].itemCount;
+                                                  });
+                                                }
 
                                               },
                                               child: Container(

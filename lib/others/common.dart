@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math'as math;
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -148,7 +149,7 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
   LocationData _locationData;*/
 
    double templat, templong;
-   void PostEmployeeVisit(
+   Future<void> PostEmployeeVisit(
        {String customerCode,
          String employeeCode,
          String purpose,
@@ -670,9 +671,11 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                                   purpose: 'Check In',
                                                   lat: _location.latitude.toString(),
                                                   long: _location.longitude.toString(),
-                                                  customerData: widget.customerData);
+                                                  customerData: widget.customerData).catchError((e){
+                                               print(e.toString());
+                                               widget.showLoading(false);});
                                             }
-                                          widget.showLoading(false);
+                                          //widget.showLoading(false);
                                         }else{
                                         widget.showLoading(false);
                                         Fluttertoast.showToast(
