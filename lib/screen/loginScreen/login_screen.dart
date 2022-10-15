@@ -6,14 +6,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app_new/api/Auth/auth.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/screen/child_lock/security_screen.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/screen/ForgetPasswordScreen/verify_phone_no_screen.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verificationcodescreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../others/common.dart';
 import '../../others/style.dart';
@@ -66,52 +69,88 @@ class _LoginScreenState extends State<LoginScreen> {
        // var data=jsonDecode(response.toString());
          // print(data['success']);
          await  Provider.of<UserModel>(context,listen: false).userSignIn(data);
-        FirebaseAuth _auth=  FirebaseAuth.instance;
-        _auth.verifyPhoneNumber(
-            phoneNumber: widget.phoneNumber,
-            timeout: Duration(seconds: 120),
-            verificationCompleted: (AuthCredential credential){
-            },
-            verificationFailed: (FirebaseAuthException exception){
-              print("OTP failed");
-              setLoading(false);
-              Fluttertoast.showToast(
-                  msg: "OTP failed, Try again later",
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 3,
-                  backgroundColor: Colors.black87,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-              print(exception);
-            },
-            codeAutoRetrievalTimeout:(authException){
-              Alert(
-                context: context,
-                type: AlertType.error,
-                title: "Authentication Failed",
-                desc: "Please check your number ",
-                buttons: [
-                  DialogButton(
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    width: 120,
-                  )
-                ],
-              ).show();
-              print(authException);
-              setLoading(false);
-            } ,
-            codeSent: ( verificationId, [forceResendingToken]) async {
-              setLoading(false);
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCodeScreen(verificationCode: verificationId,phoneNo: widget.phoneNumber,password: _passController.text,)));
-            }
-        );
+        Uri url = Uri.parse(
+            "http://api.visionsoft-pk.com:8181/ords/skr2/app/getappvrs?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=${widget.phoneNumber}&pin_password=${_passController.text}&pin_appname=SALESMAN");
+        var versionResponse = await http.get(url);
+        var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
+        var version = versionDecode['results'][0]['VERSION'];
+        print(version);
+        if (version.toString() == "030922") {
+          FirebaseAuth _auth=  FirebaseAuth.instance;
+          _auth.verifyPhoneNumber(
+              phoneNumber: widget.phoneNumber,
+              timeout: Duration(seconds: 120),
+              verificationCompleted: (AuthCredential credential){
+              },
+              verificationFailed: (FirebaseAuthException exception){
+                print("OTP failed");
+                setLoading(false);
+                Fluttertoast.showToast(
+                    msg: "OTP failed, Try again later",
+                    toastLength: Toast.LENGTH_LONG,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 3,
+                    backgroundColor: Colors.black87,
+                    textColor: Colors.white,
+                    fontSize: 16.0);
+                print(exception);
+              },
+              codeAutoRetrievalTimeout:(authException){
+                Alert(
+                  context: context,
+                  type: AlertType.error,
+                  title: "Authentication Failed",
+                  desc: "Please check your number ",
+                  buttons: [
+                    DialogButton(
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      width: 120,
+                    )
+                  ],
+                ).show();
+                print(authException);
+                setLoading(false);
+              } ,
+              codeSent: ( verificationId, [forceResendingToken]) async {
+                setLoading(false);
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCodeScreen(verificationCode: verificationId,phoneNo: widget.phoneNumber,password: _passController.text,)));
+              }
+          );
+        } else {
+          Future.delayed(Duration(seconds: 1),(){
+            Alert(
+              context: context,
+              type: AlertType.warning,
+              title: "New Version is available",
+              desc: "Please update your app first",
+              style: AlertStyle(
+                  descStyle:
+                  TextStyle(fontSize: 15, fontWeight: FontWeight.normal)),
+              buttons: [
+                DialogButton(
+                  color: Colors.red,
+                  child: Text(
+                    "Update Now",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () => launchAppStore(
+                      "https://play.google.com/store/apps/details?id=com.suqexpress.retailer"),
+                  width: 120,
+                )
+              ],
+            ).show();
+          });
+        }
+
               // Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCodeScreen(verificationCode: "123",phoneNo: widget.phoneNumber,password: _passController.text,)));
 
       }
@@ -381,7 +420,14 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = loading;
     });
   }
-
+  Future<void> launchAppStore(String appStoreLink) async {
+    debugPrint(appStoreLink);
+    if (await canLaunch(appStoreLink)) {
+      await launch(appStoreLink);
+    } else {
+      throw 'Could not launch appStoreLink';
+    }
+  }
 
 }
 

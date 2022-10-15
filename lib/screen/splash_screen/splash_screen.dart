@@ -19,6 +19,7 @@ import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/screen/splash_screen/get_started_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -68,9 +69,46 @@ class _SplashScreenState extends State<SplashScreen> {
               // print(data['success']);
               await Provider.of<UserModel>(context, listen: false).userSignIn(
                   data);
-              FirebaseAuth _auth = FirebaseAuth.instance;
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SecurityScreen()));
+              Uri url = Uri.parse(
+                  "http://api.visionsoft-pk.com:8181/ords/skr2/app/getappvrs?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_appname=SALESMAN");
+              var versionResponse = await http.get(url);
+              var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
+              var version = versionDecode['results'][0]['VERSION'];
+              print(version);
+              if (version.toString() == "030922"){
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (_) => SecurityScreen()));
+              } else {
+                Future.delayed(Duration(seconds: 1),(){
+                  Alert(
+                    context: context,
+                    type: AlertType.warning,
+                    title: "New Version is available",
+                    desc: "Please update your app first",
+                    style: AlertStyle(
+                        descStyle:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.normal)),
+                    buttons: [
+                      DialogButton(
+                        color: Colors.red,
+                        child: Text(
+                          "Update Now",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () => launchAppStore  (
+                            "https://play.google.com/store/apps/details?id=com.suqexpress.retailer"),
+                        width: 120,
+                      )
+                    ],
+                  ).show();
+                });
+              }
+              // FirebaseAuth _auth = FirebaseAuth.instance;
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => SecurityScreen()));
             } // Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCodeScreen(verificationCode: "123",phoneNo: widget.phoneNumber,password: _passController.text,)))
             else if (response.statusCode == 401) {
               Alert(
@@ -201,5 +239,13 @@ class _SplashScreenState extends State<SplashScreen> {
             ],
           ),
         ));
+  }
+  Future<void> launchAppStore(String appStoreLink) async {
+    debugPrint(appStoreLink);
+    if (await canLaunch(appStoreLink)) {
+      await launch(appStoreLink);
+    } else {
+      throw 'Could not launch appStoreLink';
+    }
   }
 }
