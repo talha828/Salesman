@@ -29,31 +29,31 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _serviceEnabled=false;
-  getVersion() async {
-    Location location = new Location();
-    _serviceEnabled = await location.serviceEnabled();
-    Uri url = Uri.parse("https://erp.suqexpress.com/api/appversion/1");
-    var response = await http.get(url);
-    var data = jsonDecode(response.body);
-    if (data['data'] == "0") {
-      openLocationFirst();
-    } else {
-      AwesomeDialog(
-          context: context,
-          dialogType: DialogType.INFO_REVERSED,
-          animType: AnimType.BOTTOMSLIDE,
-          title: "Up-date your app",
-          desc:
-          "New version is available on play store. Please update your app",
-          btnOkText: "Update Now",
-          btnCancelText: "Ok",
-          dismissOnBackKeyPress: false,
-          dismissOnTouchOutside: false,
-          btnOkOnPress: () async {
-            getVersion();
-          }).show();
-    }
-  }
+  // getVersion() async {
+  //   Location location = new Location();
+  //   _serviceEnabled = await location.serviceEnabled();
+  //   Uri url = Uri.parse("https://erp.suqexpress.com/api/appversion/1");
+  //   var response = await http.get(url);
+  //   var data = jsonDecode(response.body);
+  //   if (data['data'] == "0") {
+  //     openLocationFirst();
+  //   } else {
+  //     AwesomeDialog(
+  //         context: context,
+  //         dialogType: DialogType.INFO_REVERSED,
+  //         animType: AnimType.BOTTOMSLIDE,
+  //         title: "Up-date your app",
+  //         desc:
+  //         "New version is available on play store. Please update your app",
+  //         btnOkText: "Update Now",
+  //         btnCancelText: "Ok",
+  //         dismissOnBackKeyPress: false,
+  //         dismissOnTouchOutside: false,
+  //         btnOkOnPress: () async {
+  //           getVersion();
+  //         }).show();
+  //   }
+  // }
   getLogin()async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     phoneNumber = pref.getString("phoneno");
@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
               var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
               var version = versionDecode['results'][0]['VERSION'];
               print(version);
-              if (version.toString() == "030922"){
+              if (version.toString() == "251022"){
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (_) => SecurityScreen()));
               } else {
@@ -218,7 +218,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
   @override
   void initState() {
-    getVersion();
+    getLogin();
     super.initState();
   }
   @override
