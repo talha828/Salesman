@@ -9,9 +9,6 @@ import 'package:salesmen_app_new/model/history_model_new.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:shimmer/shimmer.dart';
-
-
-import 'history_details_screen.dart';
 class HistoryScreen extends StatefulWidget {
 
   @override

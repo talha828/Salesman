@@ -1,16 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:http/http.dart'as http;
+import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
-import 'package:location/location.dart' as loc;
-import 'package:http/http.dart'as http;
 
 class SucessFullyVerifiedForgetPasswordScreen extends StatefulWidget {
   @override

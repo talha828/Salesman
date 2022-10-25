@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:dio/dio.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app_new/api/Auth/auth.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
-import 'package:salesmen_app_new/screen/child_lock/security_screen.dart';
-import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/screen/ForgetPasswordScreen/verify_phone_no_screen.dart';
 import 'package:salesmen_app_new/screen/loginScreen/verificationcodescreen.dart';
 import 'package:url_launcher/url_launcher.dart';

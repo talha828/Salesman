@@ -1,32 +1,26 @@
 import 'dart:convert';
-import 'package:badges/badges.dart';
-import 'package:geolocator/geolocator.dart' as geo;
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoder/model.dart';
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
-import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
-import 'package:salesmen_app_new/model/delivery_model.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
-import 'package:salesmen_app_new/screen/EditShop/edit_shop.dart';
-import 'package:salesmen_app_new/screen/MechanicScreen/mechanicScreen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
-import 'package:salesmen_app_new/widget/loding_indicator.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/screen/EditShop/edit_shop.dart';
+import 'package:salesmen_app_new/screen/MechanicScreen/mechanicScreen.dart';
 import 'package:salesmen_app_new/screen/OrderScreen/categories_screen.dart';
 import 'package:salesmen_app_new/screen/deliveryScreen/deliveryScreen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
+import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/screen/other/other.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentScreen.dart';
 

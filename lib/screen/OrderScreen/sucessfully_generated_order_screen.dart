@@ -5,7 +5,6 @@ import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 
 
 class SucessFullyGeneratedOrderScreen extends StatefulWidget {

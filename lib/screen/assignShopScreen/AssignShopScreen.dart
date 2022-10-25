@@ -1,25 +1,22 @@
 import 'dart:convert';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:location/location.dart' as loc;
+import 'dart:math' show cos, sqrt, asin;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/model.dart';
 import 'package:http/http.dart'as http;
+import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
+import 'package:salesmen_app_new/others/common.dart';
+import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
-import 'package:salesmen_app_new/widget/customer_card.dart';
-import 'package:salesmen_app_new/widget/loding_indicator.dart';
-import 'package:salesmen_app_new/others/common.dart';
-import 'package:salesmen_app_new/others/style.dart';
-import 'dart:math' show cos, sqrt, asin;
-
 import 'package:shimmer/shimmer.dart';
 class AssignShopScreen extends StatefulWidget {
   List<CustomerModel> customer;

@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +10,12 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/others/common.dart';
+import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentSuccessfull.dart';
+import 'package:salesmen_app_new/screen/paymentScreen/payment_using_checque.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/pin_payment_screen.dart';
 import 'package:salesmen_app_new/widget/loding_indicator.dart';
-import 'package:salesmen_app_new/others/common.dart';
-import 'dart:math';
-
-import 'package:salesmen_app_new/others/style.dart';
-import 'package:salesmen_app_new/screen/paymentScreen/payment_using_checque.dart';
 
 class PaymentScreen extends StatefulWidget {
 /*  CustomerModel customerData;

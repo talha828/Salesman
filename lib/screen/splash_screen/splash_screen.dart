@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:dio/dio.dart';
-import 'package:http/http.dart'as http;
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart'as http;
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -14,9 +11,6 @@ import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/child_lock/security_screen.dart';
-import 'package:salesmen_app_new/screen/loginScreen/login_screen.dart';
-import 'package:salesmen_app_new/screen/loginScreen/verify_phoneno_screen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
 import 'package:salesmen_app_new/screen/splash_screen/get_started_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,9 +1,7 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
-import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';

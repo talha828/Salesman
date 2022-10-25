@@ -2,16 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-
-///image picker use here
-//import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';

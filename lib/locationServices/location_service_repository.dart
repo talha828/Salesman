@@ -6,7 +6,6 @@ import 'dart:ui';
 import 'package:background_locator/location_dto.dart';
 import 'package:salesmen_app_new/locationServices/broadcast.dart';
 
-
 import 'file_manager.dart';
 
 class LocationServiceRepository {

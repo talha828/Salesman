@@ -9,6 +9,7 @@ import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/screen/loginScreen/sucessfully_verified_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../others/common.dart';
 import '../../others/style.dart';
 

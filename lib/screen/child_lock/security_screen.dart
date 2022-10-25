@@ -1,22 +1,10 @@
-import 'dart:convert';
-import 'package:geolocator/geolocator.dart' as geo;
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
-import 'package:otp_text_field/otp_field.dart';
-import 'package:otp_text_field/otp_field_style.dart';
-import 'package:otp_text_field/style.dart';
-import 'package:provider/provider.dart';
-import 'package:salesmen_app_new/api/Auth/online_database.dart';
-import 'package:salesmen_app_new/model/addressModel.dart';
-import 'package:salesmen_app_new/model/customerList.dart';
-import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
-import 'package:location/location.dart' as loc;
-import 'package:http/http.dart'as http;
 class SecurityScreen extends StatefulWidget {
   const SecurityScreen({Key key}) : super(key: key);
 

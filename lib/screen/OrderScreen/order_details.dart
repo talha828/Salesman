@@ -1,10 +1,8 @@
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';

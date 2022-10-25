@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
@@ -13,7 +12,6 @@ import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';

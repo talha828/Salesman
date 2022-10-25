@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:salesmen_app_new/others/style.dart';
 
 class LoadingIndicator extends StatelessWidget {

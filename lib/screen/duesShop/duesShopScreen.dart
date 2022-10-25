@@ -1,14 +1,16 @@
 import 'dart:convert';
+import 'dart:math' show cos, sqrt, asin;
+
 import 'package:background_locator/background_locator.dart';
 import 'package:background_locator/settings/android_settings.dart';
 import 'package:background_locator/settings/ios_settings.dart';
 import 'package:background_locator/settings/locator_settings.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:location/location.dart' as loc;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/model.dart';
 import 'package:http/http.dart'as http;
+import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/globalvariable.dart';
@@ -16,17 +18,12 @@ import 'package:salesmen_app_new/locationServices/location_callback_handler.dart
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
-import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
+import 'package:salesmen_app_new/others/common.dart';
+import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
-import 'package:salesmen_app_new/widget/customer_card.dart';
-import 'package:salesmen_app_new/widget/loding_indicator.dart';
-import 'package:salesmen_app_new/others/common.dart';
-import 'package:salesmen_app_new/others/style.dart';
-import 'dart:math' show cos, sqrt, asin;
-
 import 'package:shimmer/shimmer.dart';
 class DuesShopScreen extends StatefulWidget {
 UserModel user;

@@ -1,10 +1,12 @@
+import 'dart:math' show cos, sqrt, asin;
+
 import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
+
 import 'customerModel.dart';
-import 'dart:math' show cos, sqrt, asin;
 
 class CustomerList extends ChangeNotifier{
   //loader

@@ -7,10 +7,6 @@ import 'package:salesmen_app_new/model/new_customer_model.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/others/style.dart';
-import 'package:salesmen_app_new/screen/MechanicScreen/addMechanicScreen.dart';
-import 'package:salesmen_app_new/screen/MechanicScreen/successfully_add_mechanic_screen.dart';
-import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
-import 'package:salesmen_app_new/screen/splash_screen/get_started_screen.dart';
 import 'package:salesmen_app_new/screen/splash_screen/splash_screen.dart';
 
 void main() async{

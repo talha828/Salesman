@@ -1,17 +1,7 @@
-import 'dart:convert';
-import 'package:location/location.dart' as loc;
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoder/geocoder.dart';
-import 'package:provider/provider.dart';
-import 'package:salesmen_app_new/api/Auth/online_database.dart';
-import 'package:salesmen_app_new/model/addressModel.dart';
-import 'package:salesmen_app_new/model/customerList.dart';
-import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
-import 'package:geolocator/geolocator.dart' as geo;
+
 import '../../others/common.dart';
 import '../../others/style.dart';
 

@@ -1,6 +1,7 @@
+import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:salesmen_app_new/screen/splash_screen/splash_screen.dart';
-import 'package:delayed_display/delayed_display.dart';
+
 import '../../others/common.dart';
 import '../../others/style.dart';
 class NoInterNetConnection extends StatefulWidget {

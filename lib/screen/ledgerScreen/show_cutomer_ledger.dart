@@ -4,7 +4,6 @@ import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/legder_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 
-
 import '../../ledger_screen.dart';
 
 class ShowCustomerLedger extends StatefulWidget {
