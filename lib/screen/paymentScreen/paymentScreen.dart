@@ -1,4 +1,3 @@
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +66,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    CustomerModel customerData=Provider.of<CustomerList>(context).singleCustomer;
+    CustomerModel customerData =
+        Provider.of<CustomerList>(context).singleCustomer;
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
@@ -87,11 +87,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           body: SingleChildScrollView(
             child:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               SizedBox(
                 height: height * sizedboxvalue,
               ),
-              paymentDetailsBlock(height, width,customerData),
+              paymentDetailsBlock(height, width, customerData),
             ]),
           ),
           /*   bottomNavigationBar: BottomAppBar(
@@ -163,12 +163,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
               )
           ),*/
         ),
-        isLoading ? Positioned.fill(child: LoadingIndicator(width: width,height: height,)) : Container()
+        isLoading
+            ? Positioned.fill(
+                child: LoadingIndicator(
+                width: width,
+                height: height,
+              ))
+            : Container()
       ],
     );
   }
 
-  Widget paymentDetailsBlock(double height, double width,CustomerModel customerData) {
+  Widget paymentDetailsBlock(
+      double height, double width, CustomerModel customerData) {
     final userData = Provider.of<UserModel>(context, listen: true);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,101 +227,126 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               _onselected(index);
                               paymentType['payment'][index]['name'] == 'Cash'
                                   ? showDialog(
-                                height,
-                                width,
-                                paymentType['payment'][index],
-                                    (amount, name) async {
-                                  totalAmount = amount;
-                                  Name = name;
-                                  showAmount = true;
-                                  setState(() {
-                                  });
-                                  if (validateFields()) {
-                                    Navigator.of(context).pop();
-                                    setLoading(true);
-                                    List<String> tempContact = [];
-                                    if(customerData.customerContactNumber != null){
-                                      tempContact.add(customerData.customerContactNumber.substring(0, customerData.customerContactNumber.length));
-                                    }
-                                    // if(widget.customerData.customerContactNumber2 != null){
-                                    //   tempContact.add(widget.customerData.customerContactNumber2);
-                                    // }else{
-                                    //   //tempContact.add('+923340243440');
-                                    // }
-                                    // String msgPin = '';
-                                    // var rng = Random();
-                                    // for (var i = 0; i < 4; i++) {
-                                    //   msgPin += rng.nextInt(9).toString();
-                                    // }
-                                    // print(msgPin);
-                                    // String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.userName} %26 Download app https://bit.ly/38uffP8';
-                                    // msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
-                                    // msgData += '\n';
-                                    // msgData +=' ';
-                                    // username = userData.userName;
-                                    //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
-                                    // String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کی رقم ادا کی ہے۔";
-                                    // msgData += '\n';
-                                    // msgData += 'آگر یہ رقم درست ہے تو کنفرمیش کے لئے $msgPin ہمارے نمائندے کو بتا دیجئے۔';
-                                    // msgData += '\n';
-                                    // msgData += 'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
-                                    // msgData += '\n';
-                                    // msgData += 'شکریہ۔';
-                                   // var response = await OnlineDatabase.sendText(tempContact[0], msgData);
-                                    var dio = new Dio();
-                                    String url = "https://erp.suqexpress.com/api/getcode";
-                                    Map<String, dynamic> map = {
-                                      "purpose": 2,
-                                      "number": tempContact.first,
-                                      "amount": totalAmount,
-                                      "customer_id":customerData.customerCode,
-                                      "emp_name": userData.userName,
-                                    };
-                                    FormData formData = FormData.fromMap(map);
-                                    //TODO sms post
-                                    Response smsResponse =
-                                    await dio.post(url, data: formData).catchError((e){
-                                      setLoading(false);
-                                      Fluttertoast.showToast(
-                                          msg: e.response.data["message"].toString(),
-                                          toastLength: Toast.LENGTH_SHORT);
-                                    });
-                                    print(smsResponse.data.toString());
-                                    if(smsResponse.statusCode == 200){
-                                      setLoading(false);
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => PaymentPin(
-                                                userName:userData.userName,
-                                                total: totalAmount,
-                                                customer:customerData,
-                                                pin: smsResponse.data["code"].toString(),
-                                                contactNumbers: tempContact,
-                                                onSuccess: (){
-                                                  print("@@@@@@@@@@@@@");
-                                                  //setLoading(false);
-                                                  postPayment(userData,customerData);
-                                                },
-                                              )
-                                          ));
-                                    }else{
-                                      setLoading(false);
-                                      Fluttertoast.showToast(
-                                          msg: "Code not sent, Try again",
-                                          toastLength: Toast.LENGTH_SHORT);
-                                    }
-                                  }
-                                },
-                              )
+                                      height,
+                                      width,
+                                      paymentType['payment'][index],
+                                      (amount, name) async {
+                                        totalAmount = amount;
+                                        Name = name;
+                                        showAmount = true;
+                                        setState(() {});
+                                        if (validateFields()) {
+                                          Navigator.of(context).pop();
+                                          setLoading(true);
+                                          List<String> tempContact = [];
+                                          if (customerData
+                                                  .customerContactNumber !=
+                                              null) {
+                                            tempContact.add(customerData
+                                                .customerContactNumber
+                                                .substring(
+                                                    0,
+                                                    customerData
+                                                        .customerContactNumber
+                                                        .length));
+                                          }
+                                          print(tempContact);
+                                          // if(widget.customerData.customerContactNumber2 != null){
+                                          //   tempContact.add(widget.customerData.customerContactNumber2);
+                                          // }else{
+                                          //   //tempContact.add('+923340243440');
+                                          // }
+                                          // String msgPin = '';
+                                          // var rng = Random();
+                                          // for (var i = 0; i < 4; i++) {
+                                          //   msgPin += rng.nextInt(9).toString();
+                                          // }
+                                          // print(msgPin);
+                                          // String msgData='Use $msgPin  to confirm Rs  $totalAmount to ${userData.userName} %26 Download app https://bit.ly/38uffP8';
+                                          // msgData+= ' ID: ${tempContact[0]} Pass: 555 or Call 03330133520';
+                                          // msgData += '\n';
+                                          // msgData +=' ';
+                                          // username = userData.userName;
+                                          //String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کا آرڈر دیا ہے۔\nشکریہ۔";
+                                          // String msgData = "آپ نے ہمارے نمائندے ${userData.userName} کو $totalAmount کی رقم ادا کی ہے۔";
+                                          // msgData += '\n';
+                                          // msgData += 'آگر یہ رقم درست ہے تو کنفرمیش کے لئے $msgPin ہمارے نمائندے کو بتا دیجئے۔';
+                                          // msgData += '\n';
+                                          // msgData += 'آگر یہ رقم درست نہیں تو ہمارے نمائندے کو نہیں بتاۂے۔';
+                                          // msgData += '\n';
+                                          // msgData += 'شکریہ۔';
+                                          // var response = await OnlineDatabase.sendText(tempContact[0], msgData);
+                                          var dio = new Dio();
+                                          String url =
+                                              "https://erp.suqexpress.com/api/getcode";
+                                          Map<String, dynamic> map = {
+                                            "purpose": 2,
+                                            "number": tempContact.first,
+                                            "amount": totalAmount,
+                                            "customer_id":
+                                                customerData.customerCode,
+                                            "emp_name": userData.userName,
+                                          };
+                                          FormData formData =
+                                              FormData.fromMap(map);
+                                          //TODO sms post
+                                          Response smsResponse = await dio
+                                              .post(url, data: formData)
+                                              .catchError((e) {
+                                            setLoading(false);
+                                            Fluttertoast.showToast(
+                                                msg: e.response.data["message"]
+                                                    .toString(),
+                                                toastLength:
+                                                    Toast.LENGTH_SHORT);
+                                          });
+                                          print(smsResponse.data.toString());
+                                          if (smsResponse.statusCode == 200) {
+                                            setLoading(false);
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PaymentPin(
+                                                          userName:
+                                                              userData.userName,
+                                                          total: totalAmount,
+                                                          customer:
+                                                              customerData,
+                                                          pin: smsResponse
+                                                              .data["code"]
+                                                              .toString(),
+                                                          contactNumbers:
+                                                              tempContact,
+                                                          onSuccess: () {
+                                                            print(
+                                                                "@@@@@@@@@@@@@");
+                                                            //setLoading(false);
+                                                            postPayment(
+                                                                userData,
+                                                                customerData);
+                                                          },
+                                                        )));
+                                          } else {
+                                            setLoading(false);
+                                            Fluttertoast.showToast(
+                                                msg: "Code not sent, Try again",
+                                                toastLength:
+                                                    Toast.LENGTH_SHORT);
+                                          }
+                                        }
+                                      },
+                                    )
                                   : Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => PaymentUsingCheck(
-                                        customerData: customerData,
-                                        paymentTypedetails:
-                                        paymentType['payment']
-                                        [index],)));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PaymentUsingCheck(
+                                                customerData: customerData,
+                                                paymentTypedetails:
+                                                    paymentType['payment']
+                                                        [index],
+                                              )));
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -323,8 +355,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   height: height * 0.025,
                                   width: height * 0.025,
                                   decoration: BoxDecoration(
-                                    //color:Colors.red,
-                                    //color: selectedIndex[index]==true ? themeColor1 : Colors.white,
+                                      //color:Colors.red,
+                                      //color: selectedIndex[index]==true ? themeColor1 : Colors.white,
                                       border: Border.all(
                                           color: paymenttypeSelected == index
                                               ? Color(0xff323232)
@@ -334,8 +366,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   child: Center(
                                       child: paymenttypeSelected == index
                                           ? Icon(Icons.circle,
-                                          size: 11,
-                                          color: Color(0xff323232))
+                                              size: 11,
+                                              color: Color(0xff323232))
                                           : Container()),
                                 ),
                                 SizedBox(
@@ -364,25 +396,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 Spacer(),
                                 showAmount
                                     ? Container(
-                                  child: paymenttypeSelected == index
-                                      ? VariableText(
-                                    text: 'Rs.$totalAmount',
-                                    fontsize: 13,
-                                    fontcolor: textcolorblack,
-                                    weight: FontWeight.w700,
-                                    fontFamily: fontRegular,
-                                  )
-                                      : Container(),
-                                )
+                                        child: paymenttypeSelected == index
+                                            ? VariableText(
+                                                text: 'Rs.$totalAmount',
+                                                fontsize: 13,
+                                                fontcolor: textcolorblack,
+                                                weight: FontWeight.w700,
+                                                fontFamily: fontRegular,
+                                              )
+                                            : Container(),
+                                      )
                                     : Container(
-                                  child: paymenttypeSelected == index
-                                      ? Icon(
-                                    Icons.check,
-                                    color: themeColor1,
-                                    size: 20,
-                                  )
-                                      : Container(),
-                                ),
+                                        child: paymenttypeSelected == index
+                                            ? Icon(
+                                                Icons.check,
+                                                color: themeColor1,
+                                                size: 20,
+                                              )
+                                            : Container(),
+                                      ),
                               ],
                             ),
                           )),
@@ -399,13 +431,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-
-
   bool validateFields() {
     bool ok = false;
     if (Name.isNotEmpty) {
       if (totalAmount.isNotEmpty) {
-        ok=true;
+        ok = true;
       } else {
         Fluttertoast.showToast(
             msg: "Please Enter Amount", toastLength: Toast.LENGTH_SHORT);
@@ -416,19 +446,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
     return ok;
   }
-  postPayment(UserModel user,CustomerModel customer) async {
+
+  postPayment(UserModel user, CustomerModel customer) async {
     try {
-      var location=await Location().getLocation();
+      var location = await Location().getLocation();
       setLoading(true);
-      var response = await OnlineDatabase.newpostPayment(emp_id: user.userID,customerCode: customer.customerCode,lat: location.latitude.toString(),long: location.longitude.toString(),amount: totalAmount,name: Name,paymentMode: '1');
+      var response = await OnlineDatabase.newpostPayment(
+          emp_id: user.userID,
+          customerCode: customer.customerCode,
+          lat: location.latitude.toString(),
+          long: location.longitude.toString(),
+          amount: totalAmount,
+          name: Name,
+          paymentMode: '1');
       print("status code is" + response.statusCode.toString());
       if (response.statusCode == 200) {
         // var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
         // print("response is"+respnseData['results'].toString());
 
         List<String> tempContact = [];
-        if(customer.customerContactNumber != null){
-          tempContact.add(customer.customerContactNumber.substring(0, customer.customerContactNumber.length));
+        if (customer.customerContactNumber != null) {
+          tempContact.add(customer.customerContactNumber
+              .substring(0, customer.customerContactNumber.length));
         }
         // if(widget.customerData.customerContactNumber2 != null){
         //   tempContact.add(widget.customerData.customerContactNumber2);
@@ -452,7 +491,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
             backgroundColor: Colors.black87,
             textColor: Colors.white,
             fontSize: 16.0);
-        Navigator.push(context,MaterialPageRoute(builder: (_)=>SucessFullyRecivePaymentScreen(customer: customer,)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => SucessFullyRecivePaymentScreen(
+                      customer: customer,
+                    )));
       } else {
         setLoading(false);
         Fluttertoast.showToast(
@@ -463,7 +507,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           fontSize: 16.0,
         );
       }
-    } catch (e,stack) {
+    } catch (e, stack) {
       setLoading(false);
       Fluttertoast.showToast(
         msg: e.response.data["message"].toString(),
@@ -472,9 +516,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      print("exception in post payment method is" + e.toString()+stack.toString());
+      print("exception in post payment method is" +
+          e.toString() +
+          stack.toString());
     }
   }
+
   // postPayment(CustomerModel customer) async {
   //   try {
   //     setLoading(true);
@@ -855,6 +902,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ],
       );
     }
+
     AwesomeDialog(
       context: context,
       animType: AnimType.SCALE,
@@ -907,7 +955,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),*/
                 child: Center(
                     child:
-                    Image.asset(paymentTypedetails['image1'], scale: 2.5)),
+                        Image.asset(paymentTypedetails['image1'], scale: 2.5)),
               ),
               paymentTypedetails['name'] == 'Cheque'
                   ? checkBody(height, width)
@@ -917,9 +965,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
               GestureDetector(
                 onTap: () {
-
                   onselected(amount.text.toString(), name.text);
-
                 },
                 child: Container(
                   height: height * 0.06,

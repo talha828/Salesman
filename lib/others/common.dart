@@ -2088,11 +2088,19 @@ class _SingleProductTileState extends State<SingleProductTile> {
                                 textAlign: TextAlign.center,
                                 keyboardType: TextInputType.number,
                                 onChanged: (v) {
-                                  setState(() {
-                                    count = int.parse(v);
-                                  });
-                                  widget.onquantityUpdate(count);
-                                },
+                                  if(int.parse(v.toString())<=widget.productDetails.availableQuantity){
+                                          setState(() {
+                                            count = int.parse(v);
+                                          });
+                                          widget.onquantityUpdate(count);
+                                        }else{
+                                    setState(() {
+                                      count = int.parse(widget.productDetails.availableQuantity.toString());
+                                      itemCount=TextEditingController(text: widget.productDetails.availableQuantity.toString());
+                                    });
+                                    widget.onquantityUpdate(widget.productDetails.availableQuantity);
+                                  }
+                                      },
                                 decoration: InputDecoration(
                                   hintText: count.toString(),
                                   hintStyle: TextStyle(
@@ -2110,15 +2118,19 @@ class _SingleProductTileState extends State<SingleProductTile> {
                             ),
                             InkWell(
                               onTap: () {
-                                if (count > 0) {
-                                  setState(() {
-                                    count++;
-                                    itemCount.text = count.toString();
-                                    //subtotal=(count*int.parse(widget.productData.price.split('.')[0]));
-                                  });
-                                  widget.onquantityUpdate(count);
+                                if(count<widget.productDetails.availableQuantity){
+                                        if (count > 0) {
+                                          setState(() {
+                                            count++;
+                                            itemCount.text = count.toString();
+                                            //subtotal=(count*int.parse(widget.productData.price.split('.')[0]));
+                                          });
+                                          widget.onquantityUpdate(count);
+                                        }
+                                      }else{
+                                  Fluttertoast.showToast(msg: "You reach the stock limit");
                                 }
-                              },
+                                    },
                               child: Container(
                                 height: ratio * 16,
                                 width: ratio * 16,
@@ -2176,12 +2188,35 @@ class _SingleProductTileState extends State<SingleProductTile> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        VariableText(
-                          text: 'Code : ${widget.productDetails.productCode}',
-                          fontsize: 12,
-                          fontFamily: fontRegular,
-                          fontcolor: Color(0xff333333),
-                          weight: FontWeight.w400,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            VariableText(
+                              text: 'Code : ${widget.productDetails.productCode}',
+                              fontsize: 12,
+                              fontFamily: fontRegular,
+                              fontcolor: Color(0xff333333),
+                              weight: FontWeight.w400,
+                            ),
+                            Row(
+                              children: [
+                                VariableText(
+                                  text: 'Stock : ',
+                                  fontsize: 12,
+                                  fontFamily: fontRegular,
+                                  fontcolor: Color(0xff333333),
+                                  weight: FontWeight.w400,
+                                ),
+                                VariableText(
+                                  text: '${widget.productDetails.availableQuantity}',
+                                  fontsize: 15,
+                                  fontFamily: fontRegular,
+                                  fontcolor: themeColor1,
+                                  weight: FontWeight.w400,
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                         SizedBox(
                           height: height * 0.0095,

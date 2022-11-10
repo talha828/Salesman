@@ -12,7 +12,7 @@ import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends StatefulWidget{
 
 
   @override

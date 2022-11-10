@@ -56,20 +56,16 @@ class _SplashScreenState extends State<SplashScreen> {
       var response = await Auth.getLogin(phoneNo: phoneNumber,
           password: password,
           onSuccess: (response) async {
-            //print("status ${response.statusCode}");
             if (response.statusCode == 200) {
               var data = jsonDecode(utf8.decode(response.bodyBytes));
-              // var data=jsonDecode(response.toString());
-              // print(data['success']);
-              await Provider.of<UserModel>(context, listen: false).userSignIn(
-                  data);
+              await Provider.of<UserModel>(context, listen: false).userSignIn(data);
               Uri url = Uri.parse(
                   "http://api.visionsoft-pk.com:8181/ords/skr2/app/getappvrs?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_appname=SALESMAN");
               var versionResponse = await http.get(url);
               var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
               var version = versionDecode['results'][0]['VERSION'];
               print(version);
-              if (version.toString() == "251022"){
+              if (version.toString() == "101122"){
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (_) => SecurityScreen()));
               } else {
@@ -92,8 +88,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               fontSize: 15,
                               fontWeight: FontWeight.bold),
                         ),
-                        onPressed: () => launchAppStore  (
-                            "https://play.google.com/store/apps/details?id=com.suqexpress.retailer"),
+                        onPressed: () {},
                         width: 120,
                       )
                     ],

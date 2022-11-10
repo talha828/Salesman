@@ -369,7 +369,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                     cartModel: cartList[index],
                                     total: total[index],
                                     onTap: () async {
-                                      if (paymentType != 0) {
+                                      if (paymentType != 0){
                                         setLoading(true);
                                         Location _location=new Location();
                                         var data =await _location.getLocation();

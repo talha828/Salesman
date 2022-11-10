@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
@@ -52,6 +53,8 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
           productPrice: item.productPrice,
           productCode: item.productCode,
           price: item.price,
+          stockQuantity: item.stockQuantity,
+          availableQuantity: item.availableQuantity,
           productDescription: item.productDescription,
           imageUrl: item.imageUrl,
           outOfStock: item.outOfStock
@@ -168,28 +171,40 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
                                     productDetails: productsearchresult[index],
                                     ontap: () {
                                       if (productCartbtn[index] == false) {
-                                        setState(() {
-                                          productCartbtn[index] = true;
-                                          addToCart = true;
-                                          widget.onAddToCart();
-                                          Provider.of<CartModel>(context,
-                                                  listen: false)
-                                              .addToCart(
-                                                  item: CartItem(
-                                                      productName: productsearchresult[index],
-                                                      itemCount: 1,
-                                                      itemPrice:
-                                                      productsearchresult[index].price,
-                                                      subTotalPrice:
-                                                      productsearchresult[index].price,
-                                                      priceModel: productsearchresult[index]
-                                                          .productPrice,
-                                                      itemcountController:
-                                                          TextEditingController(
-                                                              text: '1')),
-                                                  itemC: 1);
-                                          print("Item added!!!!!!!!!!");
-                                        });
+                                        if(productsearchresult[index].availableQuantity>0){
+                                          setState(() {
+                                            productCartbtn[index] = true;
+                                            addToCart = true;
+                                            widget.onAddToCart();
+                                            Provider.of<CartModel>(context,
+                                                    listen: false)
+                                                .addToCart(
+                                                    item: CartItem(
+                                                        productName:
+                                                            productsearchresult[
+                                                                index],
+                                                        itemCount: 1,
+                                                        itemPrice:
+                                                            productsearchresult[
+                                                                    index]
+                                                                .price,
+                                                        subTotalPrice:
+                                                            productsearchresult[
+                                                                    index]
+                                                                .price,
+                                                        priceModel:
+                                                            productsearchresult[
+                                                                    index]
+                                                                .productPrice,
+                                                        itemcountController:
+                                                            TextEditingController(
+                                                                text: '1')),
+                                                    itemC: 1);
+                                            print("Item added!!!!!!!!!!");
+                                          });
+                                        }else{
+                                          Fluttertoast.showToast(msg: "Stock is not available");
+                                        }
                                       }else{
                                         print("Already in cart");
                                       }

@@ -25,47 +25,6 @@ class OnlineDatabase{
     final response = await http.get(url);
     return response;
   }
-  static Future<dynamic> newpostPayment({String emp_id,String customerCode, String imageUrl, String lat, String long, String paymentMode, String checkNumber, String amount, String name, String date})async{
-
-    String url="http://erp.suqexpress.com/api/collection";
-    Map<String,dynamic> cash={
-      "employee_id":emp_id,
-      "customer_id":customerCode,
-      "phone":phoneNumber,
-      "password":password,
-      "lat":lat,
-      "long":long,
-      "payment_method":paymentMode,
-      "amount":amount,
-      "received_from":name,
-    };
-    Map<String,dynamic> cheque={
-      "employee_id":emp_id,
-      "customer_id":customerCode,
-      "phone":phoneNumber,
-      "password":password,
-      "lat":lat,
-      "long":long,
-      "payment_method":paymentMode,
-      "amount":amount,
-      "received_from":name,
-      "cheque_no":checkNumber,
-      "cheque_date":date,
-      "cheque_image":imageUrl,
-      "create_at":0,
-    };
-    try{
-      var dio = Dio();
-      print(paymentMode=="1"?cash:cheque);
-      String url="http://erp.suqexpress.com/api/collection";
-      FormData formData = new FormData.fromMap(paymentMode=="1"?cash:cheque);
-      var response=await dio.post(url,data: formData);
-      return response;
-    }
-    catch(e){
-      print("exception in post payment api is: "+e.toString());
-    }
-  }
   static Future<dynamic> postPayment({String customerCode, String imageUrl, String lat, String long, String paymentMode, String checkNumber, String amount, String name, String date}){
     String url=
     paymentMode=='1'?
@@ -299,83 +258,6 @@ class OnlineDatabase{
     }
   }
 
-  static Future<dynamic> newpostSalesOrder({CartModel cartData, String customerCode, String lat, String long,String paymentMethod,String emp_id,String sub_total, String brand}) async {
-    // var url =Uri.parse(directory+ 'postsalesorder?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_longitude=$long&pin_latitude=$lat&file_type=json&file_name=&pin_cash_credit=$paymentMethod');
-    // print("post Sales order url is"+url.toString());
-
-    Map<String,dynamic> postData={
-      "employee_id":emp_id,
-      "customer_id":customerCode,
-      "phone":phoneNumber,
-      "password":password,
-      "lat":lat,
-      "long":long,
-      "brand_id":brand,
-      "sub_total":sub_total,
-      "payment_method":paymentMethod,
-      "created_by":0,
-      "items": []
-    };
-    for(var item in cartData.cartItemName){
-      print("Prod_code is "+item.productName.productCode.toString());
-      print("Qty is ${item.itemCount}");
-      print("Rate is ${item.itemPrice}");
-      print("Amount is ${item.itemCount*item.itemPrice}");
-      //Orderitems old json name
-      postData['items']+= [
-        {"Prod_code":item.productName.productCode.toString(),
-          "Qty": item.itemCount,
-          "Rate": item.itemPrice,
-          "Amount": item.itemCount*item.itemPrice
-        },
-      ];}
-    Map<String,dynamic> temp={
-      "Orderitems": []
-    };
-    List<CartItem> templist = [];
-
-    for(int i=0;i<cartData.cartItemName.length;i++){
-      bool isExist=false;
-      print("data is"+cartData.cartItemName[i].productName.productCode.toString());
-      int totalCount = cartData.cartItemName[i].itemCount;
-      for(int j=i+1; i<cartData.cartItemName.length && j < cartData.cartItemName.length; j++){
-        if(cartData.cartItemName[i].productName.productCode ==
-            cartData.cartItemName[j].productName.productCode){
-          totalCount += cartData.cartItemName[j].itemCount;
-        }
-      }
-      print(totalCount.toString());
-      for(int k=0; k<templist.length; k++){
-        if(templist[k].productName.productCode == cartData.cartItemName[i].productName.productCode){
-          isExist=true;
-        }
-      }
-      if(!isExist){
-        templist.add(cartData.cartItemName[i]);
-        //print("temp list is"+templist[0].productName.name);
-        temp['Orderitems']+=[ {"Prod_code":cartData.cartItemName[i].productName.productCode.toString(),
-          "Qty": totalCount,
-          "Rate": cartData.cartItemName[i].itemPrice,
-          "Amount": totalCount*cartData.cartItemName[i].itemPrice
-        },
-        ];
-      }
-
-    }
-    print("length is"+cartData.cartItemName.length.toString());
-    print("post data is"+temp.toString());
-    print(postData);
-    var dio = Dio();
-    String url='http://erp.suqexpress.com/api/saleorder';
-
-    FormData formData = new FormData.fromMap(postData);
-    var response=await dio.post(url,data: formData);
-    // final response = await http.post(
-    //    url,
-    //    body: jsonEncode(temp),
-    //  );
-    return response;
-  }
   static Future<dynamic> sendText(String receiver, String msgData) async {
     String url = 'https://lifetimesms.com/json?api_token=573faa073b82e10a0d9c18b6e5215aa87f2f717165&api_secret=SUQ&to=$receiver&from=8584&message=$msgData';
     // String url = 'https://jsims.com.pk/OnPointSMS.aspx?key=$smsApiKey&sender=SKR&receiver=$receiver&msgdata=$msgData';
@@ -404,30 +286,6 @@ class OnlineDatabase{
     return response;
   }
   // Arsalan post box
-  static Future<dynamic> newpostBoxDeliverDetails({BoxModel boxDetails, int code_id,String customerCode,String amount,String emp_name,String lat, String long,emp_id}) async {
-    Map<String,dynamic> data={
-      "employee_id":emp_id,
-      "emp_name":emp_name,
-      "customer_id":customerCode,
-      "phone":phoneNumber,
-      "password":password,
-      "lat":lat,
-      "long":long,
-      "box_no":boxDetails.trNumber,
-      "amount":amount,
-      "code_id":code_id,
-    };
-    var dio = Dio();
-    print(data);
-    String url="https://erp.suqexpress.com/api/deliverybox";
-    FormData formData = new FormData.fromMap(data);
-    var response=await dio.post(url,data: formData);
-    // final response = await http.post(
-    //   url,
-    // );
-
-    return response;
-  }
 
   static Future<dynamic> editShop({String customerCode,String imageUrl, String lat,String long,String address,String customerName,String customerName2,String customerPhoneNo,String CustomerPhoneNo2, String shopname,String partyCategory,String city,String area ,}){
     String url=directory+'posteditshop?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_shopname=${shopname}&pin_address=$address&pin_partycategory=$partyCategory&'
@@ -634,4 +492,152 @@ class OnlineDatabase{
     var response=dio.get("http://lifetimesms.com/otp?api_token=573faa073b82e10a0d9c18b6e5215aa87f2f717165&api_secret=SUQ&to=$number&from=8584&event_id=57&data=$data");
   return response;
   }
+
+  //Arsalan post Api`s
+  static Future<dynamic> newpostBoxDeliverDetails({BoxModel boxDetails, int code_id,String customerCode,String amount,String emp_name,String lat, String long,emp_id}) async {
+    Map<String,dynamic> data={
+      "employee_id":emp_id,
+      "emp_name":emp_name,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+      "box_no":boxDetails.trNumber,
+      "amount":amount,
+      "code_id":code_id,
+    };
+    var dio = Dio();
+    print(data);
+    String url="https://erp.suqexpress.com/api/deliverybox";
+    FormData formData = new FormData.fromMap(data);
+    var response=await dio.post(url,data: formData);
+    // final response = await http.post(
+    //   url,
+    // );
+
+    return response;
+  }
+
+  static Future<dynamic> newpostSalesOrder({CartModel cartData, String customerCode, String lat, String long,String paymentMethod,String emp_id,String sub_total, String brand}) async {
+    // var url =Uri.parse(directory+ 'postsalesorder?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_longitude=$long&pin_latitude=$lat&file_type=json&file_name=&pin_cash_credit=$paymentMethod');
+    // print("post Sales order url is"+url.toString());
+
+    Map<String,dynamic> postData={
+      "employee_id":emp_id,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+      "brand_id":brand,
+      "sub_total":sub_total,
+      "payment_method":paymentMethod,
+      "created_by":0,
+      "items": []
+    };
+    for(var item in cartData.cartItemName){
+      print("Prod_code is "+item.productName.productCode.toString());
+      print("Qty is ${item.itemCount}");
+      print("Rate is ${item.itemPrice}");
+      print("Amount is ${item.itemCount*item.itemPrice}");
+      //Orderitems old json name
+      postData['items']+= [
+        {"Prod_code":item.productName.productCode.toString(),
+          "Qty": item.itemCount,
+          "Rate": item.itemPrice,
+          "Amount": item.itemCount*item.itemPrice
+        },
+      ];}
+    Map<String,dynamic> temp={
+      "Orderitems": []
+    };
+    List<CartItem> templist = [];
+
+    for(int i=0;i<cartData.cartItemName.length;i++){
+      bool isExist=false;
+      print("data is"+cartData.cartItemName[i].productName.productCode.toString());
+      int totalCount = cartData.cartItemName[i].itemCount;
+      for(int j=i+1; i<cartData.cartItemName.length && j < cartData.cartItemName.length; j++){
+        if(cartData.cartItemName[i].productName.productCode ==
+            cartData.cartItemName[j].productName.productCode){
+          totalCount += cartData.cartItemName[j].itemCount;
+        }
+      }
+      print(totalCount.toString());
+      for(int k=0; k<templist.length; k++){
+        if(templist[k].productName.productCode == cartData.cartItemName[i].productName.productCode){
+          isExist=true;
+        }
+      }
+      if(!isExist){
+        templist.add(cartData.cartItemName[i]);
+        //print("temp list is"+templist[0].productName.name);
+        temp['Orderitems']+=[ {"Prod_code":cartData.cartItemName[i].productName.productCode.toString(),
+          "Qty": totalCount,
+          "Rate": cartData.cartItemName[i].itemPrice,
+          "Amount": totalCount*cartData.cartItemName[i].itemPrice
+        },
+        ];
+      }
+
+    }
+    print("length is"+cartData.cartItemName.length.toString());
+    print("post data is"+temp.toString());
+    print(postData);
+    var dio = Dio();
+    String url='http://erp.suqexpress.com/api/saleorder';
+
+    FormData formData = new FormData.fromMap(postData);
+    print(formData);
+    var response=await dio.post(url,data: formData);
+    // final response = await http.post(
+    //    url,
+    //    body: jsonEncode(temp),
+    //  );
+    return response;
+  }
+
+  static Future<dynamic> newpostPayment({String emp_id,String customerCode, String imageUrl, String lat, String long, String paymentMode, String checkNumber, String amount, String name, String date})async{
+
+    String url="http://erp.suqexpress.com/api/collection";
+    Map<String,dynamic> cash={
+      "employee_id":emp_id,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+      "payment_method":paymentMode,
+      "amount":amount,
+      "received_from":name,
+    };
+    Map<String,dynamic> cheque={
+      "employee_id":emp_id,
+      "customer_id":customerCode,
+      "phone":phoneNumber,
+      "password":password,
+      "lat":lat,
+      "long":long,
+      "payment_method":paymentMode,
+      "amount":amount,
+      "received_from":name,
+      "cheque_no":checkNumber,
+      "cheque_date":date,
+      "cheque_image":imageUrl,
+      "create_at":0,
+    };
+    try{
+      var dio = Dio();
+      print(paymentMode=="1"?cash:cheque);
+      String url="http://erp.suqexpress.com/api/collection";
+      FormData formData = new FormData.fromMap(paymentMode=="1"?cash:cheque);
+      var response=await dio.post(url,data: formData);
+      return response;
+    }
+    catch(e){
+      print("exception in post payment api is: "+e.toString());
+    }
+  }
+
 }

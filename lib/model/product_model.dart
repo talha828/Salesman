@@ -1,33 +1,38 @@
 import 'package:flutter/cupertino.dart';
 
 class ProductModel extends ChangeNotifier {
-   String name;
-   double price;
-   String brand;
-   String model;
-   String productDescription;
-   String outOfStock;
-   String brandId;
-   String productCode;
-   String productMainType;
-   String productSubType;
-   int quantity;
-   String productmaintypeId;
-   String productmaintypeName;
-   List<ProductSubTypes> productsubtypeList = [];
-   List<productPriceModel> productPrice = [];
-   String imageUrl;
+  String name;
+  double price;
+  String brand;
+  String model;
+  String productDescription;
+  String outOfStock;
+  String brandId;
+  String productCode;
+  String productMainType;
+  String productSubType;
+  int quantity;
+  String productmaintypeId;
+  String productmaintypeName;
+  List<ProductSubTypes> productsubtypeList = [];
+  List<productPriceModel> productPrice = [];
+  int availableQuantity;
+  int stockQuantity;
+  String imageUrl;
 
   ProductModel(
-      {  this.name ,
+      {this.name,
       this.price = 0,
-       this.productDescription,
-       this.productCode,
-       this.productPrice,
-        this.brandId,
-       this.imageUrl,
-         this.outOfStock,
-         this.brand,  this.model
+      this.productDescription,
+      this.productCode,
+      this.productPrice,
+      this.brandId,
+      this.imageUrl,
+      this.outOfStock,
+      this.availableQuantity,
+      this.stockQuantity,
+      this.brand,
+      this.model
       //List<productPriceModel> productprice = null
       });
 
@@ -46,8 +51,10 @@ class ProductModel extends ChangeNotifier {
       brand = json['BRAND'];
       brandId = json['BRAND_ID'];
       model = json['MODEL'];
-      imageUrl =json['IMAGE_URL'] == "no image" ? null : json['IMAGE_URL'];
-          /* "https://suqexpress.com/assets/images/product/1644320668_5659_download.jpg";*/  //== "no image" ? null : json['IMAGE_URL'];
+      stockQuantity= json['STOCK_QTY'];
+      availableQuantity =json['AVAIL_QTY'];
+      imageUrl = json['IMAGE_URL'] == "no image" ? null : json['IMAGE_URL'];
+      /* "https://suqexpress.com/assets/images/product/1644320668_5659_download.jpg";*/ //== "no image" ? null : json['IMAGE_URL'];
       outOfStock = json['OUTOFSTOCK'] ?? 'N';
       productDescription =
           (json['DESCRIPTION'] == null ? null : json['DESCRIPTION'].toString());
@@ -83,8 +90,8 @@ class ProductModel extends ChangeNotifier {
 }
 
 class productPriceModel {
-   int min;
-   int max;
+  int min;
+  int max;
   var price;
   productPriceModel({this.price = 0, this.max = 0, this.min = 0});
 
@@ -100,8 +107,8 @@ class productPriceModel {
 }
 
 class ProductSubTypes {
-   String productsubtypeId;
-   String productsubtypeName;
+  String productsubtypeId;
+  String productsubtypeName;
 
   ProductSubTypes();
 

@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
         var version = versionDecode['results'][0]['VERSION'];
         print(version);
-        if (version.toString() == "251022") {
+        if (version.toString() == "101122") {
           FirebaseAuth _auth=  FirebaseAuth.instance;
           _auth.verifyPhoneNumber(
               phoneNumber: widget.phoneNumber,
@@ -139,8 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 15,
                         fontWeight: FontWeight.bold),
                   ),
-                  onPressed: () => launchAppStore(
-                      "https://play.google.com/store/apps/details?id=com.suqexpress.retailer"),
+                  onPressed: () {
+
+                  },
                   width: 120,
                 )
               ],

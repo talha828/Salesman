@@ -420,32 +420,37 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                 productDetails: product[index],
                                 ontap: () {
                                   if (productCartbtn[index] == false) {
-                                    setState(() {
-                                      productCartbtn[index] = true;
-                                      addToCart = true;
-                                      Provider.of<CartModel>(context,
-                                          listen: false)
-                                          .addToCart(
-                                          item: CartItem(
-                                              productName:
-                                              product[index],
-                                              itemCount: 1,
-                                              itemPrice:
-                                              product[index]
-                                                  .price,
-                                              subTotalPrice:
-                                              product[index]
-                                                  .price,
-                                              priceModel:
-                                              product[index]
-                                                  .productPrice,
-                                              itemcountController:
-                                              TextEditingController(
-                                                  text: '1')),
-                                          itemC: 1);
-                                      print("Item added!!!!!!!!!!");
-                                    });
-                                  }
+                                    if(product[index].availableQuantity>0){
+                                              setState(() {
+                                                productCartbtn[index] = true;
+                                                addToCart = true;
+                                                Provider.of<CartModel>(
+                                                        context,
+                                                        listen: false)
+                                                    .addToCart(
+                                                        item: CartItem(
+                                                            productName:
+                                                                product[index],
+                                                            itemCount: 1,
+                                                            itemPrice:
+                                                                product[index]
+                                                                    .price,
+                                                            subTotalPrice:
+                                                                product[index]
+                                                                    .price,
+                                                            priceModel: product[
+                                                                    index]
+                                                                .productPrice,
+                                                            itemcountController:
+                                                                TextEditingController(
+                                                                    text: '1')),
+                                                        itemC: 1);
+                                                print("Item added!!!!!!!!!!");
+                                              });
+                                            }else{
+                                      Fluttertoast.showToast(msg: "Stock is not available");
+                                    }
+                                          }
                                 },
                                 onquantityUpdate: (count) {
                                   Provider.of<CartModel>(context,
