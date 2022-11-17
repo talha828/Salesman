@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -451,8 +453,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     try {
       var location = await Location().getLocation();
       setLoading(true);
-      var response = await OnlineDatabase.newpostPayment(
-          emp_id: user.userID,
+      var response = await OnlineDatabase.postPayment(
+          //emp_id: user.userID,
           customerCode: customer.customerCode,
           lat: location.latitude.toString(),
           long: location.longitude.toString(),
@@ -461,8 +463,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           paymentMode: '1');
       print("status code is" + response.statusCode.toString());
       if (response.statusCode == 200) {
-        // var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
-        // print("response is"+respnseData['results'].toString());
+        var respnseData=jsonDecode(utf8.decode(response.bodyBytes));
+        print("response is"+respnseData['results'].toString());
 
         List<String> tempContact = [];
         if (customer.customerContactNumber != null) {

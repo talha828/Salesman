@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
               var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
               var version = versionDecode['results'][0]['VERSION'];
               print(version);
-              if (version.toString() == "101122"){
+              if (version.toString() == "171122"){
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (_) => SecurityScreen()));
               } else {

@@ -418,16 +418,18 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                                   .brand);
                                           paymentType = 0;
                                           cartList.remove(cartList[index]);
-                                          var responseSms =
-                                          await OnlineDatabase.sendText(
-                                              customer.customerContactNumber,
-                                              "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
+                                          // var responseSms =
+                                          // await OnlineDatabase.sendText(
+                                          //     customer.customerContactNumber,
+                                          //     "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
 
-                                          // var data = jsonDecode(utf8.decode(response.bodyBytes));
-                                          orderID = response.data["message"]
-                                              .toString()
-                                              .substring(13)
-                                              .trim();
+                                          var data = jsonDecode(utf8.decode(response.bodyBytes));
+                                          orderID = data['results'][0]['RESULT'].toString().replaceAll("Order Created ", "") ;
+                                          print(data['results'][0]['RESULT'].toString());
+
+                                          //     .toString()
+                                          //     .substring(13)
+                                          //     .trim();
                                           print(orderID);
                                              await getCustomerTransactionData(customer.customerCode);
                                           Fluttertoast.showToast(

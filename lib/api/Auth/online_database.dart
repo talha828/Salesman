@@ -266,7 +266,7 @@ class OnlineDatabase{
     print(response.statusCode.toString());
     return response;
   }
-  static Future<dynamic> postEmployee({String customerCode,String purpose,String lat,String long,String emp_id}) async {
+  static Future<dynamic> newPostEmployee({String customerCode,String purpose,String lat,String long,String emp_id}) async {
     // var url =Uri.parse(directory+'postempvisitlog?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_loc_code=&pin_longitude='+'$long'+'&pin_latitude='+'$lat'+'&pin_purpose=$purpose&pin_photo');
     //  print('post employee url is'+url.toString());
     // final response = await http.get(url);
@@ -283,6 +283,25 @@ class OnlineDatabase{
     print(data);
     FormData formData = new FormData.fromMap(data);
     var response=await dio.post(url,data: formData);
+    return response;
+  }
+  static Future<dynamic> postEmployee({String customerCode,String purpose,String lat,String long}) async {
+    var url =Uri.parse(directory+'postempvisitlog?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_loc_code=&pin_longitude='+'$long'+'&pin_latitude='+'$lat'+'&pin_purpose=$purpose&pin_photo');
+     print('post employee url is'+url.toString());
+    final response = await http.get(url);
+    // Map<String,dynamic> data={
+    //   "employee_id":emp_id,
+    //   "customer_id":customerCode,
+    //   "phone":phoneNumber,
+    //   "password":password,
+    //   "lat":lat,
+    //   "long":long,
+    // };
+    // var dio = Dio();
+    // String url='http://erp.suqexpress.com/api/checkin';
+    // print(data);
+    // FormData formData = new FormData.fromMap(data);
+    // var response=await dio.post(url,data: formData);
     return response;
   }
   // Arsalan post box
@@ -520,8 +539,8 @@ class OnlineDatabase{
   }
 
   static Future<dynamic> newpostSalesOrder({CartModel cartData, String customerCode, String lat, String long,String paymentMethod,String emp_id,String sub_total, String brand}) async {
-    // var url =Uri.parse(directory+ 'postsalesorder?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_longitude=$long&pin_latitude=$lat&file_type=json&file_name=&pin_cash_credit=$paymentMethod');
-    // print("post Sales order url is"+url.toString());
+    var url =Uri.parse(directory+ 'postsalesorder?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_longitude=$long&pin_latitude=$lat&file_type=json&file_name=&pin_cash_credit=$paymentMethod');
+    print("post Sales order url is"+url.toString());
 
     Map<String,dynamic> postData={
       "employee_id":emp_id,
@@ -585,16 +604,16 @@ class OnlineDatabase{
     print("length is"+cartData.cartItemName.length.toString());
     print("post data is"+temp.toString());
     print(postData);
-    var dio = Dio();
-    String url='http://erp.suqexpress.com/api/saleorder';
-
-    FormData formData = new FormData.fromMap(postData);
-    print(formData);
-    var response=await dio.post(url,data: formData);
-    // final response = await http.post(
-    //    url,
-    //    body: jsonEncode(temp),
-    //  );
+    // var dio = Dio();
+    // String url='http://erp.suqexpress.com/api/saleorder';
+    //
+    // FormData formData = new FormData.fromMap(postData);
+    // print(formData);
+    // var response=await dio.post(url,data: formData);
+    final response = await http.post(
+       url,
+       body: jsonEncode(temp),
+     );
     return response;
   }
 

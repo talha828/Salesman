@@ -90,18 +90,18 @@ class ProductModel extends ChangeNotifier {
 }
 
 class productPriceModel {
-  int min;
-  int max;
-  var price;
+  double min;
+  double max;
+  double price;
   productPriceModel({this.price = 0, this.max = 0, this.min = 0});
 
   productPriceModel.fromJson(Map<String, dynamic> json) {
     try {
-      min = json['MIN'];
-      max = json['MAX'];
-      price = json['SELLING_PRICE'];
+      min = double.parse(json['MIN'].toString());
+      max = double.parse(json['MAX'].toString());
+      price = double.parse(json['SELLING_PRICE'].toString());
     } catch (e) {
-      print("error in product pricr api is: " + e.toString());
+      print("error in product price api is: " + e.toString());
     }
   }
 }

@@ -8,8 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/globalvariable.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/screen/loginScreen/sucessfully_verified_screen.dart';
+import 'package:salesmen_app_new/screen/splash_screen/get_started_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:get/get.dart';
 import '../../others/common.dart';
 import '../../others/style.dart';
 
@@ -200,8 +201,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> {
             backgroundColor: Colors.black87,
             textColor: Colors.white,
             fontSize: 16.0);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context)=>SucessFullyVerifiedScreen()));
+        Get.off(SucessFullyVerifiedScreen());
       }
       else{
         setLoading(false);

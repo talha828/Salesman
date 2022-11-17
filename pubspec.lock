@@ -310,13 +310,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.6"
-  graphs:
-    dependency: transitive
+  get:
+    dependency: "direct main"
     description:
-      name: graphs
+      name: get
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "4.0.0"
   http:
     dependency: "direct main"
     description:
@@ -576,13 +576,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
-  rive:
-    dependency: "direct main"
-    description:
-      name: rive
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.7.0"
   shared_preferences:
     dependency: "direct main"
     description:

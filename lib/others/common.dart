@@ -160,37 +160,61 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
        /*   setState(() {
       widget.isLoading2=true;
     });*/
-       var response = await OnlineDatabase.postEmployee(emp_id: employeeCode, customerCode: customerCode, purpose: purpose, long: long, lat: lat);
-       print("Response is" + response.statusCode.toString());
-       if (response.statusCode == 200) {
-        print("data is" + response.data["data"]["distance"].toString());
-       //  Provider.of<CartModel>(context, listen: false).createCart();
-         Location location = new Location();
-         var _location = await location.getLocation();
-         Fluttertoast.showToast(
-             msg: 'Check In Successfully',
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
-         Provider.of<CustomerList>(context,listen: false).myCustomer(widget.customerData);
-         Navigator.push(
-             context,
-             MaterialPageRoute(
-                 builder: (_) => CheckInScreen(
-                   distance:double.parse(response.data["data"]["distance"].toString()) ,
-                     //locationdata: _locationData,
-                     shopDetails: customerData,)));
-       } else {
-         print("data is" + response.statusCode.toString());
-
-         Fluttertoast.showToast(
-             msg: 'Some thing went wrong',
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
-       }
+       var response1 = await OnlineDatabase.postEmployee(customerCode: customerCode, purpose: purpose, long: long, lat: lat).then((value)async{
+         if(value.statusCode == 200){
+          var response = await OnlineDatabase.newPostEmployee(
+              emp_id: employeeCode,
+              customerCode: customerCode,
+              purpose: purpose,
+              long: long,
+              lat: lat);
+          print("Response is" + response.statusCode.toString());
+          if (response.statusCode == 200) {
+            print("data is" + response.data["data"]["distance"].toString());
+            //  Provider.of<CartModel>(context, listen: false).createCart();
+            Fluttertoast.showToast(
+                msg: 'Check In Successfully',
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.black87,
+                textColor: Colors.white,
+                fontSize: 16.0);
+            Provider.of<CustomerList>(context, listen: false)
+                .myCustomer(widget.customerData);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => CheckInScreen(
+                          distance: double.parse(
+                              response.data["data"]["distance"].toString()),
+                          //locationdata: _locationData,
+                          shopDetails: customerData,
+                        )));
+          } else {
+            print("data is" + response.statusCode.toString());
+            widget.showLoading(false);
+            Fluttertoast.showToast(
+                msg: 'Some thing went wrong',
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.black87,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        }else {
+           print("data is" + value.statusCode.toString());
+           widget.showLoading(false);
+           Fluttertoast.showToast(
+               msg: 'Some thing went wrong',
+               toastLength: Toast.LENGTH_SHORT,
+               backgroundColor: Colors.black87,
+               textColor: Colors.white,
+               fontSize: 16.0);
+         }
+      }).catchError((e)=>Fluttertoast.showToast(
+           msg: 'Some thing went wrong',
+           toastLength: Toast.LENGTH_SHORT,
+           backgroundColor: Colors.black87,
+           textColor: Colors.white,
+           fontSize: 16.0));
      } catch (e, stack) {
        print('exception is' + e.toString());
 

@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         var versionDecode = jsonDecode(utf8.decode(versionResponse.bodyBytes));
         var version = versionDecode['results'][0]['VERSION'];
         print(version);
-        if (version.toString() == "101122") {
+        if (version.toString() == "171122") {
           FirebaseAuth _auth=  FirebaseAuth.instance;
           _auth.verifyPhoneNumber(
               phoneNumber: widget.phoneNumber,

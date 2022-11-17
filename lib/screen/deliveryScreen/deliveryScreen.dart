@@ -1170,58 +1170,58 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                     pin: smsResponse.data["code"].toString(),
                                     contactNumbers: tempContact,
                                     onSuccess: () async {
-                                      setState(() {
-                                        isLoading2 = true;
-                                      });
-                                      //
-                                      // var response = await OnlineDataBase
-                                      //     .postBoxDeliverDetails(
-                                      //         boxDetails: boxDetails,
-                                      //         lat: widget.lat.toString(),
-                                      //         long: widget.long.toString(),
-                                      //         customerCode: widget
-                                      //             .shopDetails.customerCode);
+                                      // setState(() {
+                                      //   isLoading2 = true;
+                                      // });
 
                                       var response = await OnlineDatabase
-                                          .newpostBoxDeliverDetails(
-                                          boxDetails:boxDetails,
-                                          emp_id:userData.userID ,
-                                          emp_name: userData.userName,
-                                          lat: location.latitude.toString(),
-                                          code_id: smsResponse.data["id"],
-                                          long: location.longitude.toString(),
-                                          amount: boxDetails.totalAmount,
-                                          customerCode: widget
-                                              .shopDetails.customerCode).catchError((e){
-                                        setState(() {
-                                          isLoading2 = false;
-                                        });
-                                        setLoading(false);
-                                        Navigator.pop(context);
-                                        AwesomeDialog(
-                                          context: context,
-                                          dialogType: DialogType.ERROR,
-                                          animType: AnimType.BOTTOMSLIDE,
-                                          title: "Error",
-                                          desc: "Error: " + e.response.data["message"],
-                                          btnCancelText: "Ok",
-                                          dismissOnTouchOutside: false,
-                                          btnOkOnPress: () {},
-                                        )..show();
-                                      });
+                                          .postBoxDeliverDetails(
+                                              boxDetails: boxDetails,
+                                              lat: location.latitude.toString(),
+                                              long: location.longitude.toString(),
+                                              customerCode: widget
+                                                  .shopDetails.customerCode);
+
+                                      // var response = await OnlineDatabase
+                                      //     .newpostBoxDeliverDetails(
+                                      //     boxDetails:boxDetails,
+                                      //     emp_id:userData.userID ,
+                                      //     emp_name: userData.userName,
+                                      //     lat: location.latitude.toString(),
+                                      //     code_id: smsResponse.data["id"],
+                                      //     long: location.longitude.toString(),
+                                      //     amount: boxDetails.totalAmount,
+                                      //     customerCode: widget
+                                      //         .shopDetails.customerCode).catchError((e){
+                                      //   setState(() {
+                                      //     isLoading2 = false;
+                                      //   });
+                                      //   setLoading(false);
+                                      //   Navigator.pop(context);
+                                      //   AwesomeDialog(
+                                      //     context: context,
+                                      //     dialogType: DialogType.ERROR,
+                                      //     animType: AnimType.BOTTOMSLIDE,
+                                      //     title: "Error",
+                                      //     desc: "Error: " + e.response.data["message"],
+                                      //     btnCancelText: "Ok",
+                                      //     dismissOnTouchOutside: false,
+                                      //     btnOkOnPress: () {},
+                                      //   )..show();
+                                      // });
                                       print("Post box Response is: " +
                                           response.statusCode.toString());
                                       if (response.statusCode == 200) {
 
-                                        // var data = jsonDecode(
-                                        //     utf8.decode(response.bodyBytes));
-                                        // print("Post box Response is: " +
-                                        //     data.toString());
+                                        var data = jsonDecode(
+                                            utf8.decode(response.bodyBytes));
+                                        print("Post box Response is: " +
+                                            data.toString());
                                         // String msgData = "Thankyou, you have receive goods of Rs ${boxDetails.totalAmount} from ${userData.userName} %26 Download app https://bit.ly/38uffP8";
                                         //     msgData+= " ID: ${tempContact[0]} Pass: 555";
                                         // //     "آپ ${boxDetails.totalAmount} روپے کا سامان لے چکے ہیں۔ شکریہ۔";
                                         //
-                                        // var responseMsg = await OnlineDataBase
+                                        // var responseMsg = await OnlineDatabase
                                         //     .sendText(
                                         //         tempContact[0], msgData);
                                         // if (responseMsg.statusCode == 200) {
@@ -1234,6 +1234,8 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                                                 builder: (_) =>
                                                     SucessFullyDelieveredOrderScreen(customer:customer,)));
 
+
+                                      }else{
 
                                       }
                                       //setLoading(false);
