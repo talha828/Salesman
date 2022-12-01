@@ -240,19 +240,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         if (validateFields()) {
                                           Navigator.of(context).pop();
                                           setLoading(true);
-                                          List<String> tempContact = [];
-                                          if (customerData
-                                                  .customerContactNumber !=
-                                              null) {
-                                            tempContact.add(customerData
-                                                .customerContactNumber
-                                                .substring(
-                                                    0,
-                                                    customerData
-                                                        .customerContactNumber
-                                                        .length));
-                                          }
-                                          print(tempContact);
+                                          // List<String> tempContact = [];
+                                          // if (customerData
+                                          //         .customerContactNumber !=
+                                          //     null) {
+                                          //   tempContact.add(customerData
+                                          //       .customerContactNumber
+                                          //       .substring(
+                                          //           0,
+                                          //           customerData
+                                          //               .customerContactNumber
+                                          //               .length));
+                                          // }
+                                          // print(tempContact);
                                           // if(widget.customerData.customerContactNumber2 != null){
                                           //   tempContact.add(widget.customerData.customerContactNumber2);
                                           // }else{
@@ -278,64 +278,64 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           // msgData += '\n';
                                           // msgData += 'شکریہ۔';
                                           // var response = await OnlineDatabase.sendText(tempContact[0], msgData);
-                                          var dio = new Dio();
-                                          String url =
-                                              "https://erp.suqexpress.com/api/getcode";
-                                          Map<String, dynamic> map = {
-                                            "purpose": 2,
-                                            "number": tempContact.first,
-                                            "amount": totalAmount,
-                                            "customer_id":
-                                                customerData.customerCode,
-                                            "emp_name": userData.userName,
-                                          };
-                                          FormData formData =
-                                              FormData.fromMap(map);
-                                          //TODO sms post
-                                          Response smsResponse = await dio
-                                              .post(url, data: formData)
-                                              .catchError((e) {
-                                            setLoading(false);
-                                            Fluttertoast.showToast(
-                                                msg: e.response.data["message"]
-                                                    .toString(),
-                                                toastLength:
-                                                    Toast.LENGTH_SHORT);
-                                          });
-                                          print(smsResponse.data.toString());
-                                          if (smsResponse.statusCode == 200) {
-                                            setLoading(false);
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        PaymentPin(
-                                                          userName:
-                                                              userData.userName,
-                                                          total: totalAmount,
-                                                          customer:
-                                                              customerData,
-                                                          pin: smsResponse
-                                                              .data["code"]
-                                                              .toString(),
-                                                          contactNumbers:
-                                                              tempContact,
-                                                          onSuccess: () {
-                                                            print(
-                                                                "@@@@@@@@@@@@@");
-                                                            //setLoading(false);
+                                          // var dio = new Dio();
+                                          // String url =
+                                          //     "https://erp.suqexpress.com/api/getcode";
+                                          // Map<String, dynamic> map = {
+                                          //   "purpose": 2,
+                                          //   "number": tempContact.first,
+                                          //   "amount": totalAmount,
+                                          //   "customer_id":
+                                          //       customerData.customerCode,
+                                          //   "emp_name": userData.userName,
+                                          // };
+                                          // FormData formData =
+                                          //     FormData.fromMap(map);
+                                          // //TODO sms post
+                                          // Response smsResponse = await dio
+                                          //     .post(url, data: formData)
+                                          //     .catchError((e) {
+                                          //   setLoading(false);
+                                          //   Fluttertoast.showToast(
+                                          //       msg: e.response.data["message"]
+                                          //           .toString(),
+                                          //       toastLength:
+                                          //           Toast.LENGTH_SHORT);
+                                          // });
+                                          // print(smsResponse.data.toString());
+                                          // if (smsResponse.statusCode == 200) {
+                                          //   setLoading(false);
+                                          //   Navigator.push(
+                                          //       context,
+                                          //       MaterialPageRoute(
+                                          //           builder: (context) =>
+                                          //               PaymentPin(
+                                          //                 userName:
+                                          //                     userData.userName,
+                                          //                 total: totalAmount,
+                                          //                 customer:
+                                          //                     customerData,
+                                          //                 pin: smsResponse
+                                          //                     .data["code"]
+                                          //                     .toString(),
+                                          //                 contactNumbers:
+                                          //                     tempContact,
+                                          //                 onSuccess: () {
+                                          //                   print(
+                                          //                       "@@@@@@@@@@@@@");
+                                          //                   //setLoading(false);
+                                          //                 },
+                                          //               )));
                                                             postPayment(
                                                                 userData,
                                                                 customerData);
-                                                          },
-                                                        )));
-                                          } else {
-                                            setLoading(false);
-                                            Fluttertoast.showToast(
-                                                msg: "Code not sent, Try again",
-                                                toastLength:
-                                                    Toast.LENGTH_SHORT);
-                                          }
+                                          // } else {
+                                          //   setLoading(false);
+                                          //   Fluttertoast.showToast(
+                                          //       msg: "Code not sent, Try again",
+                                          //       toastLength:
+                                          //           Toast.LENGTH_SHORT);
+                                          // }
                                         }
                                       },
                                     )

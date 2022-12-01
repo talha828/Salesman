@@ -13,6 +13,7 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -75,14 +76,19 @@ class _MainScreenState extends State<MainScreen> {
           //print("Response is" + data.toString());
 
           for (var item in data["results"]) {
-            double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-            customer.add(CustomerModel.fromModel(item,distance: dist));
+            var dist=calculateDistance(double.parse(item["LATITUDE"].toString().toLowerCase()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString().toLowerCase()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+            print(dist.toString());
+            customer.add(CustomerInfo.fromJson(item,dist));
+            print(item['CUST_CODE']);
+            // print(item['CUSTOMER']);
+            // print(item['LATITUDE']);
+            // print(item['LONGITUDE']);
           }
 
           for(int i=0; i < customer.length-1; i++){
             for(int j=0; j < customer.length-i-1; j++){
-              if(customer[j].distance > customer[j+1].distance){
-                CustomerModel temp = customer[j];
+              if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
+                CustomerInfo temp = customer[j];
                 customer[j] = customer[j+1];
                 customer[j+1] = temp;
               }
@@ -94,9 +100,7 @@ class _MainScreenState extends State<MainScreen> {
           Provider.of<CustomerList>(context,listen: false).getDues(customer);
           Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
           print("done");
-          setState(() {
-
-          });
+          setState(() {});
           //print("length is"+limitedcustomer.length.toString());
           Provider.of<CustomerList>(context,listen: false).setLoading(false);
 
@@ -126,7 +130,7 @@ class _MainScreenState extends State<MainScreen> {
 
   var actualAddress = "Searching....";
 
-   List<CustomerModel> customer=[];
+   List<CustomerInfo> customer=[];
   getWalletStatus() async {
     var response2 = await OnlineDatabase.getWalletStatus().catchError((error){Fluttertoast.showToast(
         msg: "Error: "+error.toString(), toastLength: Toast.LENGTH_LONG);});

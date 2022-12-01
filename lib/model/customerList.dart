@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 
 import 'customerModel.dart';
@@ -12,9 +13,9 @@ class CustomerList extends ChangeNotifier{
   //loader
   bool loading =false;
   //customer list
-  List<CustomerModel>customerData=[];
-  List<CustomerModel>dues=[];
-  List<CustomerModel>assign=[];
+  List<CustomerInfo>customerData=[];
+  List<CustomerInfo>dues=[];
+  List<CustomerInfo>assign=[];
   // main product list or category
   List<ProductModel>product=[];
   List<ProductModel>searchProduct=[];
@@ -32,7 +33,7 @@ class CustomerList extends ChangeNotifier{
   List<List<ProductModel>> pp=[];
 
   String address="Searching...";
-  void getAllCustomer(List<CustomerModel> value){
+  void getAllCustomer(List<CustomerInfo> value){
     customerData.clear();
     customerData.addAll(value);
     notifyListeners();
@@ -41,19 +42,19 @@ class CustomerList extends ChangeNotifier{
     address=value;
     notifyListeners();
   }
-  void getDues(List<CustomerModel> value){
+  void getDues(List<CustomerInfo> value){
     dues.clear();
     for (var i in value){
-      if(i.shopAssigned=="Yes"){
-        if(double.parse(i.dues)>0.00){
+      if(i.sHOPASSIGNED=="Yes"){
+        if(double.parse(i.bALANCE)>0.00){
           dues.add(i);
         }
       }
     }
     for(int i=0; i < dues.length-1; i++){
       for(int j=0; j < dues.length-i-1; j++){
-        if(double.parse(dues[j].dues) > double.parse(dues[j+1].dues)){
-          CustomerModel temp = dues[j];
+        if(double.parse(dues[j].bALANCE) > double.parse(dues[j+1].bALANCE)){
+          CustomerInfo temp = dues[j];
           dues[j] = dues[j+1];
           dues[j+1] = temp;
         }
@@ -65,10 +66,10 @@ class CustomerList extends ChangeNotifier{
     imageContainer.addAll(value);
     notifyListeners();
   }
-  void getAssignShop(List<CustomerModel> value){
+  void getAssignShop(List<CustomerInfo> value){
     assign.clear();
     for(var i in value){
-      if(i.shopAssigned=="Yes"){
+      if(i.sHOPASSIGNED=="Yes"){
         assign.add(i);
       }
     }
@@ -84,7 +85,7 @@ class CustomerList extends ChangeNotifier{
   }
   void clearList(){
     customerData.clear();
-    dues.clear();
+    //dues.clear();
     assign.clear();
     notifyListeners();
   }
@@ -112,10 +113,10 @@ class CustomerList extends ChangeNotifier{
   void addInitialCount(List value){
     initialCount.addAll(value);
   }
-  void addNewCustomer(CustomerModel value){
-    customerData.insert(0,value);
-    assign.insert(0,value);
-  }
+  // void addNewCustomer(CustomerModel value){
+  //   customerData.insert(0,value);
+  //   assign.insert(0,value);
+  // }
   void setLoading(bool value){
     loading=value;
   }
@@ -126,12 +127,12 @@ class CustomerList extends ChangeNotifier{
     pp.addAll(value);
   }
   void updateList(Coordinates userLocation ){
-    List<CustomerModel>customer=[];
+    List<CustomerInfo>customer=[];
     for (var item in response["results"]){
       var dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLocation.latitude,userLocation.longitude);
-      customer.add(CustomerModel.fromModel(item,distance: dist));
+      customer.add(CustomerInfo.fromJson(item,dist));
     }
-    customer.sort((a,b)=>a.distance.compareTo(b.distance));
+    //customer.sort((a,b)=>a.distance.compareTo(b.distance));
     getAllCustomer(customer);
     getDues(customer);
     getAssignShop(customer);

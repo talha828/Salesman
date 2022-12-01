@@ -1117,7 +1117,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           var add =await OnlineDatabase.getSingleCustomer(response.data["data"]["cust_code"].toString());
           var data = jsonDecode(utf8.decode(add.bodyBytes));
           CustomerModel dd= CustomerModel.fromModel(data["results"][0],distance: 0.0);
-          Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
+          //Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
           SucessFullyCreatCustomer(
               CustomerId: response.data["data"]["cust_code"].toString());
           Fluttertoast.showToast(
@@ -1165,7 +1165,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         var add =await OnlineDatabase.getSingleCustomer(response.data["data"]["cust_code"].toString());
         var data = jsonDecode(utf8.decode(add.bodyBytes));
         CustomerModel dd= CustomerModel.fromModel(data["results"][0]);
-        Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
+        //Provider.of<CustomerList>(context,listen: false).addNewCustomer(dd);
         Fluttertoast.showToast(
             msg: response.data["message"].toString(),
             toastLength: Toast.LENGTH_LONG);

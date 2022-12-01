@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart'as http;
 import 'package:salesmen_app_new/globalvariable.dart';
@@ -426,8 +427,8 @@ class OnlineDatabase{
   }
   static Future<dynamic> getAllCustomer() async {
     String url = directory +
-        'getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=INFO';
-    print("url is: " + url);
+        'getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=';
+    debugPrint("url is: " + url);
     final response = await http.get(Uri.parse(url));
     return response;
   }

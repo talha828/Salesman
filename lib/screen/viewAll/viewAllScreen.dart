@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
+import 'package:salesmen_app_new/widget/customer_card.dart';
 
 class ViewAllScreen extends StatefulWidget {
-  List<CustomerModel>customer;
+  List<CustomerInfo>customer;
   ViewAllScreen({this.customer});
 
   @override
@@ -33,20 +35,31 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    CustomShopContainer(
-                      customerList: widget.customer,
+                    CustomerCard(
+                      image:"null" ,
                       height: height,
                       width: width,
-                      customerData:widget.customer[index],
-                      //isLoading2: isLoading2,
-                      //enableLocation: _serviceEnabled,
-                      lat: 1.0,
-                      long:1.0,
-                      showLoading: (value) {
+                      f:f,
+                      menuButton: ['DIRECTIONS', 'CHECK-IN'],
+                      code: widget.customer[index].cUSTCODE,
+                      category: widget.customer[index].pARTYCATEGORY,
+                      shopName:widget.customer[index].cUSTOMER ,
+                      address: widget.customer[index].aDDRESS,
+                      name:widget.customer[index].cONTACTPERSON ,
+                      phoneNo:widget.customer[index].pHONE1 ,
+                      lastVisit:"--" ,
+                      dues: "--",
+                      lastTrans:"--" ,
+                      outstanding: widget.customer[index].bALANCE,
+                      shopAssigned:widget.customer[index].sHOPASSIGNED ,
+                      lat: widget.customer[index].lATITUDE,
+                      long: widget.customer[index].lONGITUDE,
+                      //customerData: CustomerInfo,
+                      showLoading:(value){
                         setState(() {
-                          isLoading = value;
+                          isLoading=value;
                         });
-                      },
+                      } ,
                     ),
                     SizedBox(
                       height: height * 0.025,

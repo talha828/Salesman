@@ -18,10 +18,12 @@ import 'package:salesmen_app_new/locationServices/location_callback_handler.dart
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
+import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:shimmer/shimmer.dart';
 
 
@@ -141,7 +143,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
    //  }
    //  }
    // }
-   List<CustomerModel> customer=[];
+   List<CustomerInfo> customer=[];
    List<CustomerModel> nearByCustomers=[];
    void getAllCustomerData() async {
      if(true){
@@ -176,13 +178,13 @@ class _AllShopScreenState extends State<AllShopScreen> {
 
              for (var item in data["results"]) {
                double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-               customer.add(CustomerModel.fromModel(item,distance: dist));
+               customer.add(CustomerInfo.fromJson(item,dist));
              }
 
              for(int i=0; i < customer.length-1; i++){
                for(int j=0; j < customer.length-i-1; j++){
-                 if(customer[j].distance > customer[j+1].distance){
-                   CustomerModel temp = customer[j];
+                 if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
+                   CustomerInfo temp = customer[j];
                    customer[j] = customer[j+1];
                    customer[j+1] = temp;
                  }
@@ -212,13 +214,13 @@ class _AllShopScreenState extends State<AllShopScreen> {
            }}
        } catch (e, stack) {
          print('exception is' + e.toString());
-         Fluttertoast.showToast(
-             msg: "Error: " + e.toString(),
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
-         setLoading(false);
+         // Fluttertoast.showToast(
+         //     msg: "Error: " + e.toString(),
+         //     toastLength: Toast.LENGTH_SHORT,
+         //     backgroundColor: Colors.black87,
+         //     textColor: Colors.white,
+         //     fontSize: 16.0);
+          setLoading(false);
          Provider.of<CustomerList>(context,listen: false).setLoading(false);
        }
      }
@@ -242,7 +244,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
   @override
   Widget build(BuildContext context) {
      CustomerList dd=Provider.of<CustomerList>(context);
-     List<CustomerModel> dda=Provider.of<CustomerList>(context).customerData;
+     List<CustomerInfo> dda=Provider.of<CustomerList>(context).customerData;
      print(customer.length);
     var width=MediaQuery.of(context).size.width;
     var height=MediaQuery.of(context).size.height;
@@ -363,24 +365,35 @@ class _AllShopScreenState extends State<AllShopScreen> {
                               itemBuilder: (context, index) {
                                 return Column(
                                   children: [
-                                    CustomShopContainer(
-                                      customerList: dd.customerData,
+                                    CustomerCard(
+                                      image:"null" ,
                                       height: height,
                                       width: width,
-                                      customerData: dd.customerData[index],
-                                      //isLoading2: isLoading2,
-                                      //enableLocation: _serviceEnabled,
-                                      lat: 1.0,
-                                      long:1.0,
-                                      showLoading: (value) {
+                                      f:f,
+                                      menuButton: ['DIRECTIONS', 'CHECK-IN'],
+                                      code: dda[index].cUSTCODE,
+                                      category: dd.customerData[index].pARTYCATEGORY,
+                                      shopName: dd.customerData[index].cUSTOMER ,
+                                      address:  dd.customerData[index].aDDRESS,
+                                      name: dd.customerData[index].cONTACTPERSON ,
+                                      phoneNo: dd.customerData[index].pHONE1 ,
+                                      lastVisit:"--" ,
+                                      dues: "0",
+                                      lastTrans:"--" ,
+                                      outstanding:  dd.customerData[index].bALANCE,
+                                      shopAssigned: dd.customerData[index].sHOPASSIGNED ,
+                                      lat:  dd.customerData[index].lATITUDE,
+                                      long:  dd.customerData[index].lONGITUDE,
+                                      //customerData: CustomerInfo,
+                                      showLoading:(value){
                                         setState(() {
-                                          isLoading = value;
+                                          isLoading=value;
                                         });
-                                      },
+                                      } ,
                                     ),
-                                    SizedBox(
-                                      height: height * 0.025,
-                                    ),
+                                    // SizedBox(
+                                    //   height: height * 0.025,
+                                    // ),
                                   ],
                                 );
                               },

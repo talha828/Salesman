@@ -123,7 +123,7 @@ class CustomerModel extends ChangeNotifier {
       outStanding=json['OUTSTANDING'].toString();
       editable = json['EDITABLE'].toString();
       shopAssigned = json['SHOPASSIGNED'].toString();
-      this.distance = distance;
+      this.distance = double.parse(distance.toString());
       if(json['DATA'] != null){
         for(var item in json['DATA']){
           if(item != null){

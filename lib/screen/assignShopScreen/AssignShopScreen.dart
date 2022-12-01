@@ -12,11 +12,13 @@ import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/addressModel.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/allShopScreen/allShopScreen.dart';
 import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dart';
 import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
+import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:shimmer/shimmer.dart';
 class AssignShopScreen extends StatefulWidget {
   List<CustomerModel> customer;
@@ -29,7 +31,7 @@ class AssignShopScreen extends StatefulWidget {
 
 class _AssignShopScreenState extends State<AssignShopScreen> {
    Coordinates userLatLng;
-  List<CustomerModel> customer=[];
+  List<CustomerInfo> customer=[];
   List<CustomerModel> customers=[];
   bool isLoading=false;
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
@@ -76,13 +78,13 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
 
              for (var item in data["results"]) {
                double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-               customer.add(CustomerModel.fromModel(item,distance: dist));
+               customer.add(CustomerInfo.fromJson(item,dist));
              }
 
              for(int i=0; i < customer.length-1; i++){
                for(int j=0; j < customer.length-i-1; j++){
-                 if(customer[j].distance > customer[j+1].distance){
-                   CustomerModel temp = customer[j];
+                 if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
+                   CustomerInfo temp = customer[j];
                    customer[j] = customer[j+1];
                    customer[j+1] = temp;
                  }
@@ -112,12 +114,12 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
            }}
        } catch (e, stack) {
          print('exception is' + e.toString());
-         Fluttertoast.showToast(
-             msg: "Error: " + e.toString(),
-             toastLength: Toast.LENGTH_SHORT,
-             backgroundColor: Colors.black87,
-             textColor: Colors.white,
-             fontSize: 16.0);
+         // Fluttertoast.showToast(
+         //     msg: "Error: " + e.toString(),
+         //     toastLength: Toast.LENGTH_SHORT,
+         //     backgroundColor: Colors.black87,
+         //     textColor: Colors.white,
+         //     fontSize: 16.0);
          setLoading(false);
          Provider.of<CustomerList>(context,listen: false).setLoading(false);
        }
@@ -297,24 +299,35 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                   itemBuilder: (context, index) {
                                     return Column(
                                       children: [
-                                        CustomShopContainer(
-                                          customerList: dd.assign,
-                                          height: height,
-                                          width: width,
-                                          customerData:dd.assign[index],
-                                          //isLoading2: isLoading2,
-                                          //enableLocation: _serviceEnabled,
-                                          lat: 1.0,
-                                          long:1.0,
-                                          showLoading: (value) {
-                                            setState(() {
-                                              isLoading = value;
-                                            });
-                                          },
-                                        ),
-                                        SizedBox(
-                                          height: height * 0.025,
-                                        ),
+                                       CustomerCard(
+                                         image:"null" ,
+                                         height: height,
+                                         width: width,
+                                         f:f,
+                                         menuButton: ['DIRECTIONS', 'CHECK-IN'],
+                                         code: dds[index].cUSTCODE,
+                                         category: dds[index].pARTYCATEGORY,
+                                         shopName: dds[index].cUSTOMER ,
+                                         address:  dds[index].aDDRESS,
+                                         name: dds[index].cONTACTPERSON ,
+                                         phoneNo: dds[index].pHONE1 ,
+                                         lastVisit:"--" ,
+                                         dues: "0",
+                                         lastTrans:"--" ,
+                                         outstanding:  dds[index].bALANCE,
+                                         shopAssigned: dds[index].sHOPASSIGNED ,
+                                         lat:  dds[index].lATITUDE,
+                                         long:  dds[index].lONGITUDE,
+                                         //customerData: CustomerInfo,
+                                         showLoading:(value){
+                                           setState(() {
+                                             isLoading=value;
+                                           });
+                                         } ,
+                                       ),
+                                        // SizedBox(
+                                        //   height: height * 0.025,
+                                        // ),
                                       ],
                                     );
                                   },

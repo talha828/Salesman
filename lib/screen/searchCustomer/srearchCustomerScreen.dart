@@ -2,12 +2,14 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
+import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
+import 'package:salesmen_app_new/widget/customer_card.dart';
 
 
 class SearchScreen extends StatefulWidget {
-  List<CustomerModel> customerModel;
+  List<CustomerInfo> customerModel;
   SearchScreen({this.customerModel});
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -26,36 +28,28 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   int i = 0;
-  List<CustomerModel> _list = [];
-  List<CustomerModel> customersearchresult = [];
+  List<CustomerInfo> _list = [];
+  List<CustomerInfo> customersearchresult = [];
   Future getAllCustomerData() async {
     for (var item in widget.customerModel) {
       if (i < widget.customerModel.length) {
-        _list.add(CustomerModel(
-            customerCode: item.customerCode,
-            customerShopName: item.customerShopName,
-            customerName: item.customerName,
-            customerLatitude: item.customerLatitude,
-            customerLongitude: item.customerLongitude,
-            customerCreditLimit: item.customerCreditLimit,
-            customerAddress: item.customerAddress,
-            customerContactPersonName: item.customerContactPersonName,
-            customerContactNumber: item.customerContactNumber,
-            customerImage: item.customerImage,
-            customerCityCode: item.customerCityCode,
-            customerCityName: item.customerCityName,
-            customerAreaCode: item.customerAreaCode,
-            customerAreaName: item.customerAreaName,
-            customerPartyCategory: item.customerPartyCategory,
-            customerContactPersonName2: item.customerContactPersonName2,
-            customerContactNumber2: item.customerContactNumber2,
-            customerCategory: item.customerCategory,
-            lastTransDay: item.lastTransDay,
-            lastVisitDay: item.lastVisitDay,
-            dues: item.dues,
-            outStanding: item.outStanding,
-            customerinfo: item.customerinfo,
-            shopAssigned: item.shopAssigned
+        _list.add(CustomerInfo(
+             cUSTCODE:item.cUSTCODE,
+         cUSTOMER:item.cUSTOMER,
+         cONTACTPERSON:item.cONTACTPERSON,
+         cONTACTPERSON2:item.cONTACTPERSON2,
+             pHONE1:item.pHONE1,
+             pHONE2:item.pHONE2,
+             lONGITUDE:item.lONGITUDE,
+             lATITUDE:item.lATITUDE,
+         cATCD:item.cATCD,
+         pARTYCATEGORY:item.pARTYCATEGORY,
+         aDDRESS:item.aDDRESS,
+         eDITABLE:item.eDITABLE,
+         aCTIVE:item.aCTIVE,
+         sHOPASSIGNED:item.sHOPASSIGNED,
+             bALANCE:item.bALANCE,
+             distances:item.distances,
         ));
 
         i++;
@@ -157,19 +151,45 @@ class _SearchScreenState extends State<SearchScreen> {
                                 horizontal: screenpadding),
                             child: Column(
                               children: [
-                                CustomShopContainer(
-                                  height: height,
-                                  width: width,
-                                  customerData: customersearchresult[index],
-                                  //isLoading2: isLoading,
-                                  lat:11.0 ,
-                                  long:11.0 ,
-                                  showLoading: (value) {
-                                    setState(() {
-                                      isLoading = value;
-                                    });
-                                  },
-                                ),
+                              CustomerCard(
+                                image:"null" ,
+                                height: height,
+                                width: width,
+                                f:f,
+                                menuButton: ['DIRECTIONS', 'CHECK-IN'],
+                                code: customersearchresult[index].cUSTCODE,
+                                category: customersearchresult[index].pARTYCATEGORY,
+                                shopName:customersearchresult[index].cUSTOMER ,
+                                address: customersearchresult[index].aDDRESS,
+                                name:customersearchresult[index].cONTACTPERSON ,
+                                phoneNo:customersearchresult[index].pHONE1 ,
+                                lastVisit:"--" ,
+                                dues: "0",
+                                lastTrans:"--" ,
+                                outstanding: customersearchresult[index].bALANCE,
+                                shopAssigned:customersearchresult[index].sHOPASSIGNED ,
+                                lat: customersearchresult[index].lATITUDE,
+                                long: customersearchresult[index].lONGITUDE,
+                                //customerData: CustomerInfo,
+                                showLoading:(value){
+                                  setState(() {
+                                    isLoading=value;
+                                  });
+                                } ,
+                              ),
+                                // CustomShopContainer(
+                                //   height: height,
+                                //   width: width,
+                                //   customerData: customersearchresult[index],
+                                //   //isLoading2: isLoading,
+                                //   lat:11.0 ,
+                                //   long:11.0 ,
+                                //   showLoading: (value) {
+                                //     setState(() {
+                                //       isLoading = value;
+                                //     });
+                                //   },
+                                // ),
                                 SizedBox(
                                   height: height * 0.025,
                                 ),
@@ -193,8 +213,8 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_isSearching != null) {
       customersearchresult.clear();
       for (int i = 0; i < _list.length; i++) {
-        String data = _list[i].customerShopName;
-        String data1 = _list[i].customerCode;
+        String data = _list[i].cUSTOMER;
+        String data1 = _list[i].cUSTCODE;
 
         if (data.toLowerCase().contains(searchText.toLowerCase())) {
           print("search by name");

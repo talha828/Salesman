@@ -1118,58 +1118,58 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
                             isLoading2 = true;
                           });
                       var location=await Location().getLocation();
-                          List<String> tempContact = [];
-                          final userData =
-                          Provider.of<UserModel>(context, listen: false);
-                          if (widget.shopDetails.customerContactNumber !=
-                              null) {
-                            tempContact.add(widget
-                                .shopDetails.customerContactNumber
-                                .substring(
-                                0,
-                                widget.shopDetails.customerContactNumber
-                                    .length));
-                          }
-                          // if (widget.shopDetails.customerContactNumber2 !=
+                          // List<String> tempContact = [];
+                          // final userData =
+                          // Provider.of<UserModel>(context, listen: false);
+                          // if (widget.shopDetails.customerContactNumber !=
                           //     null) {
-                          //   tempContact
-                          //       .add(widget.shopDetails.customerContactNumber2);
-                          // } else {
-                          //   //tempContact.add('+923340243440');
+                          //   tempContact.add(widget
+                          //       .shopDetails.customerContactNumber
+                          //       .substring(
+                          //       0,
+                          //       widget.shopDetails.customerContactNumber
+                          //           .length));
                           // }
-                          var dio = new Dio();
-                          String url = "https://erp.suqexpress.com/api/getcode";
-                          Map<String, dynamic> map = {
-                            "purpose": 1,
-                            "number": tempContact.first,
-                            "amount":boxDetails.totalAmount,
-                            "customer_id":widget.shopDetails.customerCode,
-                            "emp_name": userData.userName,
-                          };
-                          FormData formData = FormData.fromMap(map);
-                          //TODO sms post
-                          Response smsResponse =
-                          await dio.post(url, data: formData).catchError((e){
-                            setLoading(false);
-                            Fluttertoast.showToast(
-                                msg: e.response.data["message"].toString(),
-                                toastLength: Toast.LENGTH_SHORT);
-                          });
-                          if (smsResponse.statusCode == 200) {
-                            setState(() {
-                              isLoading2 = false;
-                            });
-                            print(smsResponse.data.toString());
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => PaymentPin(
-                                    userName:userData.userName ,
-                                    customer:widget.shopDetails ,
-                                    total:boxDetails.totalAmount,
-                                    pin: smsResponse.data["code"].toString(),
-                                    contactNumbers: tempContact,
-                                    onSuccess: () async {
+                          // // if (widget.shopDetails.customerContactNumber2 !=
+                          // //     null) {
+                          // //   tempContact
+                          // //       .add(widget.shopDetails.customerContactNumber2);
+                          // // } else {
+                          // //   //tempContact.add('+923340243440');
+                          // // }
+                          // var dio = new Dio();
+                          // String url = "https://erp.suqexpress.com/api/getcode";
+                          // Map<String, dynamic> map = {
+                          //   "purpose": 1,
+                          //   "number": tempContact.first,
+                          //   "amount":boxDetails.totalAmount,
+                          //   "customer_id":widget.shopDetails.customerCode,
+                          //   "emp_name": userData.userName,
+                          // };
+                          // FormData formData = FormData.fromMap(map);
+                          // //TODO sms post
+                          // Response smsResponse =
+                          // await dio.post(url, data: formData).catchError((e){
+                          //   setLoading(false);
+                          //   Fluttertoast.showToast(
+                          //       msg: e.response.data["message"].toString(),
+                          //       toastLength: Toast.LENGTH_SHORT);
+                          // });
+                          //if (smsResponse.statusCode == 200) {
+                          //   setState(() {
+                          //     isLoading2 = false;
+                          //   });
+                            //print(smsResponse.data.toString());
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (_) => PaymentPin(
+                            //         userName:userData.userName ,
+                            //         customer:widget.shopDetails ,
+                            //         total:boxDetails.totalAmount,
+                            //         pin: smsResponse.data["code"].toString(),
+                            //         contactNumbers: tempContact,
+                            //         onSuccess: () async {
                                       // setState(() {
                                       //   isLoading2 = true;
                                       // });
@@ -1236,20 +1236,22 @@ class _DeliveryScreenState extends State<DeliveryScreen> {
 
 
                                       }else{
-
+                                        Fluttertoast.showToast(
+                                                msg: "Code not sent, Try again",
+                                                toastLength: Toast.LENGTH_SHORT);
                                       }
                                       //setLoading(false);
-                                    },
-                                  ),
-                                ));
-                          } else {
-                            setState(() {
-                              isLoading2 = false;
-                            });
-                            Fluttertoast.showToast(
-                                msg: "Code not sent, Try again",
-                                toastLength: Toast.LENGTH_SHORT);
-                          }
+                                    // },
+                                //   ),
+                                // ));
+                          // } else {
+                          //   setState(() {
+                          //     isLoading2 = false;
+                          //   });
+                          //   Fluttertoast.showToast(
+                          //       msg: "Code not sent, Try again",
+                          //       toastLength: Toast.LENGTH_SHORT);
+                          // }
                         } catch (e, stack) {
                           setState(() {
                             isLoading2 = false;
