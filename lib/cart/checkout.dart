@@ -5,9 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
@@ -39,6 +41,98 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   List<CartModel> cartList = [];
   List<double> total = [];
   List brandName = [];
+  final items=  Get.find<CheckAllProducts>();
+  Future<bool> getAllProduct(var item) async {
+    try {
+      setLoading(true);
+      var response = await OnlineDatabase.getAllproductsubcategory(
+          subTypeId: "", maintypeId: "");
+      print("Response is" + response.statusCode.toString());
+      //print("Response is" + response .toString());
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        List<ProductModel> searchProduct = [];
+        var datalist = data['results'];
+        print("data is " + datalist.toString());
+        if (datalist.isNotEmpty) {
+          for (var item in datalist) {
+            searchProduct.add(ProductModel.fromJson(item));
+          }
+          for (int i=0;i<searchProduct.length;i++){
+            for(int j=0;j<item.myProducts.length;j++){
+              print(item.myProducts[j].productName.productCode);
+              print(item.myProducts[j].productName.productPrice[0].price);
+              if(searchProduct[i].productCode.toString() ==item.myProducts[j].productName.productCode.toString()){
+                if(searchProduct[i].productPrice[0].price > item.myProducts[j].productName.productPrice[0].price || searchProduct[i].productPrice[0].price< item.myProducts[j].productName.productPrice[0].price ){
+                  item.difference.value =true;
+                  //item.searchList.add(searchProduct[i]);
+                  var dd=  item.myProducts[j];
+                  dd.productName.productPrice[0].price = searchProduct[i].productPrice[0].price;
+                  item.cartList.add(dd);
+                  print(searchProduct[j].availableQuantity);
+                  print(searchProduct[j].productPrice[0].max);
+                }
+                if(searchProduct[i].availableQuantity < item.myProducts[j].itemCount){
+                  item.difference.value =true;
+                  //item.searchList.add(searchProduct[i]);
+                  var dd =item.myProducts[j] ;
+                  searchProduct[i].availableQuantity<1?dd.itemCount =0 :dd.itemCount =searchProduct[i].availableQuantity;
+                  item.cartList.add(dd);
+                  item.indexList.add(dd.productName.name);
+                  print(searchProduct[j].availableQuantity);
+                  print(searchProduct[j].productPrice[0].min);
+                }
+              }
+            }
+          }
+          setLoading(false);
+        } else {
+          setLoading(false);
+          Fluttertoast.showToast(
+              msg: "Product not found",
+              toastLength: Toast.LENGTH_SHORT,
+              backgroundColor: Colors.black87,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      } else if (response.statusCode == 400) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "${data['results'].toString()}",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else if (response.statusCode == 401) {
+        setLoading(false);
+        Fluttertoast.showToast(
+            msg: "User not found",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Something went wrong try again later",
+            toastLength: Toast.LENGTH_SHORT,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e, stack) {
+      print('exception is' + e.toString() + stack.toString());
+      setLoading(false);
+      Fluttertoast.showToast(
+          msg: "Something went wrong try again later",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    return item.difference.value;
+  }
+
   Future<void> getCustomerTransactionData(String code) async {
     setLoading(true);
     try {
@@ -370,97 +464,129 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                     total: total[index],
                                     onTap: () async {
                                       if (paymentType != 0){
-                                        setLoading(true);
-                                        Location _location=new Location();
-                                        var data =await _location.getLocation();
-                                        var response = await OnlineDatabase
-                                            .newpostSalesOrder(
-                                            brand: cartList[index]
-                                                .cartItemName[0]
-                                                .productName
-                                                .brand,
-                                            sub_total: total[index]
-                                                .toString(),
-                                            emp_id: userDetails.userEmpolyeeNumber,
-                                            paymentMethod: paymentType
-                                                .toString(),
-                                            cartData: cartList[index],
-                                            lat:data.latitude.toString(),
-                                            long: data.longitude.toString(),
-                                            customerCode: customer.customerCode)
-                                            .catchError(
-                                              (e) {
-                                                setLoading(false);
-                                                Fluttertoast.showToast(
-                                                  msg: "Error: "+e.response.data["message"],
-                                                  toastLength: Toast.LENGTH_LONG,
-                                                  backgroundColor: Colors.black87,
-                                                  textColor: Colors.white,
-                                                  fontSize: 16.0,
-                                                );
-                                              }
-                                                  // .then(
-                                                  // (value) => setLoading(false)),
-                                        );
-                                        if (response.statusCode == 200) {
-                                          cartData.cartItemName.removeWhere(
-                                                  (element) =>
-                                              element.productName.brand ==
+                                        getAllProduct(items).then((value)async{
+                                          if(value == false){
+                                            setLoading(true);
+                                            Location _location=new Location();
+                                            var data =await _location.getLocation();
+                                            var response = await OnlineDatabase
+                                                .newpostSalesOrder(
+                                                brand: cartList[index]
+                                                    .cartItemName[0]
+                                                    .productName
+                                                    .brand,
+                                                sub_total: total[index]
+                                                    .toString(),
+                                                emp_id: userDetails.userEmpolyeeNumber,
+                                                paymentMethod: paymentType
+                                                    .toString(),
+                                                cartData: cartList[index],
+                                                lat:data.latitude.toString(),
+                                                long: data.longitude.toString(),
+                                                customerCode: customer.customerCode)
+                                                .catchError(
+                                                    (e) {
+                                                  setLoading(false);
+                                                  Fluttertoast.showToast(
+                                                    msg: "Error: "+e.response.data["message"],
+                                                    toastLength: Toast.LENGTH_LONG,
+                                                    backgroundColor: Colors.black87,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0,
+                                                  );
+                                                }
+                                              // .then(
+                                              // (value) => setLoading(false)),
+                                            );
+                                            if (response.statusCode == 200) {
+                                              cartData.cartItemName.removeWhere(
+                                                      (element) =>
+                                                  element.productName.brand ==
+                                                      cartList[index]
+                                                          .cartItemName[0]
+                                                          .productName
+                                                          .brand);
+                                              brandName.removeWhere((element) =>
+                                              element ==
                                                   cartList[index]
                                                       .cartItemName[0]
                                                       .productName
                                                       .brand);
-                                          brandName.removeWhere((element) =>
-                                          element ==
-                                              cartList[index]
-                                                  .cartItemName[0]
-                                                  .productName
-                                                  .brand);
-                                          paymentType = 0;
-                                          cartList.remove(cartList[index]);
-                                          // var responseSms =
-                                          // await OnlineDatabase.sendText(
-                                          //     customer.customerContactNumber,
-                                          //     "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
+                                              paymentType = 0;
+                                              cartList.remove(cartList[index]);
+                                              // var responseSms =
+                                              // await OnlineDatabase.sendText(
+                                              //     customer.customerContactNumber,
+                                              //     "آپ نے ہمارے نمائندے ${userDetails.userName} کو ${total[index].toStringAsFixed(2)} کا آرڈر دیا ہے۔\nشکریہ۔");
 
-                                          var data = jsonDecode(utf8.decode(response.bodyBytes));
-                                          orderID = data['results'][0]['RESULT'].toString().replaceAll("Order Created ", "") ;
-                                          print(data['results'][0]['RESULT'].toString());
+                                              var data = jsonDecode(utf8.decode(response.bodyBytes));
+                                              orderID = data['results'][0]['RESULT'].toString().replaceAll("Order Created ", "") ;
+                                              print(data['results'][0]['RESULT'].toString());
 
-                                          //     .toString()
-                                          //     .substring(13)
-                                          //     .trim();
-                                          print(orderID);
-                                             await getCustomerTransactionData(customer.customerCode);
-                                          Fluttertoast.showToast(
-                                              msg:
-                                              "order placed successfully ${wallet.availableBalance.toStringAsFixed(2)}",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              backgroundColor: Colors.black87,
-                                              textColor: Colors.white,
-                                              fontSize: 16.0);
-                                          if (cartList.length < 1){
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        SucessFullyGeneratedOrderScreen(
-                                                          customer: customer,
-                                                          orderID: orderID,
-                                                        )));
+                                              //     .toString()
+                                              //     .substring(13)
+                                              //     .trim();
+                                              print(orderID);
+                                              await getCustomerTransactionData(customer.customerCode);
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                  "order placed successfully ${wallet.availableBalance.toStringAsFixed(2)}",
+                                                  toastLength: Toast.LENGTH_SHORT,
+                                                  backgroundColor: Colors.black87,
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0);
+                                              if (cartList.length < 1){
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SucessFullyGeneratedOrderScreen(
+                                                              customer: customer,
+                                                              orderID: orderID,
+                                                            )));
+                                              }
+                                              setLoading(false);
+                                            } else {
+                                              print("Response is" +
+                                                  response.statusCode.toString());
+                                              Fluttertoast.showToast(
+                                                  msg:
+                                                  "Cannot palace order above ${wallet.availableBalance.toStringAsFixed(2)}",
+                                                  toastLength: Toast.LENGTH_SHORT,
+                                                  backgroundColor: Colors.black87,
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0);
+                                            }
+                                          }else{
+                                            Alert(
+                                              context: context,
+                                              type: AlertType.warning,
+                                              title: "Order is Updated",
+                                              desc: "آپ کا آرڈر دیر ہونے کی وجہ سے قیمت اور تعداد میں اپڈیٹ ہوا ہے۔",
+                                              buttons: [
+                                                DialogButton(
+                                                    color: themeColor1,
+                                                    child: Text(
+                                                      "ok",
+                                                      style: TextStyle(color: Colors.white, fontSize: 20),
+                                                    ),
+                                                    onPressed: () {
+                                                      items.myProducts.value.clear();
+                                                      items.cartList.clear();
+                                                      items.difference.value=false;
+                                                      for(var i in cartData.cartItemName) {
+                                                        print(i.productName.productCode);
+                                                        items.myProducts.value.add(i);
+                                                      }
+                                                      items.indexList.clear();
+                                                      Navigator.push(
+                                                          context, MaterialPageRoute(builder: (context)=>CartScreen()));
+                                                    }
+                                                )
+                                              ],
+                                            ).show();
                                           }
-                                          setLoading(false);
-                                        } else {
-                                          print("Response is" +
-                                              response.statusCode.toString());
-                                          Fluttertoast.showToast(
-                                              msg:
-                                              "Cannot palace order above ${wallet.availableBalance.toStringAsFixed(2)}",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              backgroundColor: Colors.black87,
-                                              textColor: Colors.white,
-                                              fontSize: 16.0);
-                                        }
+                                        });
                                       } else {
                                         Fluttertoast.showToast(
                                             msg:

@@ -2,11 +2,12 @@ import 'dart:math' show cos, sqrt, asin;
 
 import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:salesmen_app_new/model/box_model.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
 import 'package:salesmen_app_new/model/newCustomerModel.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
-
+import 'package:get/get.dart';
 import 'customerModel.dart';
 
 class CustomerList extends ChangeNotifier{
@@ -146,4 +147,12 @@ class CustomerList extends ChangeNotifier{
             (1 - c((lon2 - lon1) * p))/2;
     return 12742 * asin(sqrt(a));
   }
+}
+
+class CheckAllProducts extends GetxController{
+  var myProducts=[].obs;
+  var searchList=[].obs;
+  var cartList=[].obs;
+  var indexList=[].obs;
+  var difference=false.obs;
 }

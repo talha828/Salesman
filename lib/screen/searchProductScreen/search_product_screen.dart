@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -42,7 +44,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
   int i = 0;
   List<ProductModel> _list = [];
   List<ProductModel> productsearchresult = [];
-
+  final item=Get.put(CheckAllProducts());
   Future getAllProductData() async {
     for (var item in widget.productModel) {
         _list.add(ProductModel(
@@ -269,6 +271,14 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
       bottomNavigationBar: addToCart
           ? InkWell(
         onTap: () {
+          item.myProducts.value.clear();
+          item.cartList.clear();
+          item.difference.value=false;
+          for(var i in cartdata.cartItemName) {
+            print(i.productName.productCode);
+            item.myProducts.value.add(i);
+          }
+          item.indexList.clear();
           Navigator.push(
               context,
               MaterialPageRoute(

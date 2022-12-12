@@ -4,11 +4,13 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
+import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
@@ -181,7 +183,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   //     product.add(ProductModel.fromJson(item));
   //   }
   // }
-
+  final item=Get.put(CheckAllProducts());
   @override
   Widget build(BuildContext context) {
     var f = NumberFormat("###,###.0#", "en_US");
@@ -525,6 +527,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
       bottomNavigationBar: addToCart
           ? InkWell(
         onTap: () {
+          item.myProducts.value.clear();
+          item.cartList.clear();
+          item.difference.value=false;
+          for(var i in cartdata.cartItemName) {
+            print(i.productName.productCode);
+            item.myProducts.value.add(i);
+          }
+          item.indexList.clear();
           Navigator.push(
               context,
               MaterialPageRoute(

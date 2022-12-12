@@ -1,6 +1,7 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
@@ -98,7 +99,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   // }
 
 
-
+  final item=Get.put(CheckAllProducts());
   var f = NumberFormat("###,###.0#", "en_US");
 
   @override
@@ -106,6 +107,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
      List<Widget>imageContainer=Provider.of<CustomerList>(context).imageContainer;
      List<ProductModel> product=Provider.of<CustomerList>(context).product;
      List<ProductModel> searchProduct=Provider.of<CustomerList>(context).searchProduct;
+     final cartdata = Provider.of<CartModel>(context, listen: true);
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
@@ -348,6 +350,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       bottomNavigationBar: addToCart
           ? InkWell(
         onTap: () {
+          item.myProducts.value.clear();
+          item.cartList.clear();
+          item.difference.value=false;
+          for(var i in cartdata.cartItemName) {
+            print(i.productName.productCode);
+            item.myProducts.value.add(i);
+          }
+          item.indexList.clear();
           Navigator.push(
               context,
               MaterialPageRoute(
