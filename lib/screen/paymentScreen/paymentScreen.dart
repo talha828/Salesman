@@ -231,6 +231,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ? showDialog(
                                       height,
                                       width,
+                                      customerData,
                                       paymentType['payment'][index],
                                       (amount, name) async {
                                         totalAmount = amount;
@@ -586,7 +587,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
   }
 
-  void showDialog(double height, double width, var paymentTypedetails,
+  void showDialog(double height, double width,CustomerModel user ,var paymentTypedetails,
       Function onselected) {
     double sizedboxvalue = 0.02;
 
@@ -879,10 +880,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red)),
-                  hintText: '4,045.00',
+                  hintText: user.outStanding,
                   hintStyle: TextStyle(
                     fontSize: 14,
-                    color: textcolorlightgrey,
                   ),
                   prefixIcon: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),

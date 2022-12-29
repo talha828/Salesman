@@ -14,7 +14,8 @@ class CustomerInfo {
   String aCTIVE;
   String sHOPASSIGNED;
   String bALANCE;
-  String distances;
+  String lASTDAYS;
+
 
 
   CustomerInfo(
@@ -33,10 +34,10 @@ class CustomerInfo {
         this.aCTIVE,
         this.sHOPASSIGNED,
         this.bALANCE,
-        this.distances
+        this.lASTDAYS
       });
 
-  CustomerInfo.fromJson(Map<String, dynamic> json,double distance) {
+  CustomerInfo.fromJson(Map<String, dynamic> json ) {
     cUSTCODE = json['CUST_CODE'];
     cUSTOMER = json['CUSTOMER'];
     cONTACTPERSON = json['CONTACT_PERSON'];
@@ -52,7 +53,7 @@ class CustomerInfo {
     aCTIVE = json['ACTIVE'];
     sHOPASSIGNED = json['SHOPASSIGNED'];
     bALANCE = json['BALANCE'].toString();
-    distances = distance.toString();
+    lASTDAYS= json['LAST_DAYS'].toString();
   }
 
   Map<String, dynamic> toJson() {

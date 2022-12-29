@@ -13,6 +13,7 @@ import 'customerModel.dart';
 class CustomerList extends ChangeNotifier{
   //loader
   bool loading =false;
+  bool allShop =false;
   //customer list
   List<CustomerInfo>customerData=[];
   List<CustomerInfo>dues=[];
@@ -85,9 +86,13 @@ class CustomerList extends ChangeNotifier{
     notifyListeners();
   }
   void clearList(){
-    customerData.clear();
-    //dues.clear();
+    //customerData.clear();
+    dues.clear();
     assign.clear();
+    notifyListeners();
+  }
+  void clearAllCustomer(){
+    customerData.clear();
     notifyListeners();
   }
   void clearSliderImage(){
@@ -121,6 +126,9 @@ class CustomerList extends ChangeNotifier{
   void setLoading(bool value){
     loading=value;
   }
+  void setLoadingAllShop(bool value){
+    allShop=value;
+  }
   void storeResponse(Map<String,dynamic>value){
     response.addAll(value);
   }
@@ -131,7 +139,7 @@ class CustomerList extends ChangeNotifier{
     List<CustomerInfo>customer=[];
     for (var item in response["results"]){
       var dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLocation.latitude,userLocation.longitude);
-      customer.add(CustomerInfo.fromJson(item,dist));
+      customer.add(CustomerInfo.fromJson(item));
     }
     //customer.sort((a,b)=>a.distance.compareTo(b.distance));
     getAllCustomer(customer);

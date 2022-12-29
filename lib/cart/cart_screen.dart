@@ -502,14 +502,28 @@ class _CartScreenState extends State<CartScreen> {
                                               InkWell(
                                                 onTap:(){
                                                   if( cartData[index].itemCount>=0){
-                                                    setState(() {
-                                                      cartData[index].itemCount++;
-                                                      itemCountController.text=cartData[index].itemCount.toString();
-                                                      Provider.of<CartModel>(context, listen: false).updateSubTotal();
-                                                      //cartData[index].itemPrice= calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].itemDetails)??0;
-                                                      //cartData[index].itemTotal= cartData[index].itemPrice*cartData[index].itemCount;
-                                                    });
-                                                  }
+                                                   if(cartData[index].itemCount < cartData[index].productName.availableQuantity) {
+                                                                setState(() {
+                                                                  cartData[
+                                                                          index]
+                                                                      .itemCount++;
+                                                                  itemCountController
+                                                                      .text = cartData[
+                                                                          index]
+                                                                      .itemCount
+                                                                      .toString();
+                                                                  Provider.of<CartModel>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .updateSubTotal();
+                                                                  //cartData[index].itemPrice= calculatePrice(quantity: cartData[index].itemCount,productDetils: cartData[index].itemDetails)??0;
+                                                                  //cartData[index].itemTotal= cartData[index].itemPrice*cartData[index].itemCount;
+                                                                });
+                                                              }else{
+                                                     Fluttertoast.showToast(msg: "you reach the stock limit");
+                                                   }
+                                                            }
 
                                                 },
                                                 child:  Container(

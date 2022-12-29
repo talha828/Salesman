@@ -49,7 +49,6 @@ class _SearchScreenState extends State<SearchScreen> {
          aCTIVE:item.aCTIVE,
          sHOPASSIGNED:item.sHOPASSIGNED,
              bALANCE:item.bALANCE,
-             distances:item.distances,
         ));
 
         i++;

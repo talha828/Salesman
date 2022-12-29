@@ -148,7 +148,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
    void getAllCustomerData() async {
      if(true){
        try {
-         Provider.of<CustomerList>(context,listen: false).setLoading(true);
+         Provider.of<CustomerList>(context,listen: false).setLoadingAllShop(true);
          var data =await location.getLocation();
          List<AddressModel>addressList=[];
          userLatLng=Coordinates(data.latitude,data.longitude);
@@ -177,29 +177,31 @@ class _AllShopScreenState extends State<AllShopScreen> {
              //print("Response is" + data.toString());
 
              for (var item in data["results"]) {
-               double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-               customer.add(CustomerInfo.fromJson(item,dist));
+               //double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+               customer.add(CustomerInfo.fromJson(item));
              }
 
-             for(int i=0; i < customer.length-1; i++){
-               for(int j=0; j < customer.length-i-1; j++){
-                 if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
-                   CustomerInfo temp = customer[j];
-                   customer[j] = customer[j+1];
-                   customer[j+1] = temp;
-                 }
-               }
-             }
-             Provider.of<CustomerList>(context,listen: false).clearList();
-             Provider.of<CustomerList>(context,listen: false).storeResponse(data);
+             // for(int i=0; i < customer.length-1; i++){
+             //   for(int j=0; j < customer.length-i-1; j++){
+             //     if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
+             //       CustomerInfo temp = customer[j];
+             //       customer[j] = customer[j+1];
+             //       customer[j+1] = temp;
+             //     }
+             //   }
+             // }
+             Provider.of<CustomerList>(context,listen: false).clearAllCustomer();
+             // Provider.of<CustomerList>(context,listen: false).storeResponse(data);
              Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
-             Provider.of<CustomerList>(context,listen: false).getDues(customer);
-             Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
+             // Provider.of<CustomerList>(context,listen: false).getDues(customer);
+             // Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
              print("done");
-             setState(() {});
+             setState(() {
+               isLoading=false;
+             });
              setLoading(false);
              //print("length is"+limitedcustomer.length.toString());
-             Provider.of<CustomerList>(context,listen: false).setLoading(false);
+             Provider.of<CustomerList>(context,listen: false).setLoadingAllShop(false);
 
            } else if (response.statusCode == 400) {
              var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -210,7 +212,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
                  textColor: Colors.white,
                  fontSize: 16.0);
              setLoading(false);
-             Provider.of<CustomerList>(context,listen: false).setLoading(false);
+             Provider.of<CustomerList>(context,listen: false).setLoadingAllShop(false);
            }}
        } catch (e, stack) {
          print('exception is' + e.toString());
@@ -221,7 +223,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
          //     textColor: Colors.white,
          //     fontSize: 16.0);
           setLoading(false);
-         Provider.of<CustomerList>(context,listen: false).setLoading(false);
+         Provider.of<CustomerList>(context,listen: false).setLoadingAllShop(false);
        }
      }
    }
@@ -239,6 +241,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
   @override
   void initState() {
     startLocationService();
+    getAllCustomerData();
     super.initState();
   }
   @override
@@ -250,6 +253,12 @@ class _AllShopScreenState extends State<AllShopScreen> {
     var height=MediaQuery.of(context).size.height;
     // dda.length>0?getLocation():false;
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: ()=>Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios)),
+        title: Text("All Shop",style: TextStyle(color: Colors.white),),
+      ),
       body: Stack(
         children: [
         SingleChildScrollView(

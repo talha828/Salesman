@@ -48,7 +48,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                       name:widget.customer[index].cONTACTPERSON ,
                       phoneNo:widget.customer[index].pHONE1 ,
                       lastVisit:"--" ,
-                      dues: "--",
+                      dues: "0",
                       lastTrans:"--" ,
                       outstanding: widget.customer[index].bALANCE,
                       shopAssigned:widget.customer[index].sHOPASSIGNED ,

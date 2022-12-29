@@ -31,7 +31,6 @@ class AssignShopScreen extends StatefulWidget {
 
 class _AssignShopScreenState extends State<AssignShopScreen> {
    Coordinates userLatLng;
-  List<CustomerInfo> customer=[];
   List<CustomerModel> customers=[];
   bool isLoading=false;
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
@@ -46,61 +45,93 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
    loc.Location location = new loc.Location();
    String actualAddress="Searching....";
    void getAllCustomerData() async {
-     if(true){
+     List<CustomerInfo> customer=[];
+     if (true) {
        try {
-         Provider.of<CustomerList>(context,listen: false).setLoading(true);
-         var data =await location.getLocation();
-         List<AddressModel>addressList=[];
-         userLatLng=Coordinates(data.latitude,data.longitude);
-         String mapApiKey="AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+         Provider.of<CustomerList>(context, listen: false).setLoading(true);
+         var data = await location.getLocation();
+         List<AddressModel> addressList = [];
+         userLatLng = Coordinates(data.latitude, data.longitude);
+         String mapApiKey = "AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
          String _host = 'https://maps.google.com/maps/api/geocode/json';
-         final url = '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
+         final url =
+             '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
          print(url);
-         if(userLatLng.latitude != null && userLatLng.longitude != null){
+         if (userLatLng.latitude != null && userLatLng.longitude != null) {
            var response1 = await http.get(Uri.parse(url));
-           if(response1.statusCode == 200) {
+           if (response1.statusCode == 200) {
              Map data = jsonDecode(response1.body);
              String _formattedAddress = data["results"][0]["formatted_address"];
              var address = data["results"][0]["address_components"];
-             for(var i in address){
+             for (var i in address) {
                addressList.add(AddressModel.fromJson(i));
              }
-             actualAddress=addressList[3].shortName;
-             Provider.of<CustomerList>(context,listen: false).updateAddress(actualAddress);
+             actualAddress = addressList[3].shortName;
+             Provider.of<CustomerList>(context, listen: false)
+                 .updateAddress(actualAddress);
              print("response ==== $_formattedAddress");
              _formattedAddress;
            }
-           var response = await OnlineDatabase.getAllCustomer();
+
+
+
+           var response = await OnlineDatabase.getDuesShop();
            print("Response code is " + response.statusCode.toString());
            if (response.statusCode == 200) {
              var data = jsonDecode(utf8.decode(response.bodyBytes));
+             for (var item in data["results"]) {
+               customer.add(CustomerInfo.fromJson(item));
+               print(item['CUST_CODE']);
+             }
+             Provider.of<CustomerList>(context, listen: false).clearList();
+             Provider.of<CustomerList>(context, listen: false).getDues(customer);
+
+
+
+
+             var response1 = await OnlineDatabase.getAssignShop();
+             print("Response code is " + response1.statusCode.toString());
+             if (response1.statusCode == 200) {
+               var data = jsonDecode(utf8.decode(response1.bodyBytes));
+               for (var item in data["results"]) {
+                 customer.add(CustomerInfo.fromJson(item));
+                 print(item['CUST_CODE']);
+               }
+               Provider.of<CustomerList>(context, listen: false).getAssignShop(customer);
+             }
+
+
+
+
+
              //print("Response is" + data.toString());
 
-             for (var item in data["results"]) {
-               double dist=calculateDistance(double.parse(item["LATITUDE"].toString()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
-               customer.add(CustomerInfo.fromJson(item,dist));
-             }
+             //var dist=calculateDistance(double.parse(item["LATITUDE"].toString().toLowerCase()=="null"?1.toString():item["LATITUDE"].toString()), double.parse(item["LONGITUDE"].toString().toLowerCase()=="null"?1.toString():item["LONGITUDE"].toString()),userLatLng.latitude,userLatLng.longitude);
+             //print(dist.toString());
+             // print(item['CUSTOMER']);
+             // print(item['LATITUDE']);
+             // print(item['LONGITUDE']);
 
-             for(int i=0; i < customer.length-1; i++){
-               for(int j=0; j < customer.length-i-1; j++){
-                 if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
-                   CustomerInfo temp = customer[j];
-                   customer[j] = customer[j+1];
-                   customer[j+1] = temp;
-                 }
-               }
-             }
-             Provider.of<CustomerList>(context,listen: false).clearList();
-             Provider.of<CustomerList>(context,listen: false).storeResponse(data);
-             Provider.of<CustomerList>(context,listen: false).getAllCustomer(customer);
-             Provider.of<CustomerList>(context,listen: false).getDues(customer);
-             Provider.of<CustomerList>(context,listen: false).getAssignShop(customer);
-             print("done");
-             setState(() {});
-             setLoading(false);
+             // for(int i=0; i < customer.length-1; i++){
+             //   for(int j=0; j < customer.length-i-1; j++){
+             //     if(double.parse(customer[j].distances) > double.parse(customer[j+1].distances)){
+             //       CustomerInfo temp = customer[j];
+             //       customer[j] = customer[j+1];
+             //       customer[j+1] = temp;
+             //     }
+             //   }
+             // }
+
+             // Provider.of<CustomerList>(context, listen: false)
+             //     .storeResponse(data);
+             // Provider.of<CustomerList>(context, listen: false)
+             //     .getAllCustomer(customer);
+             //print("done");
+             setState(() {
+               isLoading=false;
+             });
              //print("length is"+limitedcustomer.length.toString());
-             Provider.of<CustomerList>(context,listen: false).setLoading(false);
-
+             Provider.of<CustomerList>(context, listen: false).setLoading(false);
            } else if (response.statusCode == 400) {
              var data = jsonDecode(utf8.decode(response.bodyBytes));
              Fluttertoast.showToast(
@@ -109,19 +140,18 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                  backgroundColor: Colors.black87,
                  textColor: Colors.white,
                  fontSize: 16.0);
-             setLoading(false);
-             Provider.of<CustomerList>(context,listen: false).setLoading(false);
-           }}
+             Provider.of<CustomerList>(context, listen: false).setLoading(false);
+           }
+         }
        } catch (e, stack) {
          print('exception is' + e.toString());
-         // Fluttertoast.showToast(
-         //     msg: "Error: " + e.toString(),
-         //     toastLength: Toast.LENGTH_SHORT,
-         //     backgroundColor: Colors.black87,
-         //     textColor: Colors.white,
-         //     fontSize: 16.0);
-         setLoading(false);
-         Provider.of<CustomerList>(context,listen: false).setLoading(false);
+         Fluttertoast.showToast(
+             msg: "Error: " + e.toString(),
+             toastLength: Toast.LENGTH_SHORT,
+             backgroundColor: Colors.black87,
+             textColor: Colors.white,
+             fontSize: 16.0);
+         Provider.of<CustomerList>(context, listen: false).setLoading(false);
        }
      }
    }
@@ -295,7 +325,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: dd.assign.length>10?10:dd.assign.length,
+                                  itemCount: dd.assign.length,
                                   itemBuilder: (context, index) {
                                     return Column(
                                       children: [
@@ -311,8 +341,8 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                          address:  dds[index].aDDRESS,
                                          name: dds[index].cONTACTPERSON ,
                                          phoneNo: dds[index].pHONE1 ,
-                                         lastVisit:"--" ,
-                                         dues: "0",
+                                         lastVisit:dds[index].lASTDAYS ,
+                                         dues: dds[index].bALANCE,
                                          lastTrans:"--" ,
                                          outstanding:  dds[index].bALANCE,
                                          shopAssigned: dds[index].sHOPASSIGNED ,
