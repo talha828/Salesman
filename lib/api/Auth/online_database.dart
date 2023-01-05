@@ -659,16 +659,16 @@ class OnlineDatabase{
       print("exception in post payment api is: "+e.toString());
     }
   }
-  static Future<dynamic>getDuesShop()async{
-    Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=DUES&pin_cust_code=");
+  static Future<dynamic>getDuesShop({String lat, String long})async{
+    Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=DUES&pin_cust_code=&pin_longitude=$long&pin_latitude=$lat");
     print("login url is: "+url.toString());
     final response = await http.get(url);
     print(response.statusCode.toString());
     print("login data is: "+response.body.toString());
     return response;
   }
-  static Future<dynamic>getAssignShop()async{
-    Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=ASSIGNED&pin_cust_code=");
+  static Future<dynamic>getAssignShop({String lat, String long})async{
+    Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=ASSIGNED&pin_cust_code=&pin_longitude=$long&pin_latitude=$lat");
     print("login url is: "+url.toString());
     final response = await http.get(url);
     print(response.statusCode.toString());

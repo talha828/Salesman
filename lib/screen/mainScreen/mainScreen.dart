@@ -73,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
 
 
 
-          var response = await OnlineDatabase.getDuesShop();
+          var response = await OnlineDatabase.getDuesShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
           print("Response code is " + response.statusCode.toString());
           if (response.statusCode == 200) {
             var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -87,7 +87,7 @@ class _MainScreenState extends State<MainScreen> {
 
 
 
-            var response1 = await OnlineDatabase.getAssignShop();
+            var response1 = await OnlineDatabase.getAssignShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
             print("Response code is " + response1.statusCode.toString());
             if (response1.statusCode == 200) {
               var data = jsonDecode(utf8.decode(response1.bodyBytes));

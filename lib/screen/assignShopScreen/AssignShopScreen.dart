@@ -75,7 +75,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
 
 
 
-           var response = await OnlineDatabase.getDuesShop();
+           var response = await OnlineDatabase.getDuesShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
            print("Response code is " + response.statusCode.toString());
            if (response.statusCode == 200) {
              var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -89,7 +89,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
 
 
 
-             var response1 = await OnlineDatabase.getAssignShop();
+             var response1 = await OnlineDatabase.getAssignShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
              print("Response code is " + response1.statusCode.toString());
              if (response1.statusCode == 200) {
                var data = jsonDecode(utf8.decode(response1.bodyBytes));
@@ -325,7 +325,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  itemCount: dd.assign.length,
+                                  itemCount: dd.assign.length >25 ?25:dd.assign.length,
                                   itemBuilder: (context, index) {
                                     return Column(
                                       children: [
@@ -341,9 +341,9 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
                                          address:  dds[index].aDDRESS,
                                          name: dds[index].cONTACTPERSON ,
                                          phoneNo: dds[index].pHONE1 ,
-                                         lastVisit:dds[index].lASTDAYS ,
-                                         dues: dds[index].bALANCE,
-                                         lastTrans:"--" ,
+                                         lastVisit:"--" ,
+                                         dues: "0",
+                                         lastTrans:dds[index].lASTDAYS ,
                                          outstanding:  dds[index].bALANCE,
                                          shopAssigned: dds[index].sHOPASSIGNED ,
                                          lat:  dds[index].lATITUDE,

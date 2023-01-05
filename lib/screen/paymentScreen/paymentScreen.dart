@@ -591,8 +591,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       Function onselected) {
     double sizedboxvalue = 0.02;
 
-    TextEditingController amount = new TextEditingController();
     TextEditingController name = new TextEditingController();
+    TextEditingController amount = new TextEditingController(text: user.outStanding.toString());
     checkBody(double height, double width) {
       return Column(
         children: [
