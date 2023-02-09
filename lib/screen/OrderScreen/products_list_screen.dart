@@ -20,10 +20,13 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductListScreen extends StatefulWidget {
   String productmaintypeId, productsubtypeId;
+  int value;
   ProductListScreen(
       {
         this.productmaintypeId,
-        this.productsubtypeId});
+        this.productsubtypeId,
+        this.value,
+      });
 
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
@@ -130,7 +133,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
       setLoading(true);
       var response = await OnlineDatabase.getAllproductsubcategory(
           maintypeId: widget.productmaintypeId.toString(),
-          subTypeId: widget.productsubtypeId.toString());
+          subTypeId: widget.productsubtypeId.toString(),
+          value: widget.value,
+      );
+
       print("Response is" + response.statusCode.toString());
       if (response.statusCode == 200) {
         var data = jsonDecode(utf8.decode(response.bodyBytes));

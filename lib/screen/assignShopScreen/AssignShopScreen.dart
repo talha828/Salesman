@@ -88,7 +88,7 @@ class _AssignShopScreenState extends State<AssignShopScreen> {
 
 
 
-
+             customer.clear();
              var response1 = await OnlineDatabase.getAssignShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
              print("Response code is " + response1.statusCode.toString());
              if (response1.statusCode == 200) {

@@ -97,7 +97,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
 
 
 
-
+            customer.clear();
             var response1 = await OnlineDatabase.getAssignShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
             print("Response code is " + response1.statusCode.toString());
             if (response1.statusCode == 200) {
@@ -346,7 +346,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                             child: ListView.builder(
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
-                              reverse: true,
+                              // reverse: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: dd.dues.length >25 ?25:dd.dues.length,
                               itemBuilder: (context, index) {
@@ -376,7 +376,7 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                                         setState(() {
                                           isLoading=value;
                                         });
-                                      } ,
+                                      },
                                     ),
                                     // CustomShopContainer(
                                     //   customerList: dd.dues,

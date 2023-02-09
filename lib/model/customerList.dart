@@ -48,20 +48,20 @@ class CustomerList extends ChangeNotifier{
     dues.clear();
     for (var i in value){
       if(i.sHOPASSIGNED=="Yes"){
-        if(double.parse(i.bALANCE)>0.00){
+        if(double.parse(i.bALANCE)>100.00){
           dues.add(i);
         }
       }
     }
-    for(int i=0; i < dues.length-1; i++){
-      for(int j=0; j < dues.length-i-1; j++){
-        if(double.parse(dues[j].bALANCE) > double.parse(dues[j+1].bALANCE)){
-          CustomerInfo temp = dues[j];
-          dues[j] = dues[j+1];
-          dues[j+1] = temp;
-        }
-      }
-    }
+    // for(int i=0; i < dues.length-1; i++){
+    //   for(int j=0; j < dues.length-i-1; j++){
+    //     if(double.parse(dues[j].bALANCE) > double.parse(dues[j+1].bALANCE)){
+    //       CustomerInfo temp = dues[j];
+    //       dues[j] = dues[j+1];
+    //       dues[j+1] = temp;
+    //     }
+    //   }
+    // }
     notifyListeners();
   }
   void sliderPicture(List<Widget> value){

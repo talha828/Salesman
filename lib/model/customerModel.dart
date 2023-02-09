@@ -9,8 +9,8 @@ class CustomerModel extends ChangeNotifier {
   String customerCategory;
   String customerCnicExpiry;
   String name;
-  var customerLatitude;
-  var customerLongitude;
+  String customerLatitude;
+  String customerLongitude;
   String customerContactPersonName;
   String customerContactPersonName2;
   String customerContactNumber;
@@ -89,8 +89,8 @@ class CustomerModel extends ChangeNotifier {
       customerCode = json['CUST_CODE'];
       customerShopName = json['CUSTOMER'];
       customerName = json['NICK_NAME'];
-      customerLatitude = json['LATITUDE']??null;
-      customerLongitude = json['LONGITUDE']??null;
+      customerLatitude = json['LATITUDE'].toString();
+      customerLongitude = json['LONGITUDE'].toString();
       customerAddress = json['ADDRESS'] ?? 'Not Found';
       customerContactPersonName = json['OWNER'] ?? '-';
       customerContactNumber = json['PHONE1'].toString() ?? '-';

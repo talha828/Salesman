@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/cart/cart_screen.dart';
+import 'package:salesmen_app_new/generated/assets.dart';
 import 'package:salesmen_app_new/model/cart_model.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
@@ -268,6 +269,65 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       SizedBox(
                         height: height * 0.025,
                       ),
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => ProductListScreen(
+                                      value: 0, )));
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(
+                              //color: Colors.white,
+                              // boxShadow: [
+                              //   BoxShadow(
+                              //     offset: Offset(0,-2),
+                              //     spreadRadius: 5,
+                              //     blurRadius: 30,
+                              //     color: Colors.grey,
+                              //   )
+                              // ]
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: width * 0.04,horizontal: width * 0.18),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                      colors: [
+                                        //  Color(0xff720000),
+                                        // Color(0xfffb0102),
+                                        const Color(0xFF3366FF),
+                                        const Color(0xFF00CCFF),
+                                      ],
+                                      begin: Alignment.topRight,
+                                      end: Alignment.bottomLeft,
+                                      // stops: [0.0, 1.0],
+                                      tileMode: TileMode.repeated),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      offset: Offset(0,-2),
+                                      spreadRadius: 5,
+                                      blurRadius: 30,
+                                      color: Colors.grey,
+                                    )
+                                  ],
+                                  color: themeColor1,
+                                  borderRadius: BorderRadius.circular(7)
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: width * 0.04,horizontal: width * 0.05),
+                              child: Row(
+                                children: [
+                                  Image.asset(Assets.iconsGift,width: width * 0.08,),
+                                  SizedBox(width: 15,),
+                                  Text("SPECIAL OFFER",textAlign: TextAlign.center,style: TextStyle(color: Colors.white,letterSpacing: 1,fontWeight: FontWeight.bold,fontSize: width *0.05),),
+                                ],
+                              ),
+                            )
+                        ),
+                      ),
+                      SizedBox(
+                        height: height * 0.025,
+                      ),
                       ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -318,7 +378,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                         MaterialPageRoute(
                                                             builder: (_) => ProductListScreen(
                                                                 productmaintypeId: product[index].productmaintypeId,
-                                                                productsubtypeId: product[index].productsubtypeList[i].productsubtypeId))).then((value){
+                                                                productsubtypeId: product[index].productsubtypeList[i].productsubtypeId,value: 1,))).then((value){
                                                       addToCart = false;
                                                       if (Provider.of<CartModel>(context, listen: false)
                                                           .cartItemName

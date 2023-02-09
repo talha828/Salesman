@@ -730,9 +730,9 @@ class _CustomShopContainerState extends State<CustomShopContainer> {
                                         await MapLauncher.showMarker(
                                           mapType: MapType.google,
                                           coords: Coords(
-                                              widget.customerData.customerLatitude,
-                                              widget
-                                                  .customerData.customerLongitude),
+                                              double.parse(widget.customerData.customerLatitude),
+                                              double.parse(widget
+                                                  .customerData.customerLongitude)),
                                           title:
                                           widget.customerData.customerShopName,
                                           description:

@@ -19,9 +19,9 @@ class OnlineDatabase{
   static const String _something='Something went wrong';
   static int _secs=20;
   static const String _timeoutString="Response Timed Out";
-  static Future<dynamic> getAllproductsubcategory({String maintypeId,String subTypeId}) async {
+  static Future<dynamic> getAllproductsubcategory({String maintypeId,String subTypeId,int value }) async {
     //var url=Uri.parse(getproductsubcategoryListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_cust_code=&pin_itcd=&pin_main_type=$maintypeId&pin_sub_type=$subTypeId');
-    var url=Uri.parse(directory +"getprodprice?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=&pin_itcd=&pin_main_type=$maintypeId&pin_sub_type=$subTypeId&pin_app_for=");
+    var url=Uri.parse(value ==0 ? directory+ "getprodprice?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=&pin_itcd=&pin_main_type=&pin_sub_type=&pin_app_for=&pin_promotional=Y":directory +"getprodprice?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=&pin_itcd=&pin_main_type=$maintypeId&pin_sub_type=$subTypeId&pin_app_for=");
     print("getAllproductsubcategory url is "+url.toString());
     final response = await http.get(url);
     return response;
@@ -661,7 +661,7 @@ class OnlineDatabase{
   }
   static Future<dynamic>getDuesShop({String lat, String long})async{
     Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=DUES&pin_cust_code=&pin_longitude=$long&pin_latitude=$lat");
-    print("login url is: "+url.toString());
+    print("login url is: "+url.query);
     final response = await http.get(url);
     print(response.statusCode.toString());
     print("login data is: "+response.body.toString());
@@ -669,7 +669,7 @@ class OnlineDatabase{
   }
   static Future<dynamic>getAssignShop({String lat, String long})async{
     Uri url=Uri.parse(directory +"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=ASSIGNED&pin_cust_code=&pin_longitude=$long&pin_latitude=$lat");
-    print("login url is: "+url.toString());
+    print("login url is: "+url.path);
     final response = await http.get(url);
     print(response.statusCode.toString());
     print("login data is: "+response.body.toString());

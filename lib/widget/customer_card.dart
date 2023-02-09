@@ -149,6 +149,7 @@ class _CustomerCardState extends State<CustomerCard> {
               textColor: Colors.white,
               fontSize: 16.0);
         }
+        return true;
       }).catchError((e) => Fluttertoast.showToast(
               msg: 'Some thing went wrong',
               toastLength: Toast.LENGTH_SHORT,
