@@ -49,7 +49,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                       phoneNo:widget.customer[index].pHONE1 ,
                       lastVisit:"--" ,
                       dues: "0",
-                      lastTrans:"--" ,
+                      lastTrans:widget.customer[index].lASTDAYS ,
                       outstanding: widget.customer[index].bALANCE,
                       shopAssigned:widget.customer[index].sHOPASSIGNED ,
                       lat: widget.customer[index].lATITUDE,

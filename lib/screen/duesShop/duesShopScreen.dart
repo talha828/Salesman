@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/model.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart' as loc;
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
@@ -27,11 +27,10 @@ import 'package:salesmen_app_new/screen/searchCustomer/srearchCustomerScreen.dar
 import 'package:salesmen_app_new/screen/viewAll/viewAllScreen.dart';
 import 'package:salesmen_app_new/widget/customer_card.dart';
 import 'package:shimmer/shimmer.dart';
+
 class DuesShopScreen extends StatefulWidget {
-UserModel user;
-DuesShopScreen({this.user});
-
-
+  UserModel user;
+  DuesShopScreen({this.user});
 
   @override
   State<DuesShopScreen> createState() => _DuesShopScreenState();
@@ -39,52 +38,58 @@ DuesShopScreen({this.user});
 
 class _DuesShopScreenState extends State<DuesShopScreen> {
   Coordinates userLatLng;
-  List<CustomerInfo> customer=[];
-  List<CustomerModel> customers=[];
-  bool isLoading=false;
+  List<CustomerInfo> customer = [];
+  List<CustomerModel> customers = [];
+  bool isLoading = false;
   List<String> menuButton = ['DIRECTIONS', 'CHECK-IN'];
-  double calculateDistance(lat1, lon1, lat2, lon2){
+  double calculateDistance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
     var c = cos;
-    var a = 0.5 - c((lat2 - lat1) * p)/2 +
-        c(lat1 * p) * c(lat2 * p) *
-            (1 - c((lon2 - lon1) * p))/2;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
   }
+
   loc.Location location = new loc.Location();
-  String actualAddress="Searching....";
+  String actualAddress = "Searching....";
   void getAllCustomerData() async {
-    List<CustomerInfo> customer=[];
+    List<CustomerInfo> customer = [];
     if (true) {
-      try {
-        Provider.of<CustomerList>(context, listen: false).setLoading(true);
-        var data = await location.getLocation();
-        List<AddressModel> addressList = [];
-        userLatLng = Coordinates(data.latitude, data.longitude);
-        String mapApiKey = "AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
-        String _host = 'https://maps.google.com/maps/api/geocode/json';
-        final url =
-            '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
-        print(url);
-        if (userLatLng.latitude != null && userLatLng.longitude != null) {
-          var response1 = await http.get(Uri.parse(url));
-          if (response1.statusCode == 200) {
-            Map data = jsonDecode(response1.body);
-            String _formattedAddress = data["results"][0]["formatted_address"];
-            var address = data["results"][0]["address_components"];
-            for (var i in address) {
-              addressList.add(AddressModel.fromJson(i));
-            }
-            actualAddress = addressList[3].shortName;
-            Provider.of<CustomerList>(context, listen: false)
-                .updateAddress(actualAddress);
-            print("response ==== $_formattedAddress");
-            _formattedAddress;
-          }
+      // try {
+      Provider.of<CustomerList>(context, listen: false).setDuesLoading(true);
+      // Provider.of<CustomerList>(context, listen: false).setAssignLoading(true);
+        var location = await loc.Location().getLocation();
+        userLatLng = Coordinates(location.latitude, location.longitude);
+        setState(() {});
+        //Provider.of<CustomerList>(context, listen: false).updateList(userLatLng);
+        actualAddress="Karachi";
+        // List<AddressModel> addressList = [];
+        // userLatLng = Coordinates(data.latitude, data.longitude);
+        // String mapApiKey = "AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+        // String _host = 'https://maps.google.com/maps/api/geocode/json';
+        // final url =
+        //     '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
+        // print(url);
+        // if (userLatLng.latitude != null && userLatLng.longitude != null) {
+        //   var response1 = await http.get(Uri.parse(url));
+        //   // if (response1.statusCode == 200) {
+        //     Map data = jsonDecode(response1.body);
+        //     String _formattedAddress = data["results"][0]["formatted_address"];
+        //     var address = data["results"][0]["address_components"];
+        //     for (var i in address) {
+        //       addressList.add(AddressModel.fromJson(i));
+        //     }
+        //     actualAddress = addressList[3].shortName;
+        //     Provider.of<CustomerList>(context, listen: false)
+        //         .updateAddress(actualAddress);
+        //     print("response ==== $_formattedAddress");
+        //     _formattedAddress;
+        //   }
 
-
-
-          var response = await OnlineDatabase.getDuesShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
+          var response = await OnlineDatabase.getGDuesShop(
+              lat: userLatLng.latitude.toString(),
+              long: userLatLng.longitude.toString(),);
           print("Response code is " + response.statusCode.toString());
           if (response.statusCode == 200) {
             var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -92,26 +97,26 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
               customer.add(CustomerInfo.fromJson(item));
               print(item['CUST_CODE']);
             }
-            Provider.of<CustomerList>(context, listen: false).clearList();
-            Provider.of<CustomerList>(context, listen: false).getDues(customer);
-
-
+            Provider.of<CustomerList>(context, listen: false).clearDues();
+            Provider.of<CustomerList>(context, listen: false)
+                .getMotorBikeDues(customer);
+            Provider.of<CustomerList>(context, listen: false).setDuesLoading(false);
+            setState(() {});
 
             customer.clear();
-            var response1 = await OnlineDatabase.getAssignShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
-            print("Response code is " + response1.statusCode.toString());
-            if (response1.statusCode == 200) {
-              var data = jsonDecode(utf8.decode(response1.bodyBytes));
-              for (var item in data["results"]) {
-                customer.add(CustomerInfo.fromJson(item));
-                print(item['CUST_CODE']);
-              }
-              Provider.of<CustomerList>(context, listen: false).getAssignShop(customer);
-            }
-
-
-
-
+            // var response1 = await OnlineDatabase.getAssignShop(
+            //     lat: userLatLng.latitude.toString(),
+            //     long: userLatLng.longitude.toString());
+            // print("Response code is " + response1.statusCode.toString());
+            // if (response1.statusCode == 200) {
+            //   var data = jsonDecode(utf8.decode(response1.bodyBytes));
+            //   for (var item in data["results"]) {
+            //     customer.add(CustomerInfo.fromJson(item));
+            //     print(item['CUST_CODE']);
+            //   }
+            //   Provider.of<CustomerList>(context, listen: false)
+            //       .getAssignShop(customer);
+            // }
 
             //print("Response is" + data.toString());
 
@@ -136,11 +141,11 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
             // Provider.of<CustomerList>(context, listen: false)
             //     .getAllCustomer(customer);
             //print("done");
-            setState(() {
-              isLoading=false;
-            });
+            // setState(() {
+            //   isLoading = false;
+            // });
             //print("length is"+limitedcustomer.length.toString());
-            Provider.of<CustomerList>(context, listen: false).setLoading(false);
+            // Provider.of<CustomerList>(context, listen: false).setAssignLoading(false);
           } else if (response.statusCode == 400) {
             var data = jsonDecode(utf8.decode(response.bodyBytes));
             Fluttertoast.showToast(
@@ -149,43 +154,45 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                 backgroundColor: Colors.black87,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Provider.of<CustomerList>(context, listen: false).setLoading(false);
+            Provider.of<CustomerList>(context, listen: false).setDuesLoading(false);
+            // Provider.of<CustomerList>(context, listen: false).setAssignLoading(false);
           }
-        }
-      } catch (e, stack) {
-        print('exception is' + e.toString());
-        Fluttertoast.showToast(
-            msg: "Error: " + e.toString(),
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.black87,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        Provider.of<CustomerList>(context, listen: false).setLoading(false);
-      }
+        // }
+      // } catch (e, stack) {
+      //   print('exception is' + e.toString());
+      //   Fluttertoast.showToast(
+      //       msg: "Error: " + e.toString(),
+      //       toastLength: Toast.LENGTH_SHORT,
+      //       backgroundColor: Colors.black87,
+      //       textColor: Colors.white,
+      //       fontSize: 16.0);
+      //   Provider.of<CustomerList>(context, listen: false).setLoading(false);
+      // }
     }
   }
-  getLocation()async{
-    var location=await loc.Location().getLocation();
-    userLatLng=Coordinates(location.latitude,location.longitude);
-    Provider.of<CustomerList>(context,listen: false).updateList(userLatLng);
-  }
-  changeList(List<CustomerModel> value,String buttonText){
-    if(buttonText=="dues"){
+
+
+
+
+  changeList(List<CustomerModel> value, String buttonText) {
+    if (buttonText == "dues") {
       setState(() {
         customers.clear();
         customers.addAll(value);
       });
     }
   }
+
   var dues;
-  void setLoading(bool value){
+  void setLoading(bool value) {
     setState(() {
-      isLoading=value;
+      isLoading = value;
     });
   }
-  int index = 0;
-  Future<void> startLocationService() async {
 
+  int index = 0;
+  bool flag = false;
+  Future<void> startLocationService() async {
     await BackgroundLocator.initialize();
     Map<String, dynamic> data = {
       'countInit': 1,
@@ -211,215 +218,300 @@ class _DuesShopScreenState extends State<DuesShopScreen> {
                 notificationTitle: 'Start Location Tracking',
                 notificationMsg: 'Track location in background',
                 notificationBigMsg:
-                'Background location is on to keep the app up-tp-date with your location. This is required for main features to work properly when the app is not running.',
+                    'Background location is on to keep the app up-tp-date with your location. This is required for main features to work properly when the app is not running.',
                 notificationIcon: '',
                 notificationIconColor: Colors.grey,
                 notificationTapCallback:
-                LocationCallbackHandler.notificationCallback)));
+                    LocationCallbackHandler.notificationCallback)));
   }
+
   @override
   void initState() {
+    getAllCustomerData();
     startLocationService();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    var dd=Provider.of<CustomerList>(context);
-    var ddd=Provider.of<CustomerList>(context).dues;
-    var width=MediaQuery.of(context).size.width;
-    var height=MediaQuery.of(context).size.height;
-    var response=Provider.of<CustomerList>(context).response;
+    var dd = Provider.of<CustomerList>(context);
+    var ddd = Provider.of<CustomerList>(context).motorBikeDues;
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var response = Provider.of<CustomerList>(context).response;
     //ddd.length>0?getLocation():false;
     return Scaffold(
         body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-                child: Column(
+      children: [
+        SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: height * 0.015,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      height: height * 0.015,
+                      height: height * 0.03,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Stack(
                       children: [
-                        SizedBox(
-                          height: height * 0.03,
-                        ),
-                        Stack(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => SearchScreen(customerModel: dd.dues,)));
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    width:width * 0.6 ,
-                                    child: RectangluartextFeild(
-                                      bordercolor: Color(0xffEBEAEA),
-                                      hinttext: "Search by shop name",
-                                      containerColor: Color(0xFFFFFF),
-                                      enableborder: true,
-                                      enable: false,
-                                      keytype: TextInputType.text,
-                                      textlength: 25,
-                                      //onChanged: searchOperation,
-                                    ),
-                                  ),
-                                  SizedBox(width: 5,),
-                                ],
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => SearchScreen(
+                                          customerModel: dd.motorBikeDues,
+                                        )));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                width: width * 0.5,
+                                child: RectangluartextFeild(
+                                  bordercolor: Color(0xffEBEAEA),
+                                  hinttext: "Search by shop name",
+                                  containerColor: Color(0xFFFFFF),
+                                  enableborder: true,
+                                  enable: false,
+                                  keytype: TextInputType.text,
+                                  textlength: 25,
+                                  //onChanged: searchOperation,
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(
+                                width: 5,
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        // ),
-                        IconButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: (){
-                              setLoading(true);
-                              getAllCustomerData();
-                            }, icon: Icon(Icons.refresh,color: themeColor1)),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        // ),
-                        IconButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: (){
-                              getLocation();
-                            }, icon: Image.asset("assets/images/update.png",color: themeColor1,width: 25,height: 25,))
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Near by you (${dd.dues.length})",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 15) ,),
-                          InkWell(
-                              onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>ViewAllScreen(customer: ddd,))),
-
-                              child: Text("View All",style:TextStyle(fontSize: 15,color: themeColor1) ,))
-                        ],),
+                    SizedBox(
+                      height: height * 0.02,
                     ),
-                    dd.loading ?Container(
-                      height: 480,
-                      child: Shimmer.fromColors(
-                        period: Duration(seconds: 1),
-                        baseColor: Colors.grey.withOpacity(0.4),
-                        highlightColor: Colors.grey.shade100,
-                        enabled: true,
-                        child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: 4,
-                          itemBuilder:
-                              (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                CustomShopContainerLoading(
-                                  height: height,
-                                  width: width,
-                                ),
-                                SizedBox(
-                                  height: height * 0.025,
-                                ),
-                              ],
-                            );
-                          },
+                    // ),
+                    IconButton(
+                        padding: EdgeInsets.all(0),
+                        onPressed: () {
+                          //setLoading(true);
+                          getAllCustomerData();
+                        },
+                        icon: Icon(Icons.refresh, color: themeColor1)),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              flag ? Colors.white : themeColor1),
                         ),
-                      ),
-                    )
-                           :  Container(
-                        child: SingleChildScrollView(
-                          child: Container(
-                            child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              // reverse: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: dd.dues.length >25 ?25:dd.dues.length,
-                              itemBuilder: (context, index) {
-                                return Column(
-                                  children: [
-                                    CustomerCard(
-                                      image:"null" ,
-                                      height: height,
-                                      width: width,
-                                      f:f,
-                                      menuButton: ['DIRECTIONS', 'CHECK-IN'],
-                                      code: ddd[index].cUSTCODE,
-                                      category: ddd[index].pARTYCATEGORY,
-                                      shopName: ddd[index].cUSTOMER ,
-                                      address:  ddd[index].aDDRESS,
-                                      name: ddd[index].cONTACTPERSON ,
-                                      phoneNo: ddd[index].pHONE1 ,
-                                      lastVisit: "--",
-                                      dues: "0",
-                                      lastTrans:ddd[index].lASTDAYS,
-                                      outstanding:  ddd[index].bALANCE,
-                                      shopAssigned: ddd[index].sHOPASSIGNED ,
-                                      lat:  ddd[index].lATITUDE,
-                                      long:  ddd[index].lONGITUDE,
-                                      //customerData: CustomerInfo,
-                                      showLoading:(value){
-                                        setState(() {
-                                          isLoading=value;
-                                        });
-                                      },
-                                    ),
-                                    // CustomShopContainer(
-                                    //   customerList: dd.dues,
-                                    //   height: height,
-                                    //   width: width,
-                                    //   customerData:dd.dues[index],
-                                    //   //isLoading2: isLoading2,
-                                    //   //enableLocation: _serviceEnabled,
-                                    //   lat: 1.0,
-                                    //   long:1.0,
-                                    //   showLoading: (value) {
-                                    //     setState(() {
-                                    //       isLoading = value;
-                                    //     });
-                                    //   },
-                                    // ),
-                                    // SizedBox(
-                                    //   height: height * 0.025,
-                                    // ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        )
-                    ),
+                        onPressed: () async {
 
+                          if(flag==false){
+                            setLoading(true);
+                            //var location = await loc.Location().getLocation();
+                            setState(() {
+                              flag = flag ? false : true;
+                            });
+                            var response = await OnlineDatabase.getMDuesShop(
+                                lat: userLatLng.latitude.toString(),
+                                long: userLatLng.longitude.toString(),
+                                );
+                            print("Response code is " +
+                                response.statusCode.toString());
+                            if (response.statusCode == 200) {
+                              var data =
+                                  jsonDecode(utf8.decode(response.bodyBytes));
+                              for (var item in data["results"]) {
+                                customer.add(CustomerInfo.fromJson(item));
+                                print(item['CUST_CODE']);
+                              }
+                              Provider.of<CustomerList>(context, listen: false)
+                                  .getAllDues(customer);
+                              setLoading(false);
+                              customer.clear();
+                            }
+                          }else{
+                            setState(() {
+                              flag = flag ? false : true;
+                            });
+                            setLoading(true);
+                            var location = await loc.Location().getLocation();
+                            var response = await OnlineDatabase.getGDuesShop(
+                                lat: userLatLng.latitude.toString(),
+                                long: userLatLng.longitude.toString(),
+                                );
+                            print("Response code is " +
+                                response.statusCode.toString());
+                            if (response.statusCode == 200) {
+                              var data =
+                              jsonDecode(utf8.decode(response.bodyBytes));
+                              for (var item in data["results"]) {
+                                customer.add(CustomerInfo.fromJson(item));
+                                print(item['CUST_CODE']);
+                              }
+                              Provider.of<CustomerList>(context, listen: false)
+                                  .getMotorBikeDues(customer);
+                              setLoading(false);
+                              customer.clear();
+                            }
+                          }
+                        },
+                        child: Text(
+                          "All Dues",
+                          style: TextStyle(
+                              color: flag ? themeColor1 : Colors.white),
+                        )),
+                    // ),
+                    // IconButton(
+                    //     padding: EdgeInsets.all(0),
+                    //     onPressed: (){
+                    //       getLocation();
+                    //     }, icon: Image.asset("assets/images/update.png",color: themeColor1,width: 25,height: 25,))
                   ],
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Near by you (${dd.motorBikeDues.length})",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      InkWell(
+                          onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ViewAllScreen(
+                                        customer: ddd,
+                                      ))),
+                          child: Text(
+                            "View All",
+                            style: TextStyle(fontSize: 15, color: themeColor1),
+                          ))
+                    ],
+                  ),
+                ),
+                dd.duesLoading
+                    ? Container(
+                        height: 480,
+                        child: Shimmer.fromColors(
+                          period: Duration(seconds: 1),
+                          baseColor: Colors.grey.withOpacity(0.4),
+                          highlightColor: Colors.grey.shade100,
+                          enabled: true,
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: 4,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Column(
+                                children: [
+                                  CustomShopContainerLoading(
+                                    height: height,
+                                    width: width,
+                                  ),
+                                  SizedBox(
+                                    height: height * 0.025,
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    : Container(
+                        child: SingleChildScrollView(
+                        child: Container(
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            // reverse: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: dd.motorBikeDues.length > 25
+                                ? 25
+                                : dd.motorBikeDues.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  CustomerCard(
+                                    image: "null",
+                                    height: height,
+                                    width: width,
+                                    f: f,
+                                    menuButton: ['DIRECTIONS', 'CHECK-IN'],
+                                    code: ddd[index].cUSTCODE,
+                                    category: ddd[index].pARTYCATEGORY,
+                                    shopName: ddd[index].cUSTOMER,
+                                    address: ddd[index].aDDRESS,
+                                    name: ddd[index].cONTACTPERSON,
+                                    phoneNo: ddd[index].pHONE1,
+                                    lastVisit: "--",
+                                    dues: "0",
+                                    lastTrans: ddd[index].lASTDAYS,
+                                    outstanding: ddd[index].bALANCE,
+                                    shopAssigned: ddd[index].sHOPASSIGNED,
+                                    lat: ddd[index].lATITUDE,
+                                    long: ddd[index].lONGITUDE,
+                                    //customerData: CustomerInfo,
+                                    showLoading: (value) {
+                                      setState(() {
+                                        isLoading = value;
+                                      });
+                                    },
+                                  ),
+                                  // CustomShopContainer(
+                                  //   customerList: dd.dues,
+                                  //   height: height,
+                                  //   width: width,
+                                  //   customerData:dd.dues[index],
+                                  //   //isLoading2: isLoading2,
+                                  //   //enableLocation: _serviceEnabled,
+                                  //   lat: 1.0,
+                                  //   long:1.0,
+                                  //   showLoading: (value) {
+                                  //     setState(() {
+                                  //       isLoading = value;
+                                  //     });
+                                  //   },
+                                  // ),
+                                  // SizedBox(
+                                  //   height: height * 0.025,
+                                  // ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      )),
+              ],
             ),
-            dd.dues.length<1 &&dd.loading != true ?
-            Container(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children:[
-                    Text("No shops are Found",textAlign: TextAlign.center,),
-                  ]
-              ),
-            ):Container(),
-            isLoading?Positioned.fill(child: ProcessLoading()):Container()
-          ],)
-    );
+          ),
+        ),
+        dd.motorBikeDues.length < 1 && dd.duesLoading != true
+            ? Container(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        "No shops are Found",
+                        textAlign: TextAlign.center,
+                      ),
+                    ]),
+              )
+            : Container(),
+        isLoading ? Positioned.fill(child: ProcessLoading()) : Container()
+      ],
+    ));
   }
 }

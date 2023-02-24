@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:open_whatsapp/open_whatsapp.dart';
 import 'package:provider/provider.dart';
 import 'package:salesmen_app_new/api/Auth/online_database.dart';
 import 'package:salesmen_app_new/model/customerList.dart';
@@ -15,7 +18,7 @@ import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class CustomerCard extends StatefulWidget {
   CustomerCard({
     this.height,
@@ -388,30 +391,80 @@ class _CustomerCardState extends State<CustomerCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        VariableText(
-                          //text: 'Muhammad Ali',
-                          text: 'Last Visit: ',
-                          // text: shopdetails[index].ownerName,
-                          fontsize: 11,
-                          fontcolor: Color(0xff333333),
-                          max_lines: 1,
-                          weight: FontWeight.w600,
-                          textAlign: TextAlign.start,
+                        InkWell(
+                          onTap:()async{
+                            if(widget.phoneNo.length > 12){
+                              var whatsapp = widget.phoneNo.substring(1);
+                              var whatsappAndroid =Uri.parse("whatsapp://send?phone=$whatsapp&text=hello");
+
+                                await launch("whatsapp://send?phone=$whatsapp&text=");
+                              // } else {
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     const SnackBar(
+                              //       content: Text("WhatsApp is not installed on the device"),
+                              //     ),
+                              //   );
+                              // }
+                              // FlutterOpenWhatsapp.sendSingleMessage(widget.phoneNo.substring(1), "Dues amount: ${widget.outstanding}").catchError((e){
+                              //   print("whatsapp error: "+e.toString());
+                              // });
+                            }else{
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.ERROR,
+                                animType: AnimType.BOTTOMSLIDE,
+                                title: "Invalid Phone Number",
+                                desc: "Please check your number",
+                                btnCancelText: "Ok",
+                                dismissOnTouchOutside: true,
+                                btnOkOnPress: () {},
+                              )..show();
+                            }
+                          },
+                          child: Container(
+                            width: widget.width * 0.25,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: themeColor1),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: widget.width * 0.01,horizontal:widget.width * 0.02 ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  FaIcon(FontAwesomeIcons.whatsapp,size: widget.width * 0.035,color: themeColor1,),
+                                  Text("WhatsApp",style: TextStyle(fontSize: widget.width * 0.03,color: themeColor1,fontWeight: FontWeight.w100),),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        Spacer(),
-                        VariableText(
-                          //text: 'Muhammad Ali',
-                          text: widget.lastVisit.toString(),
-                          // widget.customerData.lastVisitDay
-                          //     .toString(),
-                          // text: shopdetails[index].ownerName,
-                          fontsize: 11,
-                          fontcolor: textcolorgrey,
-                          max_lines: 1,
-                          weight: FontWeight.w500,
-                          textAlign: TextAlign.start,
-                        ),
+
+                        // VariableText(
+                        //   //text: 'Muhammad Ali',
+                        //   text: 'Last Visit: ',
+                        //   // text: shopdetails[index].ownerName,
+                        //   fontsize: 11,
+                        //   fontcolor: Color(0xff333333),
+                        //   max_lines: 1,
+                        //   weight: FontWeight.w600,
+                        //   textAlign: TextAlign.start,
+                        // ),
+                        // Spacer(),
+                        // VariableText(
+                        //   //text: 'Muhammad Ali',
+                        //   text: widget.lastVisit.toString(),
+                        //   // widget.customerData.lastVisitDay
+                        //   //     .toString(),
+                        //   // text: shopdetails[index].ownerName,
+                        //   fontsize: 11,
+                        //   fontcolor: textcolorgrey,
+                        //   max_lines: 1,
+                        //   weight: FontWeight.w500,
+                        //   textAlign: TextAlign.start,
+                        // ),
                       ],
                     ),
                     SizedBox(
@@ -455,31 +508,80 @@ class _CustomerCardState extends State<CustomerCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        VariableText(
-                          //text: 'Muhammad Ali',
-                          text: 'Dues: ',
-                          // text: shopdetails[index].ownerName,
-                          fontsize: 11,
-                          fontcolor: Color(0xff333333),
-                          max_lines: 1,
-                          weight: FontWeight.w600,
-                          textAlign: TextAlign.start,
+                        InkWell(
+                          onTap:()async{
+                            if(widget.phoneNo.length > 12){
+                              var whatsapp = widget.phoneNo;
+                              // var whatsappAndroid =Uri.parse("whatsapp://send?phone=$whatsapp&text=hello");
+                              //
+                              // await launch("whatsapp://send?phone=$whatsapp&text=hello");
+                              // // } else {
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     const SnackBar(
+                              //       content: Text("WhatsApp is not installed on the device"),
+                              //     ),
+                              //   );
+                              // }
+                              // FlutterOpenWhatsapp.sendSingleMessage(widget.phoneNo.substring(1), "Dues amount: ${widget.outstanding}").catchError((e){print("whatsapp error: "+e.toString());});
+                              bool res = await FlutterPhoneDirectCaller.callNumber(whatsapp);
+                            }else{
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.ERROR,
+                                animType: AnimType.BOTTOMSLIDE,
+                                title: "Invalid Phone Number",
+                                desc: "Please check your number",
+                                btnCancelText: "Ok",
+                                dismissOnTouchOutside: true,
+                                btnOkOnPress: () {},
+                              )..show();
+                            }
+                          },
+                          child: Container(
+                            width: widget.width * 0.25,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: themeColor1),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: widget.width * 0.01,horizontal:widget.width * 0.02 ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  FaIcon(FontAwesomeIcons.phone,size: widget.width * 0.035,color: themeColor1,),
+                                  //SizedBox(width: 5,),
+                                  Text("Call Now",style: TextStyle(fontSize: widget.width * 0.03,color: themeColor1,fontWeight: FontWeight.w100),),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        Spacer(),
-                        VariableText(
-                          //text: 'Muhammad Ali',
-                          text: widget.dues.toString() == '0'
-                              ? '--'
-                              : widget.f
-                                  .format(double.parse(widget.dues.toString())),
-                          // text: shopdetails[index].ownerName,
-                          fontsize: 11,
-                          fontcolor: textcolorgrey,
-                          max_lines: 1,
-                          weight: FontWeight.w500,
-                          textAlign: TextAlign.start,
-                        ),
+                        // VariableText(
+                        //   //text: 'Muhammad Ali',
+                        //   text: 'Dues: ',
+                        //   // text: shopdetails[index].ownerName,
+                        //   fontsize: 11,
+                        //   fontcolor: Color(0xff333333),
+                        //   max_lines: 1,
+                        //   weight: FontWeight.w600,
+                        //   textAlign: TextAlign.start,
+                        // ),
+                        // Spacer(),
+                        // VariableText(
+                        //   //text: 'Muhammad Ali',
+                        //   text: widget.dues.toString() == '0'
+                        //       ? '--'
+                        //       : widget.f
+                        //           .format(double.parse(widget.dues.toString())),
+                        //   // text: shopdetails[index].ownerName,
+                        //   fontsize: 11,
+                        //   fontcolor: textcolorgrey,
+                        //   max_lines: 1,
+                        //   weight: FontWeight.w500,
+                        //   textAlign: TextAlign.start,
+                        // ),
                       ],
                     ),
                     SizedBox(

@@ -416,7 +416,7 @@ class _AllShopScreenState extends State<AllShopScreen> {
             ),
           ),
         ),
-          dd.customerData.length<1 &&dd.loading != true ?
+          dd.customerData.length<1 &&dd.allShop != true ?
           Container(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

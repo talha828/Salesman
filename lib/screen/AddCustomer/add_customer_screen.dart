@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/AddCustomer/sucessfully_add_customer_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 ///email,cnic,cnic exp,uc,citymarket,payterm,
 
@@ -382,13 +384,55 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                       SizedBox(
                         height: height * 0.01,
                       ),
-                      RectangluartextFeildWithPrefix(
-                        showprefix: true,
-                        hinttext: "3123045267",
-                        cont: phoneno,
-                        //onChanged: enableBtn(email.text),
-                        keytype: TextInputType.number,
-                        textlength: 10,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            width: width * 0.6,
+                            child: RectangluartextFeildWithPrefix(
+                              showprefix: true,
+                              hinttext: "3123045267",
+                              cont: phoneno,
+                              //onChanged: enableBtn(email.text),
+                              keytype: TextInputType.number,
+                              textlength: 10,
+                            ),
+                          ),
+                          SizedBox(width: width * 0.02,),
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(themeColor1),
+                              ),
+                              onPressed: ()async{
+                                if(phoneno.text.length > 9){
+                                  var whatsapp = phoneno.text;
+                                  var whatsappAndroid =Uri.parse("whatsapp://send?phone=$whatsapp&text=hello");
+
+                                  await launch("whatsapp://send?phone=+92$whatsapp&text=");
+                                  // } else {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(
+                                  //       content: Text("WhatsApp is not installed on the device"),
+                                  //     ),
+                                  //   );
+                                  // }
+                                  // FlutterOpenWhatsapp.sendSingleMessage(widget.phoneNo.substring(1), "Dues amount: ${widget.outstanding}").catchError((e){
+                                  //   print("whatsapp error: "+e.toString());
+                                  // });
+                                }else{
+                                  AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.ERROR,
+                                    animType: AnimType.BOTTOMSLIDE,
+                                    title: "Invalid Phone Number",
+                                    desc: "Please check your number",
+                                    btnCancelText: "Ok",
+                                    dismissOnTouchOutside: true,
+                                    btnOkOnPress: () {},
+                                  )..show();
+                                }
+                              }, child: Text("Whatsapp"))
+                        ],
                       ),
                       SizedBox(
                         height: height * 0.03,

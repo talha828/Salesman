@@ -45,35 +45,40 @@ class _MainScreenState extends State<MainScreen> {
 
   void getAllCustomerData(bool data) async {
     if (true) {
-      try {
-        Provider.of<CustomerList>(context, listen: false).setLoading(true);
+      // try {
+        Provider.of<CustomerList>(context, listen: false).setDuesLoading(true);
+        Provider.of<CustomerList>(context, listen: false).setAssignLoading(true);
         var data = await location.getLocation();
         List<AddressModel> addressList = [];
         userLatLng = Coordinates(data.latitude, data.longitude);
-        String mapApiKey = "AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
-        String _host = 'https://maps.google.com/maps/api/geocode/json';
-        final url =
-            '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
-        print(url);
-        if (userLatLng.latitude != null && userLatLng.longitude != null) {
-          var response1 = await http.get(Uri.parse(url));
-          if (response1.statusCode == 200) {
-            Map data = jsonDecode(response1.body);
-            String _formattedAddress = data["results"][0]["formatted_address"];
-            var address = data["results"][0]["address_components"];
-            for (var i in address) {
-              addressList.add(AddressModel.fromJson(i));
-            }
-            actualAddress = addressList[3].shortName;
-            Provider.of<CustomerList>(context, listen: false)
-                .updateAddress(actualAddress);
-            print("response ==== $_formattedAddress");
-            _formattedAddress;
-          }
+        setState(() {});
+        actualAddress="Karachi";
+        Provider.of<CustomerList>(context, listen: false)
+                .updateAddress("Karachi");
+        // String mapApiKey = "AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI";
+        // String _host = 'https://maps.google.com/maps/api/geocode/json';
+        // final url =
+        //     '$_host?key=$mapApiKey&language=en&latlng=${userLatLng.latitude},${userLatLng.longitude}';
+        // print(url);
+        // // if (userLatLng.latitude != null && userLatLng.longitude != null) {
+        //   var response1 = await http.get(Uri.parse(url));
+        //   if (response1.statusCode == 200) {
+        //     Map data = jsonDecode(response1.body);
+        //     String _formattedAddress = data["results"][0]["formatted_address"];
+        //     var address = data["results"][0]["address_components"];
+        //     for (var i in address) {
+        //       addressList.add(AddressModel.fromJson(i));
+        //     }
+        //     actualAddress = addressList[3].shortName;
+        //     Provider.of<CustomerList>(context, listen: false)
+        //         .updateAddress(actualAddress);
+        //     print("response ==== $_formattedAddress");
+        //     _formattedAddress;
+        //   }
+        //
 
 
-
-          var response = await OnlineDatabase.getDuesShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
+          var response = await OnlineDatabase.getGDuesShop(lat:userLatLng.latitude.toString() ,long:userLatLng.longitude.toString() );
           print("Response code is " + response.statusCode.toString());
           if (response.statusCode == 200) {
             var data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -82,7 +87,7 @@ class _MainScreenState extends State<MainScreen> {
               print(item['CUST_CODE']);
             }
             Provider.of<CustomerList>(context, listen: false).clearList();
-            Provider.of<CustomerList>(context, listen: false).getDues(customer);
+            Provider.of<CustomerList>(context, listen: false).getMotorBikeDues(customer);
 
 
 
@@ -126,8 +131,10 @@ class _MainScreenState extends State<MainScreen> {
             //     .getAllCustomer(customer);
             //print("done");
             setState(() {});
+            Provider.of<CustomerList>(context, listen: false).setDuesLoading(false);
+            Provider.of<CustomerList>(context, listen: false).setAssignLoading(false);
             //print("length is"+limitedcustomer.length.toString());
-            Provider.of<CustomerList>(context, listen: false).setLoading(false);
+            // Provider.of<CustomerList>(context, listen: false).setLoading(false);
           } else if (response.statusCode == 400) {
             var data = jsonDecode(utf8.decode(response.bodyBytes));
             Fluttertoast.showToast(
@@ -136,19 +143,21 @@ class _MainScreenState extends State<MainScreen> {
                 backgroundColor: Colors.black87,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            Provider.of<CustomerList>(context, listen: false).setLoading(false);
+            Provider.of<CustomerList>(context, listen: false).setDuesLoading(false);
+            Provider.of<CustomerList>(context, listen: false).setAssignLoading(false);
+            //Provider.of<CustomerList>(context, listen: false).setLoading(false);
           }
-        }
-      } catch (e, stack) {
-        print('exception is' + e.toString());
-        Fluttertoast.showToast(
-            msg: "Error: " + e.toString(),
-            toastLength: Toast.LENGTH_SHORT,
-            backgroundColor: Colors.black87,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        Provider.of<CustomerList>(context, listen: false).setLoading(false);
-      }
+        // }
+      // } catch (e, stack) {
+      //   print('exception is' + e.toString());
+      //   Fluttertoast.showToast(
+      //       msg: "Error: " + e.toString(),
+      //       toastLength: Toast.LENGTH_SHORT,
+      //       backgroundColor: Colors.black87,
+      //       textColor: Colors.white,
+      //       fontSize: 16.0);
+      //   Provider.of<CustomerList>(context, listen: false).setLoading(false);
+      // }
     }
   }
 
@@ -191,7 +200,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     getWalletStatus();
-    getAllCustomerData(true);
+    //getAllCustomerData(true);
     super.initState();
   }
 
@@ -250,7 +259,7 @@ class _MainScreenState extends State<MainScreen> {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                 child: Center(
                   child: VariableText(
-                    text: address,
+                    text: "Karachi",
                     fontsize: 15,
                     fontcolor: Colors.white,
                     fontFamily: fontRegular,

@@ -12,10 +12,14 @@ import 'customerModel.dart';
 
 class CustomerList extends ChangeNotifier{
   //loader
-  bool loading =false;
+  bool duesLoading =false;
+  bool assignLoading =false;
+  // bool loading =false;
   bool allShop =false;
   //customer list
   List<CustomerInfo>customerData=[];
+  List<CustomerInfo>motorBikeDues=[];
+  List<CustomerInfo>allDues=[];
   List<CustomerInfo>dues=[];
   List<CustomerInfo>assign=[];
   // main product list or category
@@ -44,24 +48,52 @@ class CustomerList extends ChangeNotifier{
     address=value;
     notifyListeners();
   }
-  void getDues(List<CustomerInfo> value){
+  void getMotorBikeDues(List<CustomerInfo> value){
+    motorBikeDues.clear();
     dues.clear();
     for (var i in value){
+      print(i.bALANCE);
       if(i.sHOPASSIGNED=="Yes"){
-        if(double.parse(i.bALANCE)>100.00){
+        if(double.parse(i.bALANCE)>10.00){
+          motorBikeDues.add(i);
           dues.add(i);
         }
       }
     }
     // for(int i=0; i < dues.length-1; i++){
-    //   for(int j=0; j < dues.length-i-1; j++){
-    //     if(double.parse(dues[j].bALANCE) > double.parse(dues[j+1].bALANCE)){
-    //       CustomerInfo temp = dues[j];
-    //       dues[j] = dues[j+1];
-    //       dues[j+1] = temp;
-    //     }
-    //   }
-    // }
+    //     //   for(int j=0; j < dues.length-i-1; j++){
+    //     //     if(double.parse(dues[j].bALANCE) > double.parse(dues[j+1].bALANCE)){
+    //     //       CustomerInfo temp = dues[j];
+    //     //       dues[j] = dues[j+1];
+    //     //       dues[j+1] = temp;
+    //     //     }
+    //     //   }
+    //     // }
+    notifyListeners();
+  }
+
+  void getAllDues(List<CustomerInfo> value){
+    motorBikeDues.clear();
+    allDues.clear();
+    for (var i in value){
+      if(i.sHOPASSIGNED=="Yes"){
+        if(double.parse(i.bALANCE)>100.00){
+          motorBikeDues.add(i);
+          allDues.add(i);
+        }
+      }
+    }
+    notifyListeners();
+  }
+  void changeDuesList(List<CustomerInfo> value){
+    motorBikeDues.clear();
+    for (var i in value){
+      if(i.sHOPASSIGNED=="Yes"){
+        if(double.parse(i.bALANCE)>100.00){
+          motorBikeDues.add(i);
+        }
+      }
+    }
     notifyListeners();
   }
   void sliderPicture(List<Widget> value){
@@ -87,9 +119,16 @@ class CustomerList extends ChangeNotifier{
   }
   void clearList(){
     //customerData.clear();
-    dues.clear();
+    motorBikeDues.clear();
     assign.clear();
     notifyListeners();
+  }
+  void clearAssign(){
+    assign.clear();
+    notifyListeners();
+  }
+  void clearDues(){
+    motorBikeDues.clear();
   }
   void clearAllCustomer(){
     customerData.clear();
@@ -123,8 +162,11 @@ class CustomerList extends ChangeNotifier{
   //   customerData.insert(0,value);
   //   assign.insert(0,value);
   // }
-  void setLoading(bool value){
-    loading=value;
+  void setDuesLoading(bool value){
+    duesLoading=value;
+  }
+  void setAssignLoading(bool value){
+    assignLoading=value;
   }
   void setLoadingAllShop(bool value){
     allShop=value;
@@ -143,7 +185,7 @@ class CustomerList extends ChangeNotifier{
     }
     //customer.sort((a,b)=>a.distance.compareTo(b.distance));
     getAllCustomer(customer);
-    getDues(customer);
+    getMotorBikeDues(customer);
     getAssignShop(customer);
     notifyListeners();
   }
