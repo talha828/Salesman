@@ -13,6 +13,8 @@ import 'package:salesmen_app_new/model/city_model.dart';
 import 'package:salesmen_app_new/model/complain_issue.dart';
 import 'package:salesmen_app_new/model/delivery_model.dart';
 import 'package:salesmen_app_new/model/partycategories.dart';
+import 'package:salesmen_app_new/newModel/cartModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 const String Server="http://api.visionsoft-pk.com:8181/ords/skr2/";
 const String directory=Server+"app/";
 class OnlineDatabase{
@@ -453,7 +455,7 @@ class OnlineDatabase{
     return response;
   }
   static Future<dynamic> getOrderDetails(String startDate,String endDate,String empNo)async{
-    Uri url=Uri.parse("http://124.29.202.191:8181/ords/skr2/app/gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=PSO&pin_order_no=&pin_fromdate=$startDate&pin_todate=$endDate&pin_app_for=&pin_cmp_id=&pin_cust_code=&pin_emp_userid=$empNo");
+    Uri url=Uri.parse("http://api.visionsoft-pk.com:8181/ords/skr2/app/gettransactions?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_datatype=PSO&pin_order_no=&pin_fromdate=$startDate&pin_todate=$endDate&pin_app_for=&pin_cmp_id=&pin_cust_code=&pin_emp_userid=$empNo");
     var response =await http.get(url);
     print(url);
     print(response.statusCode.toString());
@@ -683,4 +685,134 @@ class OnlineDatabase{
     print("login data is: "+response.body.toString());
     return response;
   }
+  /////// offers apis ////////
+  static Future<dynamic> getOffers({String subType,int isPromotional}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=&pin_status=&pin_main_type=&pin_sub_type=$subType&pin_promotional=&pin_ShowInApp=Y');
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> getOffersProduct({String subType,int isPromotional}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(isPromotional==1?directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=&pin_status=A&pin_main_type=&pin_sub_type=$subType&pin_promotional=&pin_ShowInApp=Y':directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=&pin_status=A&pin_main_type=&pin_sub_type=&pin_promotional=Y&pin_ShowInApp=Y');
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> getSingleProduct({String productCode,int isPromotional}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=$productCode&pin_pt_cd=&pin_status=&pin_main_type=&pin_sub_type=&pin_promotional=&pin_ShowInApp=Y');
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> getSingleMainSearchProduct({String productCode,int isPromotional}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=$productCode&pin_pt_cd=&pin_status=A&pin_main_type=&pin_sub_type=&pin_promotional=&pin_ShowInApp=Y');
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> getOfferSearchProduct(){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+"getoffesrexcel?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=&pin_status&pin_from_date&pin_to_date&pin_main_type=&pin_sub_type=&pin_promotional&pin_showinapp=Y");
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> getUserBalances()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String code=await prefs.getString("code");
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    Uri url=Uri.parse(directory+"getcustomers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+92&pin_password=007&pin_datatype=INFO&pin_cust_code=$code");
+    print('getUserBalances url is'+url.path);
+    var response= http.get(url);
+    return response;
+  }
+  static Future<dynamic> getMainSearchProduct(){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+"getoffesrexcel?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=&pin_status=A&pin_from_date&pin_to_date&pin_main_type=&pin_sub_type=&pin_promotional&pin_showinapp=Y");
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+
+  static Future<dynamic>postNewSalesOrder({List<NewCartModel> cart,String customerCode,String lat,String long})async{
+    var url =Uri.parse(directory+'postsalesorder?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_longitude=$long&pin_latitude=$lat&file_type=&file_name&pin_cash_credit=1');
+    print("post Sales order url is: "+url.toString());
+    Map<String,dynamic> postData={
+      "Orderitems": []
+    };
+
+
+
+    for(var item in cart){
+      postData['Orderitems']+=[ {
+        "Prod_code": item.productCode,
+        "Qty": item.qty,
+        "Rate": item.rate,
+        "Amount":item.amount,
+        "TR":item.tr
+      },
+      ];}
+    print("post data is"+postData.toString());
+    final response = await http.post(
+      url,
+      body: jsonEncode(postData),
+    );
+    return response;
+  }
+  static Future<dynamic> getMyOffers({String customerCode}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse(directory+'getoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_it_cd=&pin_pt_cd=$customerCode&pin_status=&pin_main_type=&pin_sub_type=&pin_promotional=&pin_ShowInApp=YER');
+    print('getOrderDetails url is'+url.toString());
+    var response=http.get(url);
+    return response;
+  }
+  static Future<dynamic> postOffer({String customerCode,String productCode,String rate,String qty,String MRP,String expire,String lat,String long}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse('http://api.visionsoft-pk.com:8181/ords/skr2/app/postoffers?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_cust_code=$customerCode&pin_prod_code=$productCode&pin_rate=$rate&pin_qty=$qty&pin_mrp=$MRP&pin_expiry=$expire&pin_latitude=$long&pin_longitude=$lat');
+    print('getOrderDetails url is'+url.toString());
+    var response= http.post(url);
+    return response;
+  }
+  static Future<dynamic> postCloseOffer({String tr}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse('http://api.visionsoft-pk.com:8181/ords/skr2/app/postcloseoffer?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_tr=$tr');
+    print('getOrderDetails url is'+url.toString());
+    var response= http.post(url);
+    return response;
+  }
+  // static Future<dynamic> uploadImage({String type, var image}) async {
+  //   Dio dio = new Dio();
+  //
+  //   var url = 'https://suqexpress.com/api/uploadimage';
+  //   print("Url is: "+url.toString());
+  //   try{
+  //     FormData postData= new FormData.fromMap({"type": type,});
+  //     postData.files.add(MapEntry("image", image));
+  //
+  //     var response = await dio.post(url, data: postData, options:
+  //     Options(contentType: 'multipart/form-data; boundary=1000')
+  //     );
+  //     if(response.statusCode == 200)
+  //       return true;
+  //     else
+  //       return false;
+  //
+  //   }catch(e){
+  //     e.toString();
+  //     return false;
+  //   }
+  // }
+  static Future<dynamic> postNewCategory({String title,String description,String imageUrl,String lat,String long}){
+    //var url=Uri.parse(getAllOrderListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_datatype=SOITEMS&pin_cust_code=00396&pin_order_no=211100175&pin_fromdate=2021-01-01&pin_todate=2021-12-30&pin_app_for=');
+    var url=Uri.parse('http://api.visionsoft-pk.com:8181/ords/skr2/app/postproduct?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_longitude=$long&pin_latitude=$lat&pin_itemname=$title&pin_description=$description&pin_typecode=030&pin_uom=PCS&pin_cud=C&pin_image_url=$imageUrl');
+    print('getOrderDetails url is'+url.toString());
+    var response= http.post(url);
+    return response;
+  }
+
+/////// offers apis ////////
 }

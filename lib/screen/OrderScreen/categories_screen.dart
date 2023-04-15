@@ -12,7 +12,9 @@ import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/OrderScreen/products_list_screen.dart';
+import 'package:salesmen_app_new/screen/main_search_screen/main_search_screen.dart';
 import 'package:salesmen_app_new/screen/searchProductScreen/search_product_screen.dart';
+import 'package:salesmen_app_new/sun_menu_screen/sub_menu.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -197,17 +199,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (_) => SearchProductScreen(
-                                            productModel: searchProduct,
-                                        onAddToCart: (){}))).then((value){
-                                  addToCart = false;
-                                  if (Provider.of<CartModel>(context, listen: false)
-                                      .cartItemName
-                                      .isNotEmpty) {
-                                    addToCart = true;
-                                  }
-                                  setState(() {});
-                                });
+                                        builder: (_) => MainSearchScreen()));
                               },
                               child: RectangluartextFeild(
                                 bordercolor: Color(0xffEBEAEA),
@@ -271,11 +263,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       ),
                       InkWell(
                         onTap: (){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => ProductListScreen(
-                                      value: 0, )));
+                          Get.to(SubMenuScreen(value:1));
+
                         },
                         child: Container(
                             decoration: BoxDecoration(
@@ -373,20 +362,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                   height: height,
                                                   width: width,
                                                   ontap: () {
-                                                    Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (_) => ProductListScreen(
-                                                                productmaintypeId: product[index].productmaintypeId,
-                                                                productsubtypeId: product[index].productsubtypeList[i].productsubtypeId,value: 1,))).then((value){
-                                                      addToCart = false;
-                                                      if (Provider.of<CartModel>(context, listen: false)
-                                                          .cartItemName
-                                                          .isNotEmpty) {
-                                                        addToCart = true;
-                                                      }
-                                                      setState(() {});
-                                                    });
+                                                    Get.to(SubMenuScreen(value:1 ,productmaintypeId:product[index].productmaintypeId ,productsubtypeId:product[index].productsubtypeList[i].productsubtypeId ,));
+                                                    // Navigator.push(
+                                                    //     context,
+                                                    //     MaterialPageRoute(
+                                                    //         builder: (_) => ProductListScreen(
+                                                    //             productmaintypeId: product[index].productmaintypeId,
+                                                    //             productsubtypeId: product[index].productsubtypeList[i].productsubtypeId,value: 1,))).then((value){
+                                                    //   addToCart = false;
+                                                    //   if (Provider.of<CartModel>(context, listen: false)
+                                                    //       .cartItemName
+                                                    //       .isNotEmpty) {
+                                                    //     addToCart = true;
+                                                    //   }
+                                                    //   setState(() {});
+                                                    // });
                                                   }),
                                               SizedBox(
                                                 width: width * 0.03,

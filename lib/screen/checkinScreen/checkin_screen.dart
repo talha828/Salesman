@@ -13,6 +13,7 @@ import 'package:salesmen_app_new/model/customerList.dart';
 import 'package:salesmen_app_new/model/customerModel.dart';
 import 'package:salesmen_app_new/model/product_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
+import 'package:salesmen_app_new/newModel/cartModel.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/EditShop/edit_shop.dart';
@@ -335,6 +336,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
   // Delivery Api`s
   Future<bool>_willPopScope(){
+    Provider.of<AddToCartModel>(context,listen: false).cartClear();
     Provider.of<CartModel>(context,listen:false).clearCart();
     return Navigator.push(
         context, MaterialPageRoute(builder: (_) => MainScreen()));
@@ -447,7 +449,27 @@ class _CheckInScreenState extends State<CheckInScreen> {
                             ),
                           ),
                         ),
+                            Column(
+                                      children: [
+                                        VariableText(
+                                          text: 'Outstanding',
+                                          fontsize: 14,
+                                          fontcolor: Colors.grey,
+                                          weight: FontWeight.w500,
+                                          fontFamily: fontRegular,
+                                        ),
+                                        SizedBox(height: width * 0.02,),
+                                        VariableText(
+                                          text: myCustomer.outStanding.toString()=="null"?"- -":
+                                          "Rs " + f.format(double.parse(myCustomer.outStanding.toString().length<5? myCustomer.outStanding.toString(): double.parse(myCustomer.outStanding).toStringAsFixed(2),)),
 
+                                          fontsize: 14,
+                                          fontcolor: textcolorblack,
+                                          weight: FontWeight.w500,
+                                          fontFamily: fontRegular,
+                                        ),
+                                      ],
+                                    ),
                       ],
                     ),
                   ),
@@ -572,99 +594,99 @@ class _CheckInScreenState extends State<CheckInScreen> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: height * 0.01,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenpadding),
-                  child: Container(
-                    // height: height*0.15,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: themeColor2,
-                        boxShadow: [
-                          BoxShadow(color: Color(0xff000000).withOpacity(0.25))
-                        ]),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Color.fromARGB(
-                              5,
-                              246,
-                              130,
-                              31,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.red.withOpacity(0.25))
-                            ]),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: height * 0.01,
-                              ),
-                              Row(
-                                children: [
-                                  VariableText(
-                                    text: 'Dues: ',
-                                    fontsize: 14,
-                                    fontcolor: textcolorblack,
-                                    weight: FontWeight.w100,
-                                    fontFamily: fontRegular,
-                                  ),
-                                  Spacer(),
-                                  VariableText(
-                                    text:myCustomer.dues.toString()=="null"?"- -": "Rs. " +
-                                        f.format(double.parse(myCustomer.dues.toString().length<5?myCustomer.dues.toString(): double.parse(myCustomer.dues).toStringAsFixed(2),)),
-
-                                    fontsize: 14,
-                                    fontcolor: Colors.red,
-                                    weight: FontWeight.w500,
-                                    fontFamily: fontMedium,
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Container(
-                                  height: 1,
-                                  color: themeColor1,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  VariableText(
-                                    text: 'Outstanding: ',
-                                    fontsize: 14,
-                                    fontcolor: textcolorblack,
-                                    weight: FontWeight.w500,
-                                    fontFamily: fontRegular,
-                                  ),
-                                  Spacer(),
-                                  VariableText(
-                                    text: myCustomer.outStanding.toString()=="null"?"- -":
-                                    "Rs " + f.format(double.parse(myCustomer.outStanding.toString().length<5? myCustomer.outStanding.toString(): double.parse(myCustomer.outStanding).toStringAsFixed(2),)),
-
-                                    fontsize: 14,
-                                    fontcolor: textcolorblack,
-                                    weight: FontWeight.w500,
-                                    fontFamily: fontRegular,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // SizedBox(
+                //   height: height * 0.01,
+                // ),
+                // Padding(
+                //   padding: EdgeInsets.symmetric(horizontal: screenpadding),
+                //   child: Container(
+                //     // height: height*0.15,
+                //     decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(5),
+                //         color: themeColor2,
+                //         boxShadow: [
+                //           BoxShadow(color: Color(0xff000000).withOpacity(0.25))
+                //         ]),
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(12.0),
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //             borderRadius: BorderRadius.circular(5),
+                //             color: Color.fromARGB(
+                //               5,
+                //               246,
+                //               130,
+                //               31,
+                //             ),
+                //             boxShadow: [
+                //               BoxShadow(
+                //                   color: Colors.red.withOpacity(0.25))
+                //             ]),
+                //         child: Padding(
+                //           padding: const EdgeInsets.all(8.0),
+                //           child: Column(
+                //             crossAxisAlignment: CrossAxisAlignment.center,
+                //             mainAxisAlignment: MainAxisAlignment.center,
+                //             children: [
+                //               SizedBox(
+                //                 height: height * 0.01,
+                //               ),
+                //               Row(
+                //                 children: [
+                //                   VariableText(
+                //                     text: 'Dues: ',
+                //                     fontsize: 14,
+                //                     fontcolor: textcolorblack,
+                //                     weight: FontWeight.w100,
+                //                     fontFamily: fontRegular,
+                //                   ),
+                //                   Spacer(),
+                //                   VariableText(
+                //                     text:myCustomer.dues.toString()=="null"?"- -": "Rs. " +
+                //                         f.format(double.parse(myCustomer.dues.toString().length<5?myCustomer.dues.toString(): double.parse(myCustomer.dues).toStringAsFixed(2),)),
+                //
+                //                     fontsize: 14,
+                //                     fontcolor: Colors.red,
+                //                     weight: FontWeight.w500,
+                //                     fontFamily: fontMedium,
+                //                   ),
+                //                 ],
+                //               ),
+                //               Padding(
+                //                 padding: EdgeInsets.symmetric(vertical: 8.0),
+                //                 child: Container(
+                //                   height: 1,
+                //                   color: themeColor1,
+                //                 ),
+                //               ),
+                //               Row(
+                //                 children: [
+                //                   VariableText(
+                //                     text: 'Outstanding: ',
+                //                     fontsize: 14,
+                //                     fontcolor: textcolorblack,
+                //                     weight: FontWeight.w500,
+                //                     fontFamily: fontRegular,
+                //                   ),
+                //                   Spacer(),
+                //                   VariableText(
+                //                     text: myCustomer.outStanding.toString()=="null"?"- -":
+                //                     "Rs " + f.format(double.parse(myCustomer.outStanding.toString().length<5? myCustomer.outStanding.toString(): double.parse(myCustomer.outStanding).toStringAsFixed(2),)),
+                //
+                //                     fontsize: 14,
+                //                     fontcolor: textcolorblack,
+                //                     weight: FontWeight.w500,
+                //                     fontFamily: fontRegular,
+                //                   ),
+                //                 ],
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
                   height: height * 0.01,
                 ),

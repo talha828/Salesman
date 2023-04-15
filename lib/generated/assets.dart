@@ -3,6 +3,9 @@ class Assets {
   Assets._();
 
   static const String assetsOpenSansRegular = 'assets/OpenSans-Regular.ttf';
+  static const String excelData = 'assets/excel/data.json';
+  static const String excelOffer = 'assets/excel/offer.xlsx';
+  static const String excelOffer2 = 'assets/excel/offer_2.json';
   static const String fontsLICENSE = 'assets/fonts/LICENSE.txt';
   static const String fontsRobotoBlack = 'assets/fonts/Roboto-Black.ttf';
   static const String fontsRobotoBlackItalic = 'assets/fonts/Roboto-BlackItalic.ttf';

@@ -9,6 +9,10 @@ import 'package:salesmen_app_new/model/user_model.dart';
 import 'package:salesmen_app_new/model/wallet_capacity.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/splash_screen/splash_screen.dart';
+import 'package:salesmen_app_new/testing/testing.dart';
+
+import 'model/customerModel.dart';
+import 'newModel/cartModel.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // Add this
@@ -28,6 +32,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<NewCustomerModel>(
           create: (_) => NewCustomerModel(),
         ),
+        ChangeNotifierProvider<CustomerModel>(
+          create: (_) => CustomerModel(),
+        ),
         ChangeNotifierProvider<WalletCapacity>(
           create: (_) => WalletCapacity(),
         ),
@@ -37,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<CustomerList>(
           create: (_) => CustomerList(),
         ),
+        ChangeNotifierProvider<AddToCartModel>(create: (_)=>AddToCartModel()),
       ],
       child: GetMaterialApp(
         theme: ThemeData(

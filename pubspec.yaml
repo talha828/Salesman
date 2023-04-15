@@ -34,6 +34,9 @@ dependencies:
   http: 0.13.0
   firebase_core: ^1.6.0
   firebase_auth: 2.0.0
+  cart_stepper:
+  flutter_typeahead: 3.1.1
+  excel:
   map_launcher: ^2.1.2
   delayed_display: ^2.0.0
   firebase_database: ^8.1.0
@@ -86,6 +89,7 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/
+    - assets/excel/
     - assets/tabviewicon/
   # assets:
   #   - images/a_dot_burr.jpeg
