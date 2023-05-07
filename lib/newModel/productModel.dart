@@ -58,20 +58,20 @@ class Results {
         this.pRICE});
 
   Results.fromJson(Map<String, dynamic> json) {
-    pRODCODE = json['PROD_CODE'];
-    pRODUCT = json['PRODUCT'];
-    tYPEID = json['TYPE_ID'];
-    iTEMTYPE = json['ITEMTYPE'];
-    mAINID = json['MAIN_ID'];
-    mAINTYPE = json['MAIN_TYPE'];
-    bRAND = json['BRAND'];
-    mODEL = json['MODEL'];
-    dESCRIPTION = json['DESCRIPTION'];
-    pROMOTIONAL = json['PROMOTIONAL'];
-    iMAGEURL = json['IMAGE_URL'];
-    oUTOFSTOCK = json['OUTOFSTOCK'];
-    sHOWINAPP = json['SHOWINAPP'];
-    oFFERITEM = json['OFFER_ITEM'];
+    pRODCODE = json['PROD_CODE'].toString();
+    pRODUCT = json['PRODUCT'].toString();
+    tYPEID = json['TYPE_ID'].toString();
+    iTEMTYPE = json['ITEMTYPE'].toString();
+    mAINID = json['MAIN_ID'].toString();
+    mAINTYPE = json['MAIN_TYPE'].toString();
+    bRAND = json['BRAND'].toString();
+    mODEL = json['MODEL'].toString();
+    dESCRIPTION = json['DESCRIPTION'].toString();
+    pROMOTIONAL = json['PROMOTIONAL'].toString();
+    iMAGEURL = json['IMAGE_URL'].toString();
+    oUTOFSTOCK = json['OUTOFSTOCK'].toString();
+    sHOWINAPP = json['SHOWINAPP'].toString();
+    oFFERITEM = json['OFFER_ITEM'].toString();
     if (json['PRICE'] != null) {
       pRICE = new List<PRICE>();
       json['PRICE'].forEach((v) {

@@ -708,8 +708,7 @@ class ProductTile extends StatelessWidget {
   Widget build(BuildContext context) {
     var cart=Provider.of<AddToCartModel>(context);
     return Container(
-      padding: EdgeInsets.symmetric(
-          vertical: width * 0.04, horizontal: width * 0.04),
+      padding: EdgeInsets.symmetric(horizontal: width * 0.04),
       margin: EdgeInsets.symmetric(horizontal: width * 0.04),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -869,7 +868,7 @@ class ProductTile extends StatelessWidget {
                         ),
                         Container(
                   // width: width * 0.2,
-                            height: width * 0.15,
+                            height: width * 0.12,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(7),
                               color: Colors.white,

@@ -89,6 +89,7 @@ class Assets {
   static const String imagesDues = 'assets/images/dues.png';
   static const String imagesGear = 'assets/images/gear.png';
   static const String imagesGetstartedbottomimage = 'assets/images/getstartedbottomimage.png';
+  static const String imagesOffer = 'assets/images/offer.png';
   static const String imagesPlaceHolder = 'assets/images/placeHolder.png';
   static const String imagesProduct1 = 'assets/images/product_1.png';
   static const String imagesShop1 = 'assets/images/shop1.jpg';

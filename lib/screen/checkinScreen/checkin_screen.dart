@@ -22,12 +22,15 @@ import 'package:salesmen_app_new/screen/OrderScreen/categories_screen.dart';
 import 'package:salesmen_app_new/screen/deliveryScreen/deliveryScreen.dart';
 import 'package:salesmen_app_new/screen/ledgerScreen/ledgerScreen.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
+import 'package:salesmen_app_new/screen/offerCategoryScreen/categories_screen.dart';
 import 'package:salesmen_app_new/screen/other/other.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentScreen.dart';
+import 'package:salesmen_app_new/screen/tradingAddItems/add_items_screen.dart';
 
 class CheckInScreen extends StatefulWidget {
-  CustomerModel shopDetails;double distance;
-  CheckInScreen({this.shopDetails,this.distance});
+  CustomerModel shopDetails;
+  double distance;
+  CheckInScreen({this.shopDetails, this.distance});
 
   @override
   _CheckInScreenState createState() => _CheckInScreenState();
@@ -49,9 +52,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
     getAllSearchProduct();
     //getMainDeliveryDetails();
   }
+
   void getAllSearchProduct() async {
     try {
-      List<ProductModel>searchProduct=[];
+      List<ProductModel> searchProduct = [];
       setLoading(true);
       var response = await OnlineDatabase.getAllproductsubcategory(
           subTypeId: "", maintypeId: "");
@@ -66,26 +70,28 @@ class _CheckInScreenState extends State<CheckInScreen> {
           for (var item in datalist) {
             searchProduct.add(ProductModel.fromJson(item));
           }
-          List<String> sub=[];
-          for(var i in searchProduct){
-           sub.add( i.productSubType);
+          List<String> sub = [];
+          for (var i in searchProduct) {
+            sub.add(i.productSubType);
           }
-          print("sub length:"+ sub.length.toString());
-          print("subset length:"+ sub.toSet().length.toString());
-          List<List<ProductModel>> pp=[];
-          List<ProductModel> ppp=[];
-          for(var ii in sub.toSet()){
-            for(var jj in searchProduct){
-              if(ii == jj.productSubType){
+          print("sub length:" + sub.length.toString());
+          print("subset length:" + sub.toSet().length.toString());
+          List<List<ProductModel>> pp = [];
+          List<ProductModel> ppp = [];
+          for (var ii in sub.toSet()) {
+            for (var jj in searchProduct) {
+              if (ii == jj.productSubType) {
                 ppp.add(jj);
               }
             }
             pp.add(ppp);
             ppp.clear();
           }
-          Provider.of<CustomerList>(context,listen: false).clearProductSearchList();
-          Provider.of<CustomerList>(context,listen: false).addSearchProduct(searchProduct);
-          Provider.of<CustomerList>(context,listen: false).addProductItem(pp);
+          Provider.of<CustomerList>(context, listen: false)
+              .clearProductSearchList();
+          Provider.of<CustomerList>(context, listen: false)
+              .addSearchProduct(searchProduct);
+          Provider.of<CustomerList>(context, listen: false).addProductItem(pp);
           setLoading(false);
         } else {
           setLoading(false);
@@ -125,13 +131,14 @@ class _CheckInScreenState extends State<CheckInScreen> {
       print('exception is' + e.toString() + stack.toString());
       setLoading(false);
       Fluttertoast.showToast(
-          msg: "Error: "+e.toString(),
+          msg: "Error: " + e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
           fontSize: 16.0);
     }
   }
+
   void getCustomerTransactionData() async {
     setLoading(true);
     try {
@@ -161,41 +168,48 @@ class _CheckInScreenState extends State<CheckInScreen> {
             textColor: Colors.white,
             fontSize: 16.0);
         setLoading(false);
-
       }
     } catch (e, stack) {
       print('exception is' + e.toString());
       Fluttertoast.showToast(
-          msg: "Error: "+e.toString(),
+          msg: "Error: " + e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
           fontSize: 16.0);
       setLoading(false);
-
     }
   }
-  getSliderImage()async{
-    List<Widget> imageContainer=[];
-    Uri url=Uri.parse("https://suqexpress.com/api/getsliderimages");
-    var response= await http.get(url).then((response) {
+
+  getSliderImage() async {
+    List<Widget> imageContainer = [];
+    Uri url = Uri.parse("https://suqexpress.com/api/getsliderimages");
+    var response = await http.get(url).then((response) {
       print(response.body);
-      if(response.statusCode==200){
-        var data=jsonDecode(utf8.decode(response.bodyBytes));
-        var item=data['data'];
-        for (var image in item){
-          var temp=ClipRRect(
+      if (response.statusCode == 200) {
+        var data = jsonDecode(utf8.decode(response.bodyBytes));
+        var item = data['data'];
+        for (var image in item) {
+          var temp = ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(image['url'],fit: BoxFit.fill,cacheHeight: 200,width: 500,filterQuality: FilterQuality.low,),
+            child: Image.network(
+              image['url'],
+              fit: BoxFit.fill,
+              cacheHeight: 200,
+              width: 500,
+              filterQuality: FilterQuality.low,
+            ),
           );
           print(image["url"]);
           imageContainer.add(temp);
-          Provider.of<CustomerList>(context,listen: false).clearSliderImage();
-          Provider.of<CustomerList>(context,listen: false).sliderPicture(imageContainer);
+          Provider.of<CustomerList>(context, listen: false).clearSliderImage();
+          Provider.of<CustomerList>(context, listen: false)
+              .sliderPicture(imageContainer);
         }
       }
     });
   }
+
   void getAllProductCategory() async {
     try {
       var response = await OnlineDatabase.getAllCategories();
@@ -203,15 +217,15 @@ class _CheckInScreenState extends State<CheckInScreen> {
       //print("Response is" + response .toString());
       if (response.statusCode == 200) {
         var data = jsonDecode(utf8.decode(response.bodyBytes));
-        List<ProductModel>  product = [];
+        List<ProductModel> product = [];
         var datalist = data['results'];
         // print("data is "+datalist.toString());
         if (datalist.isNotEmpty) {
           for (var item in datalist) {
             product.add(ProductModel.getProductMainCategory(item));
           }
-          Provider.of<CustomerList>(context,listen: false).clearProductList();
-          Provider.of<CustomerList>(context,listen: false).addProduct(product);
+          Provider.of<CustomerList>(context, listen: false).clearProductList();
+          Provider.of<CustomerList>(context, listen: false).addProduct(product);
         } else {
           Fluttertoast.showToast(
               msg: "Product not found",
@@ -246,130 +260,142 @@ class _CheckInScreenState extends State<CheckInScreen> {
     } catch (e, stack) {
       print('exception is' + e.toString() + stack.toString());
       Fluttertoast.showToast(
-          msg: "Error: "+e.toString(),
+          msg: "Error: " + e.toString(),
           toastLength: Toast.LENGTH_SHORT,
           backgroundColor: Colors.black87,
           textColor: Colors.white,
           fontSize: 16.0);
     }
   }
-  calculateDistance(double lat,double long)async{
+
+  calculateDistance(double lat, double long) async {
     Location location = new Location();
     var _location = await location.getLocation();
     print(_location.latitude);
     print(_location.longitude);
     var distance = geo.Geolocator.distanceBetween(
-        _location.latitude, _location.longitude,
-        lat, long);
+        _location.latitude, _location.longitude, lat, long);
     return distance;
   }
-  void showDistance()async{
-      if (widget.distance > 100) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.INFO,
-          animType: AnimType.BOTTOMSLIDE,
-          title: widget.distance.toStringAsFixed(0) + " m",
-          desc: "Dukan ki location update karo warna fuel expense nahi milega.",
-          btnOkText: "Update",
-          btnCancelText: "Ok",
-          dismissOnTouchOutside: false,
-          btnCancelOnPress: () {},
-          btnOkOnPress: () async {
-            var response = await OnlineDatabase.getSingleCustomer(
-                widget.shopDetails.customerCode);
-            print("Response is" + response.statusCode.toString());
-            if (response.statusCode == 200) {
-              var data = jsonDecode(utf8.decode(response.bodyBytes));
-              // print("Response is" + data.toString());
-              var userDetail = CustomerModel.fromModel(data['results'][0]);
-              Provider.of<CustomerList>(context,listen: false).myCustomer(userDetail);
 
-              print(userDetail.editable);
+  void showDistance() async {
+    if (widget.distance > 100) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.INFO,
+        animType: AnimType.BOTTOMSLIDE,
+        title: widget.distance.toStringAsFixed(0) + " m",
+        desc: "Dukan ki location update karo warna fuel expense nahi milega.",
+        btnOkText: "Update",
+        btnCancelText: "Ok",
+        dismissOnTouchOutside: false,
+        btnCancelOnPress: () {},
+        btnOkOnPress: () async {
+          var response = await OnlineDatabase.getSingleCustomer(
+              widget.shopDetails.customerCode);
+          print("Response is" + response.statusCode.toString());
+          if (response.statusCode == 200) {
+            var data = jsonDecode(utf8.decode(response.bodyBytes));
+            // print("Response is" + data.toString());
+            var userDetail = CustomerModel.fromModel(data['results'][0]);
+            Provider.of<CustomerList>(context, listen: false)
+                .myCustomer(userDetail);
 
-              if ("Y" == 'Y') {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            EditShopScreen(
-                              shopData: widget.shopDetails,
-                            )));
-              } else {
-                Fluttertoast.showToast(
-                    msg: "Edit not allowed. Call to open edit shop",
-                    toastLength: Toast.LENGTH_SHORT,
-                    backgroundColor: Colors.black87,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-                showDistance();
-              }
-            }
-            else if (response.statusCode != 200) {
-              var data = jsonDecode(utf8.decode(response.bodyBytes));
-              setLoading(false);
+            print(userDetail.editable);
+
+            if ("Y" == 'Y') {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => EditShopScreen(
+                            shopData: widget.shopDetails,
+                          )));
+            } else {
               Fluttertoast.showToast(
-                  msg: "Internet Issue",
+                  msg: "Edit not allowed. Call to open edit shop",
                   toastLength: Toast.LENGTH_SHORT,
                   backgroundColor: Colors.black87,
                   textColor: Colors.white,
                   fontSize: 16.0);
+              showDistance();
             }
-          },
-        )
-          ..show();
-      }
-
+          } else if (response.statusCode != 200) {
+            var data = jsonDecode(utf8.decode(response.bodyBytes));
+            setLoading(false);
+            Fluttertoast.showToast(
+                msg: "Internet Issue",
+                toastLength: Toast.LENGTH_SHORT,
+                backgroundColor: Colors.black87,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+        },
+      )..show();
+    }
   }
-  void getCustomer()async {
-    var response = await OnlineDatabase.getSingleCustomer(
-        widget.shopDetails.customerCode);
+
+  void getCustomer() async {
+    var response =
+        await OnlineDatabase.getSingleCustomer(widget.shopDetails.customerCode);
     print("Response is" + response.statusCode.toString());
     if (response.statusCode == 200) {
       var data = jsonDecode(utf8.decode(response.bodyBytes));
       // print("Response is" + data.toString());
       var userDetail = CustomerModel.fromModel(data['results'][0]);
-      var cc= Provider.of<CustomerList>(context, listen: false).myCustomer(userDetail);
+      var cc = Provider.of<CustomerList>(context, listen: false)
+          .myCustomer(userDetail);
       print(userDetail);
     }
   }
 
   // Delivery Api`s
-  Future<bool>_willPopScope(){
-    Provider.of<AddToCartModel>(context,listen: false).cartClear();
-    Provider.of<CartModel>(context,listen:false).clearCart();
+  Future<bool> _willPopScope() {
+    Provider.of<AddToCartModel>(context, listen: false).cartClear();
+    Provider.of<CartModel>(context, listen: false).clearCart();
     return Navigator.push(
         context, MaterialPageRoute(builder: (_) => MainScreen()));
   }
 
-
   @override
   Widget build(BuildContext context) {
-    CustomerModel myCustomer=Provider.of<CustomerList>(context).singleCustomer;
-    WalletCapacity wallet=Provider.of<WalletCapacity>(context);
+    CustomerModel myCustomer =
+        Provider.of<CustomerList>(context).singleCustomer;
+    WalletCapacity wallet = Provider.of<WalletCapacity>(context);
     var media = MediaQuery.of(context).size;
     double height = media.height;
     double width = media.width;
     return WillPopScope(
-      onWillPop:_willPopScope ,
+      onWillPop: _willPopScope,
       child: Stack(
         children: [
           Scaffold(
             floatingActionButton: FloatingActionButton.extended(
-              tooltip: "Mechanic",
+              tooltip: "Add Item",
               autofocus: true,
               backgroundColor: themeColor1,
-              label:Row(
+              label: Row(
                 children: [
-                  Text("Mechanic",style: TextStyle(color: Colors.white),),
-                  SizedBox(width: 15,),
-                  Icon(Icons.arrow_forward,color: Colors.white,),
+                  Text(
+                    "Add Item",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                  ),
                 ],
-              ) ,
-              onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MechanicScreen(customerModel:myCustomer ,))),),
+              ),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddItemsScreen())),
+            ),
             appBar: MyAppBar(
               title: 'Check-In',
-              ontap: () =>_willPopScope(),
+              ontap: () => _willPopScope(),
             ),
             body: SingleChildScrollView(
               child: Column(children: [
@@ -393,7 +419,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
-                              child: Image.asset("assets/icons/person.png",color: Colors.grey,),
+                              child: Image.asset(
+                                "assets/icons/person.png",
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ),
@@ -408,7 +437,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                 children: [
                                   // SizedBox(height: height*0.0055,),
                                   VariableText(
-                                    text: myCustomer.customerShopName.toString()
+                                    text: myCustomer.customerShopName
+                                        .toString()
                                         .toString(),
                                     //text: widget.shopDetails['name'],
                                     fontsize: 15, fontcolor: textcolorblack,
@@ -420,7 +450,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                   ),
                                   Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Expanded(
@@ -449,27 +479,39 @@ class _CheckInScreenState extends State<CheckInScreen> {
                             ),
                           ),
                         ),
-                            Column(
-                                      children: [
-                                        VariableText(
-                                          text: 'Outstanding',
-                                          fontsize: 14,
-                                          fontcolor: Colors.grey,
-                                          weight: FontWeight.w500,
-                                          fontFamily: fontRegular,
-                                        ),
-                                        SizedBox(height: width * 0.02,),
-                                        VariableText(
-                                          text: myCustomer.outStanding.toString()=="null"?"- -":
-                                          "Rs " + f.format(double.parse(myCustomer.outStanding.toString().length<5? myCustomer.outStanding.toString(): double.parse(myCustomer.outStanding).toStringAsFixed(2),)),
-
-                                          fontsize: 14,
-                                          fontcolor: textcolorblack,
-                                          weight: FontWeight.w500,
-                                          fontFamily: fontRegular,
-                                        ),
-                                      ],
-                                    ),
+                        Column(
+                          children: [
+                            VariableText(
+                              text: 'Outstanding',
+                              fontsize: 14,
+                              fontcolor: Colors.grey,
+                              weight: FontWeight.w500,
+                              fontFamily: fontRegular,
+                            ),
+                            SizedBox(
+                              height: width * 0.02,
+                            ),
+                            VariableText(
+                              text: myCustomer.outStanding.toString() == "null"
+                                  ? "- -"
+                                  : "Rs " +
+                                      f.format(double.parse(
+                                        myCustomer.outStanding
+                                                    .toString()
+                                                    .length <
+                                                5
+                                            ? myCustomer.outStanding.toString()
+                                            : double.parse(
+                                                    myCustomer.outStanding)
+                                                .toStringAsFixed(2),
+                                      )),
+                              fontsize: 14,
+                              fontcolor: textcolorblack,
+                              weight: FontWeight.w500,
+                              fontFamily: fontRegular,
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -522,9 +564,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                   ),
                                   Spacer(),
                                   VariableText(
-                                    text:wallet.capacity.toString()=="null"?"- -": "Rs. " +
-                                        f.format(double.parse(wallet.capacity.toString().length<5?wallet.capacity.toString(): wallet.capacity.toStringAsFixed(2),)),
-
+                                    text: wallet.capacity.toString() == "null"
+                                        ? "- -"
+                                        : "Rs. " +
+                                            f.format(double.parse(
+                                              wallet.capacity
+                                                          .toString()
+                                                          .length <
+                                                      5
+                                                  ? wallet.capacity.toString()
+                                                  : wallet.capacity
+                                                      .toStringAsFixed(2),
+                                            )),
                                     fontsize: 14,
                                     fontcolor: Color(0xff1F92F6),
                                     weight: FontWeight.w500,
@@ -550,9 +601,20 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                   ),
                                   Spacer(),
                                   VariableText(
-                                    text:wallet.usedBalance.toString()=="null"?"- -":
-                                    "Rs " + f.format(double.parse(wallet.usedBalance.toString().length<5? wallet.usedBalance.toString(): wallet.usedBalance.toStringAsFixed(2),)),
-
+                                    text:
+                                        wallet.usedBalance.toString() == "null"
+                                            ? "- -"
+                                            : "Rs " +
+                                                f.format(double.parse(
+                                                  wallet.usedBalance
+                                                              .toString()
+                                                              .length <
+                                                          5
+                                                      ? wallet.usedBalance
+                                                          .toString()
+                                                      : wallet.usedBalance
+                                                          .toStringAsFixed(2),
+                                                )),
                                     fontsize: 14,
                                     fontcolor: textcolorblack,
                                     weight: FontWeight.w500,
@@ -574,9 +636,19 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                   ),
                                   Spacer(),
                                   VariableText(
-                                    text:wallet.availableBalance.toString()=="null"?"- -":
-                                    "Rs. " +
-                                        f.format(double.parse(wallet.availableBalance.toString().length<5?wallet.availableBalance.toString(): wallet.availableBalance.toStringAsFixed(2))),
+                                    text: wallet.availableBalance.toString() ==
+                                            "null"
+                                        ? "- -"
+                                        : "Rs. " +
+                                            f.format(double.parse(wallet
+                                                        .availableBalance
+                                                        .toString()
+                                                        .length <
+                                                    5
+                                                ? wallet.availableBalance
+                                                    .toString()
+                                                : wallet.availableBalance
+                                                    .toStringAsFixed(2))),
                                     fontsize: 14,
                                     fontcolor: themeColor1,
                                     weight: FontWeight.w500,
@@ -713,8 +785,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) => CategoriesScreen(
-                                              )));
+                                              builder: (_) =>
+                                                  CategoriesScreen()));
                                     },
                                     text: 'Orders',
                                     image: 'assets/icons/order.png',
@@ -730,7 +802,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => DeliveryScreen(shopDetails: myCustomer,)));
+                                              builder: (context) =>
+                                                  DeliveryScreen(
+                                                    shopDetails: myCustomer,
+                                                  )));
                                     },
                                     text: 'Delivery',
                                     image: 'assets/icons/delivery.png',
@@ -750,8 +825,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) => PaymentScreen(
-                                              )));
+                                              builder: (_) => PaymentScreen()));
                                     },
                                     text: 'Payment',
                                     image: 'assets/icons/paymentcard.png',
@@ -767,7 +841,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) => LedgerScreen(balance: wallet.availableBalance.toString(),shopDetails: myCustomer,)));
+                                              builder: (_) => LedgerScreen(
+                                                    balance: wallet
+                                                        .availableBalance
+                                                        .toString(),
+                                                    shopDetails: myCustomer,
+                                                  )));
                                     },
                                     text: 'Ledger',
                                     image: 'assets/icons/ledger.png',
@@ -823,6 +902,58 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                     text: 'Others',
                                     image: 'assets/icons/other.png',
                                     containerColor: Color(0xffE91F22),
+                                  )),
+                            ],
+                          ),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          Row(
+                            children: [
+                              //  Expanded(
+                              // //     flex: 1,
+                              // //     child: CustomCheckInContainer(
+                              // //       onTap: () {
+                              // //         AwesomeDialog(
+                              // //           context: context,
+                              // //           dialogType: DialogType.INFO,
+                              // //           animType: AnimType.BOTTOMSLIDE,
+                              // //           title: 'No access',
+                              // //           btnOkOnPress: () {},
+                              // //         )..show();
+                              // //         // Navigator.push(
+                              // //         //     context,
+                              // //         //     MaterialPageRoute(
+                              // //         //         builder: (_) => ReturnScreen(
+                              // //         //               returncartData:
+                              // //         //                   returncartData,
+                              // //         //               shopDetails:
+                              // //         //                   widget.shopDetails,
+                              // //         //               lat: widget.lat,
+                              // //         //               long: widget.long,
+                              // //         //               product: product,
+                              // //         //             )));
+                              // //       },
+                              // //       text: 'Return',
+                              // //       image: 'assets/icons/return.png',
+                              // //       containerColor: Color(0xffF2C94C),
+                              // //     )),
+                              // SizedBox(
+                              //   width: height * 0.01,
+                              // ),
+                              Expanded(
+                                  flex: 1,
+                                  child: CustomCheckInContainer(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  OfferCategoryScreen()));
+                                    },
+                                    text: 'Offer',
+                                    image: 'assets/images/offer.png',
+                                    containerColor: Color(0xffCAC9DB),
                                   )),
                             ],
                           ),

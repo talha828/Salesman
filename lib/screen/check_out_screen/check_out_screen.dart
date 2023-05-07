@@ -61,7 +61,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
           title: 'Order Post Successfully',
           desc: 'Your Order post Successfully return to main screen',
           btnOkOnPress: () {
-            Get.to(MainScreen());
+            Get.to(CheckInScreen());
           },
         ).show();
         setLoading(false);
