@@ -407,6 +407,7 @@ class OnlineDatabase{
     final response=await http.get(url);
     return response;
   }
+
   static Future<dynamic> getAllCategories() async {
     //var url=Uri.parse(getProductListUrl+'?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=+923002233297&pin_password=654321&pin_itemtype=');
     var url=Uri.parse(directory+'getmainitemtypes?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_itemtype=&pin_app_for=');
@@ -815,4 +816,12 @@ class OnlineDatabase{
   }
 
 /////// offers apis ////////
+
+/////  main category /////
+  static Future<dynamic> getMainCategory()async{
+    var url=Uri.parse('http://api.visionsoft-pk.com:8181/ords/skr2/app/getlogin?pin_cmp=20&pin_kp=A&pin_keyword1=6731&pin_keyword2=U09Z&pin_userid=$phoneNumber&pin_password=$password&pin_longitude=123&pin_latitude=456&pin_version=011222&pin_version_check=N');
+    print('getcat url is'+url.toString());
+    var response=await http.get(url);
+    return response;
+  }
 }

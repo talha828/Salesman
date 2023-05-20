@@ -19,6 +19,7 @@ import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class CustomerCard extends StatefulWidget {
   CustomerCard({
     this.height,
@@ -258,16 +259,30 @@ class _CustomerCardState extends State<CustomerCard> {
             height: widget.height * 0.0075,
           ),
           InkWell(
-            // onTap: () {
-            //   if (widget.customerData.customerinfo.isNotEmpty) {
-            //     renderDeletePopup(context, widget.height,
-            //         widget.width, widget.customerData);
-            //   } else {
-            //     Fluttertoast.showToast(
-            //         msg: "No Information found..",
-            //         toastLength: Toast.LENGTH_LONG);
-            //   }
-            // },
+            onTap: () async {
+              widget.showLoading(true);
+              var response =
+                  await OnlineDatabase.getSingleCustomer(widget.code);
+              print("Response is" + response.statusCode.toString());
+              if (response.statusCode == 200) {
+                var data = jsonDecode(utf8.decode(response.bodyBytes));
+                // print("Response is" + data.toString());
+                var userDetail = CustomerModel.fromModel(data['results'][0],distance: 0.00);
+                var cc = Provider.of<CustomerList>(context, listen: false)
+                    .myCustomer(userDetail);
+                print(userDetail);
+                if (userDetail.customerinfo.isNotEmpty) {
+                  widget.showLoading(false);
+                  renderDeletePopup(context, widget.height,
+                      widget.width, userDetail);
+                } else {
+                  widget.showLoading(false);
+                  Fluttertoast.showToast(
+                      msg: "No Information found..",
+                      toastLength: Toast.LENGTH_LONG);
+                }
+              }
+            },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -394,12 +409,14 @@ class _CustomerCardState extends State<CustomerCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         InkWell(
-                          onTap:()async{
-                            if(widget.phoneNo.length > 12){
+                          onTap: () async {
+                            if (widget.phoneNo.length > 12) {
                               var whatsapp = widget.phoneNo.substring(1);
-                              var whatsappAndroid =Uri.parse("whatsapp://send?phone=$whatsapp&text=hello");
+                              var whatsappAndroid = Uri.parse(
+                                  "whatsapp://send?phone=$whatsapp&text=hello");
 
-                                await launch("whatsapp://send?phone=$whatsapp&text=");
+                              await launch(
+                                  "whatsapp://send?phone=$whatsapp&text=");
                               // } else {
                               //   ScaffoldMessenger.of(context).showSnackBar(
                               //     const SnackBar(
@@ -410,7 +427,7 @@ class _CustomerCardState extends State<CustomerCard> {
                               // FlutterOpenWhatsapp.sendSingleMessage(widget.phoneNo.substring(1), "Dues amount: ${widget.outstanding}").catchError((e){
                               //   print("whatsapp error: "+e.toString());
                               // });
-                            }else{
+                            } else {
                               AwesomeDialog(
                                 context: context,
                                 dialogType: DialogType.ERROR,
@@ -430,12 +447,25 @@ class _CustomerCardState extends State<CustomerCard> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: widget.width * 0.01,horizontal:widget.width * 0.02 ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: widget.width * 0.01,
+                                  horizontal: widget.width * 0.02),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  FaIcon(FontAwesomeIcons.whatsapp,size: widget.width * 0.035,color: themeColor1,),
-                                  Text("WhatsApp",style: TextStyle(fontSize: widget.width * 0.03,color: themeColor1,fontWeight: FontWeight.w100),),
+                                  FaIcon(
+                                    FontAwesomeIcons.whatsapp,
+                                    size: widget.width * 0.035,
+                                    color: themeColor1,
+                                  ),
+                                  Text(
+                                    "WhatsApp",
+                                    style: TextStyle(
+                                        fontSize: widget.width * 0.03,
+                                        color: themeColor1,
+                                        fontWeight: FontWeight.w100),
+                                  ),
                                 ],
                               ),
                             ),
@@ -511,8 +541,8 @@ class _CustomerCardState extends State<CustomerCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         InkWell(
-                          onTap:()async{
-                            if(widget.phoneNo.length > 12){
+                          onTap: () async {
+                            if (widget.phoneNo.length > 12) {
                               var whatsapp = widget.phoneNo;
                               // var whatsappAndroid =Uri.parse("whatsapp://send?phone=$whatsapp&text=hello");
                               //
@@ -525,8 +555,10 @@ class _CustomerCardState extends State<CustomerCard> {
                               //   );
                               // }
                               // FlutterOpenWhatsapp.sendSingleMessage(widget.phoneNo.substring(1), "Dues amount: ${widget.outstanding}").catchError((e){print("whatsapp error: "+e.toString());});
-                              bool res = await FlutterPhoneDirectCaller.callNumber(whatsapp);
-                            }else{
+                              bool res =
+                                  await FlutterPhoneDirectCaller.callNumber(
+                                      whatsapp);
+                            } else {
                               AwesomeDialog(
                                 context: context,
                                 dialogType: DialogType.ERROR,
@@ -546,13 +578,26 @@ class _CustomerCardState extends State<CustomerCard> {
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: widget.width * 0.01,horizontal:widget.width * 0.02 ),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: widget.width * 0.01,
+                                  horizontal: widget.width * 0.02),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  FaIcon(FontAwesomeIcons.phone,size: widget.width * 0.035,color: themeColor1,),
+                                  FaIcon(
+                                    FontAwesomeIcons.phone,
+                                    size: widget.width * 0.035,
+                                    color: themeColor1,
+                                  ),
                                   //SizedBox(width: 5,),
-                                  Text("Call Now",style: TextStyle(fontSize: widget.width * 0.03,color: themeColor1,fontWeight: FontWeight.w100),),
+                                  Text(
+                                    "Call Now",
+                                    style: TextStyle(
+                                        fontSize: widget.width * 0.03,
+                                        color: themeColor1,
+                                        fontWeight: FontWeight.w100),
+                                  ),
                                 ],
                               ),
                             ),
@@ -737,18 +782,20 @@ class _CustomerCardState extends State<CustomerCard> {
                                 color: index == 0 ? themeColor1 : themeColor2,
                                 borderRadius: BorderRadius.circular(5),
                                 border: Border.all(
-                                    color: index == 0 ?
-                                    themeColor1
-                                        : widget.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400]
-                                )),
+                                    color: index == 0
+                                        ? themeColor1
+                                        : widget.shopAssigned == 'Yes'
+                                            ? themeColor1
+                                            : Colors.grey[400])),
                             child: Center(
                               child: VariableText(
                                 text: widget.menuButton[index],
                                 fontsize: 11,
-                                fontcolor:
-                                index == 0
+                                fontcolor: index == 0
                                     ? themeColor2
-                                    : widget.shopAssigned == 'Yes' ? themeColor1 : Colors.grey[400],
+                                    : widget.shopAssigned == 'Yes'
+                                        ? themeColor1
+                                        : Colors.grey[400],
                                 weight: FontWeight.w700,
                               ),
                             ),

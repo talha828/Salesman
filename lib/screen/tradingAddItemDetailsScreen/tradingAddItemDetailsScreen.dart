@@ -16,7 +16,6 @@ import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/checkinScreen/checkin_screen.dart';
 import 'package:salesmen_app_new/screen/tredingProductScreen/treding_product_screen.dart';
 
-
 class TradingAddProductDetails extends StatefulWidget {
   Results results;
   TradingAddProductDetails({this.results, Key key}) : super(key: key);
@@ -42,8 +41,8 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
   }
 
   postData(String custCode) async {
-    if (qty.text.isNotEmpty ) {
-      if (rate.text.isNotEmpty){
+    if (qty.text.isNotEmpty) {
+      if (rate.text.isNotEmpty) {
         setLoading(true);
         var location = await Location().getLocation();
         var response = await OnlineDatabase.postOffer(
@@ -52,7 +51,7 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
           qty: qty.text,
           rate: rate.text,
           MRP: mrp.text,
-          expire: date == "Expire Date"?"":date,
+          expire: date == "Expire Date" ? "" : date,
           lat: location.latitude.toString(),
           long: location.longitude.toString(),
         );
@@ -113,8 +112,8 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                       end: Alignment.topRight,
                       begin: Alignment.bottomLeft,
                       colors: <Color>[
-                        themeColor1,
-                        themeColor1,
+                        const Color(0xFF22E774),
+                        const Color(0xFF0C9933),
                       ]),
                 ),
               ),
@@ -122,7 +121,8 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
             body: SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    vertical: width * 0.04, ),
+                  vertical: width * 0.04,
+                ),
                 child: Column(
                   children: [
                     ProductTile(
@@ -131,20 +131,21 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                       additem: false,
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.04 ),
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.04),
                       child: Column(
                         children: [
                           SizedBox(
                             height: width * 0.08,
                           ),
                           MyTextField(
-                            textInputType: TextInputType.numberWithOptions(decimal: true),
+                            textInputType:
+                                TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}')),
                             ],
                             obscureText: false,
                             controller: qty,
-
                             hintText: "Ex. 9",
                             labelText: "Quantity",
                           ),
@@ -152,9 +153,11 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                             height: width * 0.04,
                           ),
                           MyTextField(
-                            textInputType: TextInputType.numberWithOptions(decimal: true),
+                            textInputType:
+                                TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}')),
                             ],
                             obscureText: false,
                             controller: rate,
@@ -165,9 +168,11 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                             height: width * 0.04,
                           ),
                           MyTextField(
-                            textInputType: TextInputType.numberWithOptions(decimal: true),
+                            textInputType:
+                                TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}')),
                             ],
                             obscureText: false,
                             controller: mrp,
@@ -202,7 +207,9 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                                   //TODO: handle selected date
                                   if (selectedDate != null) {
                                     setState(() {
-                                      date = selectedDate.toString().substring(0, 10);
+                                      date = selectedDate
+                                          .toString()
+                                          .substring(0, 10);
                                     });
                                   }
                                 });
@@ -211,9 +218,12 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                                   ignoring: true,
                                   child: MyTextField(
                                     obscureText: false,
-                                    textInputType: TextInputType.numberWithOptions(decimal: true),
+                                    textInputType:
+                                        TextInputType.numberWithOptions(
+                                            decimal: true),
                                     inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}')),
                                     ],
                                     controller: expire,
                                     hintText: "Ex. 12-13-2023",
@@ -231,16 +241,18 @@ class _TradingAddProductDetailsState extends State<TradingAddProductDetails> {
                                       begin: Alignment.topRight,
                                       end: Alignment.bottomLeft,
                                       colors: [
-                                        themeColor1,
-                                        themeColor1,
+                                        const Color(0xFF22E774),
+                                        const Color(0xFF0C9933),
                                       ])),
                               alignment: Alignment.center,
                               padding: EdgeInsets.symmetric(
-                                  vertical: width * 0.04, horizontal: width * 0.04),
+                                  vertical: width * 0.04,
+                                  horizontal: width * 0.04),
                               child: Text(
                                 "Submit",
                                 style: TextStyle(
-                                    color: Colors.white, fontWeight: FontWeight.bold),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           )
@@ -287,8 +299,10 @@ class _GreenLoadingState extends State<GreenLoading>
         //print("val: "+_cont.value.toString());
       });
     });
-    ColorTween col =
-        ColorTween(begin: themeColor1, end: themeColor1);
+    ColorTween col = ColorTween(
+      begin: Color(0xFF22E774),
+      end: Color(0xFF0C9933),
+    );
     _anim = col.animate(_cont);
     _cont.repeat(reverse: true);
     super.initState();

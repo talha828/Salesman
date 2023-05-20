@@ -83,8 +83,8 @@ class _TradingProductScreenState extends State<TradingProductScreen> {
                   end: Alignment.topRight,
                   begin: Alignment.bottomLeft,
                   colors: <Color>[
-                   themeColor1,
-                   themeColor1,
+                    const Color(0xFF22E774),
+                    const Color(0xFF0C9933),
                   ]),
             ),
           ),
@@ -241,8 +241,8 @@ class ProductTile extends StatelessWidget {
     end: Alignment.topRight,
     begin: Alignment.bottomLeft,
     colors: <Color>[
-       themeColor1,
-       themeColor1,
+      const Color(0xFF22E774),
+      const Color(0xFF0C9933),
     ],
   ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
   @override
@@ -322,8 +322,8 @@ class ProductTile extends StatelessWidget {
                         end: Alignment.topRight,
                         begin: Alignment.bottomLeft,
                         colors: <Color>[
-                           themeColor1,
-                          themeColor1,
+                          const Color(0xFF22E774),
+                          const Color(0xFF0C9933),
                         ]),
                   ),
                   padding: EdgeInsets.symmetric(

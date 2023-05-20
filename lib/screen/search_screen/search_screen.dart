@@ -85,8 +85,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   end: Alignment.topRight,
                   begin: Alignment.bottomLeft,
                   colors: <Color>[
-                    themeColor1,
-                    themeColor1,
+                    const Color(0xFF22E774),
+                    const Color(0xFF0C9933),
                   ]),
             ),
           ),

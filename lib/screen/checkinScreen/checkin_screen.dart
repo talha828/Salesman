@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ import 'package:salesmen_app_new/screen/offerCategoryScreen/categories_screen.da
 import 'package:salesmen_app_new/screen/other/other.dart';
 import 'package:salesmen_app_new/screen/paymentScreen/paymentScreen.dart';
 import 'package:salesmen_app_new/screen/tradingAddItems/add_items_screen.dart';
+import 'package:salesmen_app_new/trading_profile_screen/trading_profile_screen.dart';
 
 class CheckInScreen extends StatefulWidget {
   CustomerModel shopDetails;
@@ -388,14 +390,40 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   ),
                 ],
               ),
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AddItemsScreen())),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddItemsScreen())),
             ),
-            appBar: MyAppBar(
-              title: 'Check-In',
-              ontap: () => _willPopScope(),
+            appBar: AppBar(
+              iconTheme: IconThemeData(color: textcolorblack),
+              elevation: 0.5,
+              backgroundColor: Colors.white,
+
+              leading: IconButton(
+                icon: new Image.asset(
+                  'assets/icons/ic_commonBackIcon.png',
+                  scale: 2.2,
+                ),
+                onPressed: () => _willPopScope(),
+              ), //Image.asset('assets/icons/ic_commonBackIcon.png', scale: 2.1,), //
+              titleSpacing: 0,
+              leadingWidth: 50,
+              title: VariableText(
+                text: 'Check-In',
+                fontsize: 16,
+                weight: FontWeight.w600,
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.map,
+                      color: Colors.grey,
+                    ),
+                    onPressed: ()=>Get.to(TradingProfileScreen(customerCode: myCustomer.customerCode,)),
+                  ),
+                )
+              ],
             ),
             body: SingleChildScrollView(
               child: Column(children: [

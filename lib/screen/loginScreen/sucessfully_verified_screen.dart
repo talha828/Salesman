@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
+import 'package:salesmen_app_new/screen/main_category_screen/main_category_screen.dart';
 
 import '../../others/common.dart';
 import '../../others/style.dart';
@@ -100,7 +101,7 @@ class _SucessFullyVerifiedScreenState extends State<SucessFullyVerifiedScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MainScreen(
+                  builder: (context) => MainCategoryScreen(
 
                       )));
           // var  userName = Provider.of<UserModel>(context, listen: false).userName;

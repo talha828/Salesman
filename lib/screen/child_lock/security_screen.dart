@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:salesmen_app_new/others/common.dart';
 import 'package:salesmen_app_new/others/style.dart';
 import 'package:salesmen_app_new/screen/mainScreen/mainScreen.dart';
+import 'package:salesmen_app_new/screen/main_category_screen/main_category_screen.dart';
 class SecurityScreen extends StatefulWidget {
   const SecurityScreen({Key key}) : super(key: key);
 
@@ -182,7 +183,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             SizedBox(height: height*0.05),
             LoginButton(text: "Done",onTap: (){
               if(dateCheck == code){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainCategoryScreen()));
               }else{
                 Fluttertoast.showToast(msg: "Incorrect password",toastLength: Toast.LENGTH_SHORT);
               }

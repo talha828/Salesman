@@ -178,8 +178,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                       end: Alignment.topRight,
                       begin: Alignment.bottomLeft,
                       colors: <Color>[
-                        themeColor1,
-                        themeColor1,
+                        const Color(0xFF22E774),
+                        const Color(0xFF0C9933),
                       ]),
                 ),
               ),
@@ -390,8 +390,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                 begin: Alignment.topRight,
                                 end: Alignment.bottomLeft,
                                 colors: [
-                                  themeColor1,
-                                  themeColor1,
+                                  const Color(0xFF22E774),
+                                  const Color(0xFF0C9933),
                                 ])),
                         alignment: Alignment.center,
                         padding: EdgeInsets.symmetric(

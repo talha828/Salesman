@@ -478,7 +478,13 @@ class _OfferCategoryScreenState extends State<OfferCategoryScreen> {
         padding: EdgeInsets.symmetric(horizontal: width * 0.03),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: themeColor1,
+            gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  const Color(0xFF22E774),
+                  const Color(0xFF0C9933),
+                ])
           //boxShadow: [BoxShadow(color:  Color.fromRGBO(31, 31, 31, 0.25),offset: Offset(0,0),blurRadius: 1.5)]
         ),
         child: Column(
